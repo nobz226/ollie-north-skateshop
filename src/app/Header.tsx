@@ -1,14 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { UserButton } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useConvexUser } from "@/hooks/useConvexUser";
+import { ShoppingCart } from "lucide-react";
 
 export default function Header() {
   const { convexUser } = useConvexUser();
+  
   const cart = useQuery(
     api.cart.getUserCart,
     convexUser ? { userId: convexUser._id } : "skip"
@@ -17,68 +18,100 @@ export default function Header() {
   const itemCount = cart?.reduce((sum, item) => sum + item.quantity, 0) || 0;
 
   return (
-    <header className="bg-[#3C2C25] text-white">
-      <nav className="container mx-auto px-8 py-6 flex justify-between items-center">
-        {/* Logo */}
-        <Link href="/" className="flex items-center">
-          <Image
-            src="/mojo-logo-white.svg"
-            alt="Mojo Coffee"
-            width={120}
-            height={60}
-            priority
-          />
-        </Link>
-
-        {/* Navigation Links */}
-        <div className="flex items-center gap-8">
-          <Link href="/" className="text-gray-300 hover:text-white transition">
-            Home
-          </Link>
-          <Link
-            href="/about"
-            className="text-gray-300 hover:text-white transition"
-          >
-            About Us
-          </Link>
-          <Link
-            href="/products"
-            className="text-gray-300 hover:text-white transition"
-          >
-            Products
-          </Link>
-          <Link
-            href="/cart"
-            className="text-gray-300 hover:text-white transition relative"
-          >
-            Cart
-            {itemCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                {itemCount}
-              </span>
-            )}
-          </Link>
-          <Link
-            href="/profile"
-            className="text-gray-300 hover:text-white transition"
-          >
-            Profile
+    <header className="border-b border-gray-200 bg-white sticky top-0 z-50">
+      <div className="container mx-auto px-4">
+        {/* Top bar */}
+        <div className="flex h-16 items-center justify-between">
+          {/* Logo */}
+          <Link href="/" className="flex items-center space-x-2">
+            <div className="text-2xl font-bold">OLLIE NORTH</div>
           </Link>
 
-          {/* Order Ahead Button */}
-          <Link
-            href="/products"
-            className="px-6 py-2 border-2 border-white text-white hover:bg-white hover:text-black transition rounded"
-          >
-            Order Ahead
-          </Link>
+          {/* Main Navigation */}
+          <nav className="hidden md:flex items-center space-x-8">
+            <Link
+              href="/"
+              className="text-sm font-medium hover:text-red-600 transition-colors"
+            >
+              HOME
+            </Link>
+            <Link
+              href="/boards"
+              className="text-sm font-medium hover:text-red-600 transition-colors"
+            >
+              BOARDS
+            </Link>
+            <Link
+              href="/hardware"
+              className="text-sm font-medium hover:text-red-600 transition-colors"
+            >
+              HARDWARE
+            </Link>
+            <Link
+              href="/apparel"
+              className="text-sm font-medium hover:text-red-600 transition-colors"
+            >
+              APPAREL
+            </Link>
+            <Link
+              href="/about"
+              className="text-sm font-medium hover:text-red-600 transition-colors"
+            >
+              ABOUT
+            </Link>
+          </nav>
 
-          {/* Login Button (UserButton replacement wrapper) */}
-          <div className="px-6 py-2 transition rounded flex items-center justify-center min-w-[80px]">
+          {/* Right side actions */}
+          <div className="flex items-center space-x-4">
+            <Link
+              href="/cart"
+              className="relative flex items-center text-gray-700 hover:text-red-600 transition-colors"
+            >
+              <ShoppingCart className="h-6 w-6" />
+              {itemCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {itemCount}
+                </span>
+              )}
+            </Link>
             <UserButton afterSignOutUrl="/sign-in" />
           </div>
         </div>
-      </nav>
+
+        {/* Mobile Navigation */}
+        <nav className="md:hidden flex items-center justify-around py-3 border-t border-gray-200">
+          <Link
+            href="/"
+            className="text-xs font-medium hover:text-red-600 transition-colors"
+          >
+            HOME
+          </Link>
+          <Link
+            href="/boards"
+            className="text-xs font-medium hover:text-red-600 transition-colors"
+          >
+            BOARDS
+          </Link>
+          <Link
+            href="/hardware"
+            className="text-xs font-medium hover:text-red-600 transition-colors"
+          >
+            HARDWARE
+          </Link>
+          <Link
+            href="/apparel"
+            className="text-xs font-medium hover:text-red-600 transition-colors"
+          >
+            APPAREL
+          </Link>
+          <Link
+            href="/about"
+            className="text-xs font-medium hover:text-red-600 transition-colors"
+          >
+            ABOUT
+          </Link>
+        </nav>
+      </div>
     </header>
   );
 }

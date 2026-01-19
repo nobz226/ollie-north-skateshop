@@ -5,76 +5,75 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="bg-[#4A3933] text-white py-12 px-4">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-          {/* Logo Section */}
-          <div className="flex flex-col items-start">
-            <div className="relative w-32 h-32 mb-2">
-              <Image
-                src="/mojo-logo-white.svg"
-                alt="Mojo Coffee"
-                fill
-                className="object-contain"
-              />
-            </div>
+    <footer className="bg-black text-white mt-20">
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          {/* About */}
+          <div>
+            <h3 className="text-lg font-bold mb-4">OLLIE NORTH</h3>
+            <p className="text-sm text-gray-400">
+              Your premier destination for quality skate gear. From complete boards to the smallest hardware, we got you covered.
+            </p>
           </div>
 
-          {/* Hours Section */}
+          {/* Shop */}
           <div>
-            <h3 className="text-xl font-semibold mb-4">Hours</h3>
-            <p className="text-gray-300 mb-2">Mon-Fri: 10am - 5pm</p>
-            <p className="text-gray-300">Sat-Sun: Closed</p>
-          </div>
-
-          {/* Contact Section */}
-          <div>
-            <h3 className="text-xl font-semibold mb-4">Contact</h3>
-            <a
-              href="mailto:hello@mojocoffeeblend.com"
-              className="text-gray-300 hover:text-white block mb-2"
-            >
-              hello@mojocoffeeblend.com
-            </a>
-            <a
-              href="tel:778-906-0044"
-              className="text-gray-300 hover:text-white block mb-2"
-            >
-              778-906-0044
-            </a>
-            <address className="text-gray-300 not-italic">
-              500 Robson St,
-              <br />
-              Vancouver, BC, V8T1J9
-            </address>
-          </div>
-
-          {/* Info Section */}
-          <div>
-            <h3 className="text-xl font-semibold mb-4">Info</h3>
-            <ul className="space-y-2">
+            <h3 className="text-lg font-bold mb-4">SHOP</h3>
+            <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/supply-chain" className="text-gray-300 hover:text-white">
-                  Supply chain
+                <Link href="/boards" className="text-gray-400 hover:text-red-500 transition-colors">
+                  Boards
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="text-gray-300 hover:text-white">
-                  Privacy Policy
+                <Link href="/hardware" className="text-gray-400 hover:text-red-500 transition-colors">
+                  Hardware
                 </Link>
               </li>
               <li>
-                <Link href="/shipping" className="text-gray-300 hover:text-white">
-                  Shipping & Refund
-                </Link>
-              </li>
-              <li>
-                <Link href="/terms" className="text-gray-300 hover:text-white">
-                  Terms & Conditions
+                <Link href="/apparel" className="text-gray-400 hover:text-red-500 transition-colors">
+                  Apparel
                 </Link>
               </li>
             </ul>
           </div>
+
+          {/* Info */}
+          <div>
+            <h3 className="text-lg font-bold mb-4">INFO</h3>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link href="/about" className="text-gray-400 hover:text-red-500 transition-colors">
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/profile" className="text-gray-400 hover:text-red-500 transition-colors">
+                  My Account
+                </Link>
+              </li>
+              <li>
+                <Link href="/cart" className="text-gray-400 hover:text-red-500 transition-colors">
+                  Shopping Cart
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Contact */}
+          <div>
+            <h3 className="text-lg font-bold mb-4">CONTACT</h3>
+            <ul className="space-y-2 text-sm text-gray-400">
+              <li>123 Skate Street</li>
+              <li>Venice Beach, CA 90291</li>
+              <li>Phone: (555) 123-4567</li>
+              <li>Email: shop@ollienorth.com</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
+          <p>&copy; {new Date().getFullYear()} Ollie North Skateshop. All rights reserved.</p>
         </div>
       </div>
     </footer>

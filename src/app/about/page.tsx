@@ -1,124 +1,115 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import Header from "../Header";
+import Footer from "../Footer";
 
 export default function AboutPage() {
   return (
-    <div>
-      {/* Hero Section */}
-      <div className="relative h-[60vh] overflow-hidden">
-        <Image
-          src="/coffeebeans.png"
-          alt="Coffee beans background"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-black/40" />
-        <div className="relative z-10 h-full flex items-center justify-center px-4">
-          <h1 className="text-5xl md:text-6xl font-bold text-white text-center">
-            Inspired by the World,<br />
-            Brewed with Love
-          </h1>
-        </div>
-      </div>
+    <div className="min-h-screen flex flex-col">
+      <Header />
 
-      {/* Our Story Section - Text Left, Image Right */}
-      <div className="bg-[#E8D5C4] py-20 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">Our Story</h2>
-              <p className="text-lg text-gray-800 leading-relaxed">
-                At Mojo Coffee Blend, every cup has a story tied to tradition, 
-                taste, and culture that unites people. Our cafe was envisioned to 
-                bring the heart of global coffee culture to a single welcoming space. 
-                From the aroma of freshly roasted beans to the first warm sip, Mojo 
-                captures the essence of what coffee is truly about: connection, care, 
-                and creativity.
-              </p>
-            </div>
-            <div className="relative h-96 rounded-lg overflow-hidden">
-              <Image
-                src="/about1.jpeg"
-                alt="Our Story"
-                fill
-                className="object-cover"
-              />
-            </div>
+      <main className="flex-grow">
+        {/* Hero Section */}
+        <section className="relative h-96 bg-black text-white">
+          <Image
+            src="https://images.unsplash.com/photo-1547447134-cd3f5c716030?w=1600"
+            alt="Skateboarding"
+            fill
+            className="object-cover opacity-40"
+          />
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+            <h1 className="text-5xl md:text-6xl font-bold mb-4">ABOUT US</h1>
+            <p className="text-xl max-w-2xl">
+              Fueling the skate scene since day one
+            </p>
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* Our Coffee Section - Image Left, Text Right */}
-      <div className="bg-[#E8D5C4] py-20 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="relative h-96 rounded-lg overflow-hidden order-2 lg:order-1">
-              <Image
-                src="/about2.jpeg"
-                alt="Our Coffee"
-                fill
-                className="object-cover"
-              />
-            </div>
-            <div className="order-1 lg:order-2">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">Our Coffee</h2>
-              <p className="text-lg text-gray-800 leading-relaxed">
-                Our passion for coffee starts at its source. We import from responsible 
-                farms around the world to bring you beans that are grown to last, chosen 
-                for their quality. Each blend announces its unique origin: full-bodied and 
-                bold, smooth and balanced, or floral fragrant. We roast each batch in 
-                small batches to ensure freshness and to highlight the natural traits that 
-                makes each coffee special. However you take it — a rich espresso, a creamy 
-                latte, or a cold brew that steeped slowly — Mojo Coffee Blend is designed 
-                to craft each cup into a soothing ritual.
+        {/* Our Story */}
+        <section className="container mx-auto px-4 py-20">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-4xl font-bold mb-8 text-center">OUR STORY</h2>
+            <div className="space-y-6 text-gray-700 leading-relaxed">
+              <p>
+                Founded by skaters, for skaters, Ollie North Skateshop started as a
+                small garage operation in Venice Beach. What began as a passion
+                project to provide quality gear to the local skate community has
+                grown into a trusted destination for riders across the country.
+              </p>
+              <p>
+                We believe skateboarding is more than just a sport—it's a
+                lifestyle, a form of self-expression, and a community that welcomes
+                everyone. Whether you're landing your first ollie or sending it down
+                a 12-stair, we're here to support your journey with the best gear
+                and expertise.
+              </p>
+              <p>
+                Every product we stock is tested by our team of riders. We don't
+                just sell skateboards; we ride them, break them in, and push them to
+                their limits. That's how we know what works and what doesn't.
               </p>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* Our Reason Section - Text Left, Image Right */}
-      <div className="bg-[#E8D5C4] py-20 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">Our Reason</h2>
-              <p className="text-lg text-gray-800 leading-relaxed">
-                Mojo originated from a position of faith that coffee unites us in a way 
-                that few other things can. It is about community, about connection, and 
-                about cherishing the simple moments. We aspired to create a space that 
-                respects global inspiration and local heritage, a cafe that feels a little 
-                bit like home, no matter where you come from. Our drive comes from an 
-                appreciation for craft, for sustainability, and for appreciating every 
-                day goodness in the shared cup of coffee.
-              </p>
-            </div>
-            <div className="relative h-96 rounded-lg overflow-hidden">
-              <Image
-                src="/about3.jpeg"
-                alt="Our Reason"
-                fill
-                className="object-cover"
-              />
+        {/* Values */}
+        <section className="bg-gray-50 py-20">
+          <div className="container mx-auto px-4">
+            <h2 className="text-4xl font-bold mb-12 text-center">
+              WHAT WE STAND FOR
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              <div className="text-center">
+                <div className="text-4xl mb-4">🛹</div>
+                <h3 className="text-xl font-bold mb-3">QUALITY GEAR</h3>
+                <p className="text-gray-600">
+                  Only the best brands and products that we trust and ride ourselves
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl mb-4">🤝</div>
+                <h3 className="text-xl font-bold mb-3">COMMUNITY</h3>
+                <p className="text-gray-600">
+                  Supporting local skaters and giving back to the scene that raised us
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl mb-4">💯</div>
+                <h3 className="text-xl font-bold mb-3">AUTHENTICITY</h3>
+                <p className="text-gray-600">
+                  Real riders, real advice, real skate culture—no posers allowed
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* Bottom Banner Section */}
-      <div className="bg-[#8B9D83] py-20 px-4 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-          More Than Coffee — Its a Connection.
-        </h2>
-        <p className="text-lg text-white max-w-4xl mx-auto leading-relaxed">
-          From our first roast to our latest seasonal blend, Mojo has remained dedicated 
-          to quality and heart. We continue to find the world in every flavor. So that 
-          every cup is world-inspired, and made with love.
-        </p>
-      </div>
+        {/* Visit Us */}
+        <section className="container mx-auto px-4 py-20">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-4xl font-bold mb-8">VISIT OUR SHOP</h2>
+            <p className="text-gray-700 mb-8">
+              Come hang out at our Venice Beach location. We've got a mini ramp out
+              back, a chill vibe inside, and a crew that actually knows what
+              they're talking about.
+            </p>
+            <div className="bg-gray-50 p-8 text-left">
+              <h3 className="font-bold text-xl mb-4">LOCATION</h3>
+              <p className="mb-2">123 Skate Street</p>
+              <p className="mb-2">Venice Beach, CA 90291</p>
+              <p className="mb-4">Phone: (555) 123-4567</p>
+
+              <h3 className="font-bold text-xl mb-4 mt-6">HOURS</h3>
+              <p className="mb-1">Monday - Friday: 10AM - 8PM</p>
+              <p className="mb-1">Saturday: 9AM - 9PM</p>
+              <p>Sunday: 10AM - 6PM</p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
     </div>
   );
 }

@@ -2,80 +2,92 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Doc } from "../../convex/_generated/dataModel";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useConvexUser } from "@/hooks/useConvexUser";
-import { useState } from "react";
+import { Doc } from "../../convex/_generated/dataModel";
 
 interface ProductCardProps {
   product: Doc<"products">;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const formattedPrice = (product.price / 100).toFixed(2);
   const { convexUser } = useConvexUser();
   const addToCart = useMutation(api.cart.addToCart);
-  const [isAdding, setIsAdding] = useState(false);
 
-  const handleAddToCart = async (e: React.MouseEvent) => {
-    e.preventDefault(); // Prevent navigation
-    if (!convexUser) return;
+  const handleAddToCart = async () => {
+    if (!convexUser) {
+      alert("Please sign in to add items to cart");
+      return;
+    }
 
-    setIsAdding(true);
     try {
       await addToCart({
         userId: convexUser._id,
         productId: product._id,
+        quantity: 1,
       });
-      alert("Added to cart!"); // Simple feedback for now
+      alert(`${product.name} added to cart!`);
     } catch (error) {
-      console.error("Failed to add to cart:", error);
-    } finally {
-      setIsAdding(false);
+      console.error("Error adding to cart:", error);
+      alert("Failed to add to cart. Please try again.");
     }
   };
 
+  const formattedPrice = (product.price / 100).toFixed(2);
+
   return (
-    <div className="border p-4 hover:shadow-lg transition-shadow">
+    <div className="group bg-white border border-gray-200 hover:border-black transition-colors">
       <Link href={`/products/${product._id}`}>
-        {/* Image */}
-        <div className="relative h-48 bg-gray-200 mb-4">
+        <div className="relative aspect-square overflow-hidden bg-gray-100">
           <Image
             src={product.imageUrl}
             alt={product.name}
             fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
-        </div>
-
-        {/* Content */}
-        <h3 className="font-bold text-lg mb-2">{product.name}</h3>
-
-        <div className="flex gap-2 mb-2 text-sm">
-          <span className="bg-gray-200 px-2 py-1">{product.origin}</span>
-          <span className="bg-gray-200 px-2 py-1">{product.roastType}</span>
-        </div>
-
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-xl font-bold">${formattedPrice}</span>
-          {product.inStock ? (
-            <span className="text-green-600 text-sm">In Stock</span>
-          ) : (
-            <span className="text-red-600 text-sm">Out of Stock</span>
+          {!product.inStock && (
+            <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center">
+              <span className="text-white text-lg font-bold">OUT OF STOCK</span>
+            </div>
           )}
         </div>
       </Link>
 
-      {/* Add to Cart Button - Outside Link */}
-      <button
-        onClick={handleAddToCart}
-        disabled={!product.inStock || isAdding || !convexUser}
-        className="w-full bg-blue-600 text-white px-4 py-2 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
-      >
-        {isAdding ? "Adding..." : "Add to Cart"}
-      </button>
+      <div className="p-4">
+        <Link href={`/products/${product._id}`}>
+          <h3 className="font-bold text-lg mb-1 group-hover:text-red-600 transition-colors line-clamp-2">
+            {product.name}
+          </h3>
+        </Link>
+
+        <div className="flex items-baseline justify-between mb-3">
+          <p className="text-2xl font-bold">${formattedPrice}</p>
+          {product.size && (
+            <span className="text-sm text-gray-600">Size: {product.size}</span>
+          )}
+        </div>
+
+        <div className="text-sm text-gray-600 mb-3">
+          <p className="line-clamp-2">{product.description}</p>
+        </div>
+
+        <div className="flex flex-wrap gap-2 mb-4 text-xs">
+          <span className="bg-gray-100 px-2 py-1">{product.category}</span>
+          <span className="bg-gray-100 px-2 py-1">{product.subcategory}</span>
+          {product.productType !== product.subcategory && (
+            <span className="bg-gray-100 px-2 py-1">{product.productType}</span>
+          )}
+        </div>
+
+        <button
+          onClick={handleAddToCart}
+          disabled={!product.inStock}
+          className="w-full bg-black text-white py-3 font-bold hover:bg-gray-800 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+        >
+          {product.inStock ? "ADD TO CART" : "OUT OF STOCK"}
+        </button>
+      </div>
     </div>
   );
 }

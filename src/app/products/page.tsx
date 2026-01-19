@@ -1,230 +1,353 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import ProductCard from "@/components/ProductCard";
-import Link from "next/link";
-import Image from "next/image";
-import { useState, useMemo } from "react";
+import Header from "../Header";
+import Footer from "../Footer";
+import { useSearchParams } from "next/navigation";
 
 export default function ProductsPage() {
-  const products = useQuery(api.products.list);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedRoastType, setSelectedRoastType] = useState("");
-  const [selectedDietary, setSelectedDietary] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const searchParams = useSearchParams();
+  const initialSubcategory = searchParams.get("subcategory") || "";
 
-  // Filter products based on search and filter criteria
+  const products = useQuery(api.products.list);
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedSubcategory, setSelectedSubcategory] = useState(initialSubcategory);
+  const [selectedProductType, setSelectedProductType] = useState("");
+  const [selectedSize, setSelectedSize] = useState("");
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 20000]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
+
+  // Reset to page 1 when filters change
+  useMemo(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory, selectedSubcategory, selectedProductType, selectedSize, priceRange]);
+
+  // Filter products
   const filteredProducts = useMemo(() => {
     if (!products) return [];
 
     return products.filter((product) => {
-      // Search filter (by name and description)
-      const matchesSearch = searchQuery === "" || 
+      const matchesSearch =
+        searchQuery === "" ||
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.origin.toLowerCase().includes(searchQuery.toLowerCase());
+        product.description.toLowerCase().includes(searchQuery.toLowerCase());
 
-      // Roast type filter
-      const matchesRoastType = selectedRoastType === "" || 
-        product.roastType === selectedRoastType;
+      const matchesCategory =
+        selectedCategory === "" || product.category === selectedCategory;
 
-      // Dietary filter
-      const matchesDietary = selectedDietary === "" || 
-        (selectedDietary === "nonDairy" && product.dietaryProfile.nonDairy) ||
-        (selectedDietary === "glutenFree" && product.dietaryProfile.glutenFree);
+      const matchesSubcategory =
+        selectedSubcategory === "" || product.subcategory.toLowerCase() === selectedSubcategory.toLowerCase();
 
-      return matchesSearch && matchesRoastType && matchesDietary;
+      const matchesProductType =
+        selectedProductType === "" || product.productType === selectedProductType;
+
+      const matchesSize =
+        selectedSize === "" || product.size === selectedSize;
+
+      const matchesPrice =
+        product.price >= priceRange[0] && product.price <= priceRange[1];
+
+      return (
+        matchesSearch &&
+        matchesCategory &&
+        matchesSubcategory &&
+        matchesProductType &&
+        matchesSize &&
+        matchesPrice
+      );
     });
-  }, [products, searchQuery, selectedRoastType, selectedDietary]);
+  }, [products, searchQuery, selectedCategory, selectedSubcategory, selectedProductType, selectedSize, priceRange]);
 
-  // Pagination logic
+  // Pagination
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentProducts = filteredProducts.slice(startIndex, endIndex);
 
-  // Reset to page 1 when filters change
-  useMemo(() => {
-    setCurrentPage(1);
-  }, [searchQuery, selectedRoastType, selectedDietary]);
+  // Get unique values for filters
+  const categories = useMemo(() => {
+    if (!products) return [];
+    return Array.from(new Set(products.map((p) => p.category))).sort();
+  }, [products]);
 
-  // Reset all filters
-  const handleReset = () => {
-    setSelectedRoastType("");
-    setSelectedDietary("");
+  const subcategories = useMemo(() => {
+    if (!products) return [];
+    const filtered = selectedCategory
+      ? products.filter((p) => p.category === selectedCategory)
+      : products;
+    return Array.from(new Set(filtered.map((p) => p.subcategory))).sort();
+  }, [products, selectedCategory]);
+
+  const productTypes = useMemo(() => {
+    if (!products) return [];
+    const filtered = selectedSubcategory
+      ? products.filter((p) => p.subcategory === selectedSubcategory)
+      : products;
+    return Array.from(new Set(filtered.map((p) => p.productType))).sort();
+  }, [products, selectedSubcategory]);
+
+  const sizes = useMemo(() => {
+    if (!products) return [];
+    const filtered = selectedProductType
+      ? products.filter((p) => p.productType === selectedProductType)
+      : products;
+    return Array.from(new Set(filtered.map((p) => p.size).filter((s) => s !== undefined))).sort();
+  }, [products, selectedProductType]);
+
+  const resetFilters = () => {
     setSearchQuery("");
+    setSelectedCategory("");
+    setSelectedSubcategory("");
+    setSelectedProductType("");
+    setSelectedSize("");
+    setPriceRange([0, 20000]);
     setCurrentPage(1);
   };
 
+  const hasActiveFilters =
+    searchQuery !== "" ||
+    selectedCategory !== "" ||
+    selectedSubcategory !== "" ||
+    selectedProductType !== "" ||
+    selectedSize !== "" ||
+    priceRange[0] !== 0 ||
+    priceRange[1] !== 20000;
+
   if (!products) {
-    return <div className="p-8">Loading...</div>;
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-2xl font-bold mb-2">Loading products...</div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
   }
 
   return (
-    <div className="p-8">
-      <Link href="/" className="text-blue-600 mb-4 inline-block">
-        ← Back to Home
-      </Link>
-      
-      <h1 className="text-3xl font-bold mb-8">Products</h1>
+    <div className="min-h-screen flex flex-col">
+      <Header />
 
-      {/* Filter Section */}
-      <div className="mb-8 flex flex-wrap gap-4 items-center">
-        <select 
-          className="px-4 py-2 border rounded bg-[#8B9D83] text-white"
-          value={selectedRoastType}
-          onChange={(e) => setSelectedRoastType(e.target.value)}
-        >
-          <option value="">All Roast Types</option>
-          <option value="Light">Light Roast</option>
-          <option value="Medium">Medium Roast</option>
-          <option value="Dark">Dark Roast</option>
-        </select>
+      <main className="flex-grow">
+        {/* Page Header */}
+        <section className="bg-black text-white py-12">
+          <div className="container mx-auto px-4 text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-2">ALL PRODUCTS</h1>
+            <p className="text-gray-400">Find your perfect setup</p>
+          </div>
+        </section>
 
-        <select 
-          className="px-4 py-2 border rounded bg-[#8B9D83] text-white"
-          value={selectedDietary}
-          onChange={(e) => setSelectedDietary(e.target.value)}
-        >
-          <option value="">All Dietary Preferences</option>
-          <option value="nonDairy">Non-Dairy</option>
-          <option value="glutenFree">Gluten Free</option>
-        </select>
+        <div className="container mx-auto px-4 py-12">
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Filters Sidebar */}
+            <aside className="lg:w-64 flex-shrink-0">
+              <div className="bg-gray-50 p-6 sticky top-20">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-bold">FILTERS</h2>
+                  {hasActiveFilters && (
+                    <button
+                      onClick={resetFilters}
+                      className="text-sm text-red-600 hover:text-red-700 font-medium"
+                    >
+                      Reset
+                    </button>
+                  )}
+                </div>
 
-        <button 
-          className="px-6 py-2 bg-[#8B9D83] text-white rounded hover:bg-[#7a8a72]"
-          onClick={handleReset}
-        >
-          Reset Filters
-        </button>
+                {/* Search */}
+                <div className="mb-6">
+                  <label className="block text-sm font-bold mb-2">SEARCH</label>
+                  <input
+                    type="text"
+                    placeholder="Search products..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-black"
+                  />
+                </div>
 
-        <div className="ml-auto flex gap-2">
-          <input
-            type="text"
-            placeholder="Search products..."
-            className="px-4 py-2 border rounded bg-[#F5E6D3]"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <button 
-            className="px-6 py-2 bg-[#8B9D83] text-white rounded hover:bg-[#7a8a72]"
-            onClick={() => {}}
-          >
-            Search
-          </button>
-        </div>
-      </div>
+                {/* Category Filter */}
+                <div className="mb-6">
+                  <label className="block text-sm font-bold mb-2">CATEGORY</label>
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => {
+                      setSelectedCategory(e.target.value);
+                      setSelectedSubcategory("");
+                      setSelectedProductType("");
+                      setSelectedSize("");
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-black"
+                  >
+                    <option value="">All Categories</option>
+                    {categories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-      {/* Results count */}
-      <div className="mb-4 text-gray-600">
-        Showing {startIndex + 1}-{Math.min(endIndex, filteredProducts.length)} of {filteredProducts.length} products
-        {(searchQuery || selectedRoastType || selectedDietary) && (
-          <button 
-            onClick={handleReset}
-            className="ml-4 text-blue-600 hover:underline text-sm"
-          >
-            Clear all filters
-          </button>
-        )}
-      </div>
+                {/* Subcategory Filter */}
+                <div className="mb-6">
+                  <label className="block text-sm font-bold mb-2">TYPE</label>
+                  <select
+                    value={selectedSubcategory}
+                    onChange={(e) => {
+                      setSelectedSubcategory(e.target.value);
+                      setSelectedProductType("");
+                      setSelectedSize("");
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-black"
+                  >
+                    <option value="">All Types</option>
+                    {subcategories.map((subcategory) => (
+                      <option key={subcategory} value={subcategory}>
+                        {subcategory}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-      {/* Products Grid */}
-      {filteredProducts.length === 0 ? (
-        <div className="border-2 border-dashed p-12 text-center">
-          <p className="text-gray-600 mb-2">No products match your filters</p>
-          <button 
-            onClick={handleReset}
-            className="text-blue-600 hover:underline"
-          >
-            Clear filters to see all products
-          </button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {currentProducts.map((product) => (
-            <ProductCard key={product._id} product={product} />
-          ))}
-        </div>
-      )}
+                {/* Product Type Filter */}
+                {productTypes.length > 0 && (
+                  <div className="mb-6">
+                    <label className="block text-sm font-bold mb-2">PRODUCT</label>
+                    <select
+                      value={selectedProductType}
+                      onChange={(e) => {
+                        setSelectedProductType(e.target.value);
+                        setSelectedSize("");
+                      }}
+                      className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-black"
+                    >
+                      <option value="">All Products</option>
+                      {productTypes.map((type) => (
+                        <option key={type} value={type}>
+                          {type}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
-      {/* Pagination */}
-      {filteredProducts.length > 0 && totalPages > 1 && (
-        <div className="flex justify-center items-center gap-2 mb-8">
-          <button 
-            className="px-4 py-2 border rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </button>
-          
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button 
-              key={page}
-              className={`px-4 py-2 border rounded hover:bg-gray-100 ${
-                currentPage === page ? 'bg-[#8B9D83] text-white' : ''
-              }`}
-              onClick={() => setCurrentPage(page)}
-            >
-              {page}
-            </button>
-          ))}
-          
-          <button 
-            className="px-4 py-2 border rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </button>
-        </div>
-      )}
+                {/* Size Filter */}
+                {sizes.length > 0 && (
+                  <div className="mb-6">
+                    <label className="block text-sm font-bold mb-2">SIZE</label>
+                    <select
+                      value={selectedSize}
+                      onChange={(e) => setSelectedSize(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-black"
+                    >
+                      <option value="">All Sizes</option>
+                      {sizes.map((size) => (
+                        <option key={size} value={size}>
+                          {size}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
-      {/* Newsletter Section - Full Width */}
-      <section className="py-20 px-4 bg-[#8B9D83] -mx-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div className="text-white">
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                Get new updates and discount offers, Sign up now!
-              </h2>
-              <p className="text-gray-100 mb-8 leading-relaxed">
-                Be part of something special. Subscribe to Mojo Coffee Blend for
-                early access to new blends, exclusive discounts, and
-                behind-the-scenes stories from our roasters and baristas. We love
-                sharing our journey and connecting with those who share our passion
-                for coffee, culture, and sustainability.
-              </p>
-              <form className="bg-white rounded-lg p-2 flex gap-2">
-                <input
-                  type="email"
-                  placeholder="Your email address"
-                  className="flex-1 px-4 py-3 border-none focus:outline-none rounded"
-                />
-                <button
-                  type="submit"
-                  className="bg-[#4A3933] text-white px-8 py-3 rounded hover:bg-[#3a2923] transition-colors font-semibold whitespace-nowrap"
-                >
-                  Keep Me Alerted
-                </button>
-              </form>
-            </div>
-
-            <div className="flex justify-center">
-              <div className="relative w-80 h-80 rounded-full overflow-hidden bg-gray-200">
-                <Image
-                  src="/updates2.png"
-                  alt="Coffee"
-                  fill
-                  className="object-cover"
-                />
+                {/* Price Range */}
+                <div className="mb-6">
+                  <label className="block text-sm font-bold mb-2">
+                    PRICE RANGE: ${(priceRange[0] / 100).toFixed(0)} - ${(priceRange[1] / 100).toFixed(0)}
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="20000"
+                    step="500"
+                    value={priceRange[1]}
+                    onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
+                    className="w-full"
+                  />
+                </div>
               </div>
+            </aside>
+
+            {/* Products Grid */}
+            <div className="flex-grow">
+              {/* Results Info */}
+              <div className="flex items-center justify-between mb-6">
+                <p className="text-gray-600">
+                  Showing {startIndex + 1}-{Math.min(endIndex, filteredProducts.length)} of{" "}
+                  {filteredProducts.length} products
+                </p>
+              </div>
+
+              {/* Products */}
+              {currentProducts.length === 0 ? (
+                <div className="text-center py-20">
+                  <p className="text-xl text-gray-500 mb-4">No products found</p>
+                  <button
+                    onClick={resetFilters}
+                    className="text-red-600 hover:text-red-700 font-medium"
+                  >
+                    Clear all filters
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                    {currentProducts.map((product) => (
+                      <ProductCard key={product._id} product={product} />
+                    ))}
+                  </div>
+
+                  {/* Pagination */}
+                  {totalPages > 1 && (
+                    <div className="flex justify-center items-center space-x-2">
+                      <button
+                        onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        className="px-4 py-2 border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                      >
+                        Previous
+                      </button>
+
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <button
+                          key={page}
+                          onClick={() => setCurrentPage(page)}
+                          className={`px-4 py-2 border ${
+                            currentPage === page
+                              ? "bg-black text-white border-black"
+                              : "border-gray-300 hover:bg-gray-50"
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      ))}
+
+                      <button
+                        onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                        className="px-4 py-2 border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>
-      </section>
+      </main>
+
+      <Footer />
     </div>
   );
 }

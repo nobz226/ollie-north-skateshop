@@ -1,19 +1,7 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import "./globals.css";
 import Providers from "./Providers";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
-
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
 
 export const metadata: Metadata = {
   title: "Ollie North Skateshop - Premium Skate Gear",
@@ -28,9 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className="antialiased">
         <Providers>
           <SignedOut>
             <div className="flex min-h-screen items-center justify-center bg-gray-100">
@@ -49,9 +35,7 @@ export default function RootLayout({
               </div>
             </div>
           </SignedOut>
-          <SignedIn>
-            <main className="flex-1">{children}</main>
-          </SignedIn>
+          <SignedIn>{children}</SignedIn>
         </Providers>
       </body>
     </html>

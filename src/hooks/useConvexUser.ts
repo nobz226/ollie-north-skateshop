@@ -1,19 +1,17 @@
-"use client";
-
-import { useQuery } from "convex/react";
 import { useUser } from "@clerk/nextjs";
+import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
 export function useConvexUser() {
-  const { user: clerkUser } = useUser();
-  
-  const users = useQuery(
+  const { user: clerkUser, isLoaded } = useUser();
+
+  const convexUser = useQuery(
     api.users.getByClerkId,
     clerkUser?.id ? { clerkUserId: clerkUser.id } : "skip"
   );
 
   return {
-    convexUser: users?.[0],
-    isLoading: users === undefined,
+    convexUser,
+    isLoading: !isLoaded || (clerkUser && !convexUser),
   };
 }
