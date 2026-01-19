@@ -1,4 +1,4 @@
-# Mojo Coffee E-Commerce Platform
+# Ollie North Skateshop E-Commerce Platform
 
 A full-stack e-commerce application built with Next.js 15, React 19, Convex, and Clerk authentication. This platform provides a complete shopping experience for coffee products with advanced filtering, real-time cart management, and user authentication.
 
@@ -21,7 +21,7 @@ A full-stack e-commerce application built with Next.js 15, React 19, Convex, and
 ## Project Structure
 
 ```
-mojo-coffee/
+ollie-north-skateshop/
 ├── src/
 │   ├── app/                    # Next.js App Router pages
 │   │   ├── apparel/           # Apparel category page
@@ -423,7 +423,7 @@ NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd mojo-coffee
+cd ollie-north-skateshop
 ```
 
 2. Install dependencies:
