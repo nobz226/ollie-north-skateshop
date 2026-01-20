@@ -89,12 +89,12 @@ export default function CartPage() {
         <div className="min-h-[60vh] flex flex-col items-center justify-center">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Your Cart is Empty</h1>
           <p className="text-gray-600 mb-8">Add some awesome skateboarding gear!</p>
-          <Link
-            href="/products"
+          <button
+            onClick={() => router.back()}
             className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
           >
             Continue Shopping
-          </Link>
+          </button>
         </div>
       </div>
     );
@@ -220,12 +220,12 @@ export default function CartPage() {
               Proceed to Checkout
             </button>
 
-            <Link
-              href="/products"
-              className="block text-center text-indigo-600 hover:text-indigo-800"
+            <button
+              onClick={() => router.back()}
+              className="block w-full text-center text-indigo-600 hover:text-indigo-800"
             >
               Continue Shopping
-            </Link>
+            </button>
           </div>
         </div>
       </div>

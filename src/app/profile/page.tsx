@@ -58,6 +58,166 @@ export default function ProfilePage() {
   const [isEditingShipping, setIsEditingShipping] = useState(false);
   const [isEditingPayment, setIsEditingPayment] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [addressValidation, setAddressValidation] = useState<{
+    isValidating: boolean;
+    isValid: boolean | null;
+    message: string;
+    suggestions?: { state: string; cities: string[] };
+  }>({ isValidating: false, isValid: null, message: "" });
+
+  // US States and Canadian Provinces
+  const US_STATES = [
+    { code: "AL", name: "Alabama" },
+    { code: "AK", name: "Alaska" },
+    { code: "AZ", name: "Arizona" },
+    { code: "AR", name: "Arkansas" },
+    { code: "CA", name: "California" },
+    { code: "CO", name: "Colorado" },
+    { code: "CT", name: "Connecticut" },
+    { code: "DE", name: "Delaware" },
+    { code: "FL", name: "Florida" },
+    { code: "GA", name: "Georgia" },
+    { code: "HI", name: "Hawaii" },
+    { code: "ID", name: "Idaho" },
+    { code: "IL", name: "Illinois" },
+    { code: "IN", name: "Indiana" },
+    { code: "IA", name: "Iowa" },
+    { code: "KS", name: "Kansas" },
+    { code: "KY", name: "Kentucky" },
+    { code: "LA", name: "Louisiana" },
+    { code: "ME", name: "Maine" },
+    { code: "MD", name: "Maryland" },
+    { code: "MA", name: "Massachusetts" },
+    { code: "MI", name: "Michigan" },
+    { code: "MN", name: "Minnesota" },
+    { code: "MS", name: "Mississippi" },
+    { code: "MO", name: "Missouri" },
+    { code: "MT", name: "Montana" },
+    { code: "NE", name: "Nebraska" },
+    { code: "NV", name: "Nevada" },
+    { code: "NH", name: "New Hampshire" },
+    { code: "NJ", name: "New Jersey" },
+    { code: "NM", name: "New Mexico" },
+    { code: "NY", name: "New York" },
+    { code: "NC", name: "North Carolina" },
+    { code: "ND", name: "North Dakota" },
+    { code: "OH", name: "Ohio" },
+    { code: "OK", name: "Oklahoma" },
+    { code: "OR", name: "Oregon" },
+    { code: "PA", name: "Pennsylvania" },
+    { code: "RI", name: "Rhode Island" },
+    { code: "SC", name: "South Carolina" },
+    { code: "SD", name: "South Dakota" },
+    { code: "TN", name: "Tennessee" },
+    { code: "TX", name: "Texas" },
+    { code: "UT", name: "Utah" },
+    { code: "VT", name: "Vermont" },
+    { code: "VA", name: "Virginia" },
+    { code: "WA", name: "Washington" },
+    { code: "WV", name: "West Virginia" },
+    { code: "WI", name: "Wisconsin" },
+    { code: "WY", name: "Wyoming" }
+  ];
+
+  const CANADA_PROVINCES = [
+    { code: "AB", name: "Alberta" },
+    { code: "BC", name: "British Columbia" },
+    { code: "MB", name: "Manitoba" },
+    { code: "NB", name: "New Brunswick" },
+    { code: "NL", name: "Newfoundland and Labrador" },
+    { code: "NS", name: "Nova Scotia" },
+    { code: "NT", name: "Northwest Territories" },
+    { code: "NU", name: "Nunavut" },
+    { code: "ON", name: "Ontario" },
+    { code: "PE", name: "Prince Edward Island" },
+    { code: "QC", name: "Quebec" },
+    { code: "SK", name: "Saskatchewan" },
+    { code: "YT", name: "Yukon" }
+  ];
+
+  const stateOptions = shippingForm.country === "USA" ? US_STATES : 
+                       shippingForm.country === "Canada" ? CANADA_PROVINCES : [];
+
+  // Validate postal code when editing shipping address
+  useEffect(() => {
+    if (!isEditingShipping) {
+      setAddressValidation({ isValidating: false, isValid: null, message: "" });
+      return;
+    }
+
+    const validatePostalCode = async () => {
+      if (!shippingForm.postalCode || !shippingForm.state || !shippingForm.city) {
+        setAddressValidation({ isValidating: false, isValid: null, message: "" });
+        return;
+      }
+
+      // Basic format validation first
+      if (shippingForm.country === "USA") {
+        if (!/^\d{5}(-\d{4})?$/.test(shippingForm.postalCode)) {
+          setAddressValidation({
+            isValidating: false,
+            isValid: false,
+            message: "Invalid ZIP code format",
+          });
+          return;
+        }
+      } else if (shippingForm.country === "Canada") {
+        if (!/^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/.test(shippingForm.postalCode)) {
+          setAddressValidation({
+            isValidating: false,
+            isValid: false,
+            message: "Invalid postal code format",
+          });
+          return;
+        }
+      }
+
+      setAddressValidation({ isValidating: true, isValid: null, message: "Validating..." });
+
+      try {
+        const response = await fetch("/api/validate-address", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            country: shippingForm.country,
+            postalCode: shippingForm.postalCode,
+            state: shippingForm.state,
+            city: shippingForm.city,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.valid) {
+          setAddressValidation({
+            isValidating: false,
+            isValid: true,
+            message: "✓ Address validated",
+          });
+        } else {
+          setAddressValidation({
+            isValidating: false,
+            isValid: false,
+            message: data.error || "Address validation failed",
+            suggestions: data.expectedState && data.expectedCities ? {
+              state: data.expectedState,
+              cities: data.expectedCities,
+            } : undefined,
+          });
+        }
+      } catch (error) {
+        console.error("Address validation error:", error);
+        setAddressValidation({
+          isValidating: false,
+          isValid: null,
+          message: "Unable to validate address",
+        });
+      }
+    };
+
+    const timeoutId = setTimeout(validatePostalCode, 500);
+    return () => clearTimeout(timeoutId);
+  }, [shippingForm.postalCode, shippingForm.state, shippingForm.city, shippingForm.country, isEditingShipping]);
 
   // Populate forms when user profile loads
   useEffect(() => {
@@ -87,6 +247,30 @@ export default function ProfilePage() {
   const handleSaveShipping = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!convexUser) return;
+
+    // Check address validation status - MANDATORY
+    if (addressValidation.isValidating) {
+      alert("Please wait for address validation to complete.");
+      return;
+    }
+
+    if (addressValidation.isValid === false) {
+      alert(
+        `Address validation failed: ${addressValidation.message}\n\n` +
+        (addressValidation.suggestions 
+          ? `Expected state: ${addressValidation.suggestions.state}\n` +
+            `Expected cities: ${addressValidation.suggestions.cities.join(", ")}\n\n`
+          : "") +
+        "Please correct your address before saving."
+      );
+      return;
+    }
+
+    // Require successful validation before saving
+    if (addressValidation.isValid !== true) {
+      alert("Please ensure all address fields are filled correctly and validated.");
+      return;
+    }
 
     setIsSaving(true);
     try {
@@ -324,6 +508,8 @@ export default function ProfilePage() {
                         <input
                           type="text"
                           required
+                          pattern="[a-zA-Z\s\-]+"
+                          title="City name should only contain letters, spaces, and hyphens"
                           value={shippingForm.city}
                           onChange={(e) => setShippingForm({ ...shippingForm, city: e.target.value })}
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -332,19 +518,40 @@ export default function ProfilePage() {
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                          State *
+                          Country *
                         </label>
-                        <input
-                          type="text"
+                        <select
                           required
-                          value={shippingForm.state}
-                          onChange={(e) => setShippingForm({ ...shippingForm, state: e.target.value })}
+                          value={shippingForm.country}
+                          onChange={(e) => setShippingForm({ ...shippingForm, country: e.target.value, state: "" })}
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                        />
+                        >
+                          <option value="USA">United States</option>
+                          <option value="Canada">Canada</option>
+                        </select>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          State/Province *
+                        </label>
+                        <select
+                          required
+                          value={shippingForm.state}
+                          onChange={(e) => setShippingForm({ ...shippingForm, state: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                        >
+                          <option value="">Select {shippingForm.country === "USA" ? "State" : "Province"}</option>
+                          {stateOptions.map((option) => (
+                            <option key={option.code} value={option.code}>
+                              {option.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Postal Code *
@@ -354,21 +561,39 @@ export default function ProfilePage() {
                           required
                           value={shippingForm.postalCode}
                           onChange={(e) => setShippingForm({ ...shippingForm, postalCode: e.target.value })}
+                          placeholder={
+                            shippingForm.country === "USA" ? "12345" :
+                            shippingForm.country === "Canada" ? "A1A 1A1" :
+                            "Postal Code"
+                          }
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
                         />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Country *
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={shippingForm.country}
-                          onChange={(e) => setShippingForm({ ...shippingForm, country: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          {shippingForm.country === "USA" && "5 digits (e.g., 90210 or 90210-1234)"}
+                          {shippingForm.country === "Canada" && "Format: A1A 1A1"}
+                        </p>
+                        {/* Address Validation Feedback */}
+                        {addressValidation.message && (
+                          <div
+                            className={`mt-2 p-2 rounded-md text-sm ${
+                              addressValidation.isValidating
+                                ? "bg-blue-50 text-blue-700"
+                                : addressValidation.isValid === true
+                                ? "bg-green-50 text-green-700"
+                                : addressValidation.isValid === false
+                                ? "bg-red-50 text-red-700"
+                                : "bg-gray-50 text-gray-700"
+                            }`}
+                          >
+                            <p className="font-medium">{addressValidation.message}</p>
+                            {addressValidation.suggestions && (
+                              <div className="mt-1 text-xs">
+                                <p>Expected state: {addressValidation.suggestions.state}</p>
+                                <p>Expected cities: {addressValidation.suggestions.cities.join(", ")}</p>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
 

@@ -103,12 +103,12 @@ export default function WishlistPage() {
             <div className="min-h-[60vh] flex flex-col items-center justify-center">
               <h1 className="text-3xl font-bold text-gray-900 mb-4">Your Wishlist is Empty</h1>
               <p className="text-gray-600 mb-8">Save items you love for later!</p>
-              <Link
-                href="/products"
+              <button
+                onClick={() => router.back()}
                 className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
               >
                 Continue Shopping
-              </Link>
+              </button>
             </div>
           </div>
         </main>

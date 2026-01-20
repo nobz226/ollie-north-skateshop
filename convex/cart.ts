@@ -126,18 +126,3 @@ export const getCartCount = query({
     return cartItems.reduce((total, item) => total + item.quantity, 0);
   },
 });
-
-// Clear all items from user's cart
-export const clearCart = mutation({
-  args: {
-    userId: v.id("users"),
-  },
-  handler: async (ctx, args) => {
-    const cartItems = await ctx.db
-      .query("cartItems")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
-      .collect();
-
-    await Promise.all(cartItems.map((item) => ctx.db.delete(item._id)));
-  },
-});

@@ -86,6 +86,162 @@ export default function CheckoutPage() {
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [saveToProfile, setSaveToProfile] = useState<boolean | null>(null);
+  const [addressValidation, setAddressValidation] = useState<{
+    isValidating: boolean;
+    isValid: boolean | null;
+    message: string;
+    suggestions?: { state: string; cities: string[] };
+  }>({ isValidating: false, isValid: null, message: "" });
+
+  // US States and Canadian Provinces
+  const US_STATES = [
+    { code: "AL", name: "Alabama" },
+    { code: "AK", name: "Alaska" },
+    { code: "AZ", name: "Arizona" },
+    { code: "AR", name: "Arkansas" },
+    { code: "CA", name: "California" },
+    { code: "CO", name: "Colorado" },
+    { code: "CT", name: "Connecticut" },
+    { code: "DE", name: "Delaware" },
+    { code: "FL", name: "Florida" },
+    { code: "GA", name: "Georgia" },
+    { code: "HI", name: "Hawaii" },
+    { code: "ID", name: "Idaho" },
+    { code: "IL", name: "Illinois" },
+    { code: "IN", name: "Indiana" },
+    { code: "IA", name: "Iowa" },
+    { code: "KS", name: "Kansas" },
+    { code: "KY", name: "Kentucky" },
+    { code: "LA", name: "Louisiana" },
+    { code: "ME", name: "Maine" },
+    { code: "MD", name: "Maryland" },
+    { code: "MA", name: "Massachusetts" },
+    { code: "MI", name: "Michigan" },
+    { code: "MN", name: "Minnesota" },
+    { code: "MS", name: "Mississippi" },
+    { code: "MO", name: "Missouri" },
+    { code: "MT", name: "Montana" },
+    { code: "NE", name: "Nebraska" },
+    { code: "NV", name: "Nevada" },
+    { code: "NH", name: "New Hampshire" },
+    { code: "NJ", name: "New Jersey" },
+    { code: "NM", name: "New Mexico" },
+    { code: "NY", name: "New York" },
+    { code: "NC", name: "North Carolina" },
+    { code: "ND", name: "North Dakota" },
+    { code: "OH", name: "Ohio" },
+    { code: "OK", name: "Oklahoma" },
+    { code: "OR", name: "Oregon" },
+    { code: "PA", name: "Pennsylvania" },
+    { code: "RI", name: "Rhode Island" },
+    { code: "SC", name: "South Carolina" },
+    { code: "SD", name: "South Dakota" },
+    { code: "TN", name: "Tennessee" },
+    { code: "TX", name: "Texas" },
+    { code: "UT", name: "Utah" },
+    { code: "VT", name: "Vermont" },
+    { code: "VA", name: "Virginia" },
+    { code: "WA", name: "Washington" },
+    { code: "WV", name: "West Virginia" },
+    { code: "WI", name: "Wisconsin" },
+    { code: "WY", name: "Wyoming" }
+  ];
+
+  const CANADA_PROVINCES = [
+    { code: "AB", name: "Alberta" },
+    { code: "BC", name: "British Columbia" },
+    { code: "MB", name: "Manitoba" },
+    { code: "NB", name: "New Brunswick" },
+    { code: "NL", name: "Newfoundland and Labrador" },
+    { code: "NS", name: "Nova Scotia" },
+    { code: "NT", name: "Northwest Territories" },
+    { code: "NU", name: "Nunavut" },
+    { code: "ON", name: "Ontario" },
+    { code: "PE", name: "Prince Edward Island" },
+    { code: "QC", name: "Quebec" },
+    { code: "SK", name: "Saskatchewan" },
+    { code: "YT", name: "Yukon" }
+  ];
+
+  const stateOptions = shippingForm.country === "USA" ? US_STATES : 
+                       shippingForm.country === "Canada" ? CANADA_PROVINCES : [];
+
+  // Validate postal code when it changes
+  useEffect(() => {
+    const validatePostalCode = async () => {
+      // Only validate if we have postal code, state, and city
+      if (!shippingForm.postalCode || !shippingForm.state || !shippingForm.city) {
+        setAddressValidation({ isValidating: false, isValid: null, message: "" });
+        return;
+      }
+
+      // Basic format validation first
+      if (shippingForm.country === "USA") {
+        if (!/^\d{5}(-\d{4})?$/.test(shippingForm.postalCode)) {
+          setAddressValidation({
+            isValidating: false,
+            isValid: false,
+            message: "Invalid ZIP code format",
+          });
+          return;
+        }
+      } else if (shippingForm.country === "Canada") {
+        if (!/^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/.test(shippingForm.postalCode)) {
+          setAddressValidation({
+            isValidating: false,
+            isValid: false,
+            message: "Invalid postal code format",
+          });
+          return;
+        }
+      }
+
+      setAddressValidation({ isValidating: true, isValid: null, message: "Validating..." });
+
+      try {
+        const response = await fetch("/api/validate-address", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            country: shippingForm.country,
+            postalCode: shippingForm.postalCode,
+            state: shippingForm.state,
+            city: shippingForm.city,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.valid) {
+          setAddressValidation({
+            isValidating: false,
+            isValid: true,
+            message: "✓ Address validated",
+          });
+        } else {
+          setAddressValidation({
+            isValidating: false,
+            isValid: false,
+            message: data.error || "Address validation failed",
+            suggestions: data.expectedState && data.expectedCities ? {
+              state: data.expectedState,
+              cities: data.expectedCities,
+            } : undefined,
+          });
+        }
+      } catch (error) {
+        console.error("Address validation error:", error);
+        setAddressValidation({
+          isValidating: false,
+          isValid: null,
+          message: "Unable to validate address",
+        });
+      }
+    };
+
+    const timeoutId = setTimeout(validatePostalCode, 500); // Debounce
+    return () => clearTimeout(timeoutId);
+  }, [shippingForm.postalCode, shippingForm.state, shippingForm.city, shippingForm.country]);
 
   // Get product details for guest cart
   const allProducts = useQuery(api.products.list);
@@ -114,16 +270,127 @@ export default function CheckoutPage() {
       return;
     }
 
-    // Basic validation
+    // Validate shipping information
     if (!shippingForm.fullName || !shippingForm.addressLine1 || !shippingForm.city || 
         !shippingForm.state || !shippingForm.postalCode || !shippingForm.phone) {
       alert("Please fill in all required shipping fields.");
       return;
     }
 
+    // Validate city (letters, spaces, hyphens only)
+    if (!/^[a-zA-Z\s\-]+$/.test(shippingForm.city)) {
+      alert("Please enter a valid city name (letters, spaces, and hyphens only).");
+      return;
+    }
+
+    // Check address validation status - MANDATORY
+    if (addressValidation.isValidating) {
+      alert("Please wait for address validation to complete.");
+      return;
+    }
+
+    if (addressValidation.isValid === false) {
+      alert(
+        `Address validation failed: ${addressValidation.message}\n\n` +
+        (addressValidation.suggestions 
+          ? `Expected state: ${addressValidation.suggestions.state}\n` +
+            `Expected cities: ${addressValidation.suggestions.cities.join(", ")}\n\n`
+          : "") +
+        "Please correct your address before proceeding."
+      );
+      return;
+    }
+
+    // Require successful validation before proceeding
+    if (addressValidation.isValid !== true) {
+      alert("Please ensure all address fields are filled correctly and validated.");
+      return;
+    }
+
+    // Validate state/province based on country
+    if (shippingForm.country === "USA") {
+      const usStates = [
+        "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
+        "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
+        "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
+        "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
+        "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
+      ];
+      if (!usStates.includes(shippingForm.state.toUpperCase())) {
+        alert("Please enter a valid US state code (e.g., CA, NY, TX).");
+        return;
+      }
+    } else if (shippingForm.country === "Canada") {
+      const canadaProvinces = [
+        "AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT"
+      ];
+      if (!canadaProvinces.includes(shippingForm.state.toUpperCase())) {
+        alert("Please enter a valid Canadian province code (e.g., ON, BC, QC).");
+        return;
+      }
+    }
+
+    // Validate postal code based on country
+    if (shippingForm.country === "USA") {
+      if (!/^\d{5}(-\d{4})?$/.test(shippingForm.postalCode)) {
+        alert("Please enter a valid US ZIP code (e.g., 12345 or 12345-6789).");
+        return;
+      }
+    } else if (shippingForm.country === "Canada") {
+      if (!/^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/.test(shippingForm.postalCode)) {
+        alert("Please enter a valid Canadian postal code (e.g., A1A 1A1).");
+        return;
+      }
+    } else if (shippingForm.country === "UK") {
+      if (!/^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i.test(shippingForm.postalCode)) {
+        alert("Please enter a valid UK postal code (e.g., SW1A 1AA).");
+        return;
+      }
+    } else if (shippingForm.country === "Australia") {
+      if (!/^\d{4}$/.test(shippingForm.postalCode)) {
+        alert("Please enter a valid Australian postal code (e.g., 2000).");
+        return;
+      }
+    }
+
+    // Validate phone number (basic: 10-15 digits)
+    const phoneDigits = shippingForm.phone.replace(/\D/g, '');
+    if (phoneDigits.length < 10 || phoneDigits.length > 15) {
+      alert("Please enter a valid phone number (10-15 digits).");
+      return;
+    }
+
     if (!paymentForm.cardHolderName || !paymentForm.cardNumber || 
         !paymentForm.expiryMonth || !paymentForm.expiryYear || !paymentForm.cvv) {
       alert("Please fill in all payment fields.");
+      return;
+    }
+
+    // Validate card number (basic: 13-19 digits)
+    const cardDigits = paymentForm.cardNumber.replace(/\D/g, '');
+    if (cardDigits.length < 13 || cardDigits.length > 19) {
+      alert("Please enter a valid card number (13-19 digits).");
+      return;
+    }
+
+    // Validate expiry month (01-12)
+    const month = parseInt(paymentForm.expiryMonth);
+    if (isNaN(month) || month < 1 || month > 12) {
+      alert("Please enter a valid expiry month (01-12).");
+      return;
+    }
+
+    // Validate expiry year (current year or later)
+    const year = parseInt(paymentForm.expiryYear);
+    const currentYear = new Date().getFullYear();
+    if (isNaN(year) || year < currentYear || year > currentYear + 20) {
+      alert(`Please enter a valid expiry year (${currentYear}-${currentYear + 20}).`);
+      return;
+    }
+
+    // Validate CVV (3-4 digits)
+    if (!/^\d{3,4}$/.test(paymentForm.cvv)) {
+      alert("Please enter a valid CVV (3 or 4 digits).");
       return;
     }
 
@@ -217,7 +484,7 @@ export default function CheckoutPage() {
           await clearUserCart({ userId: convexUser._id });
 
           alert("Order placed successfully! " + (saveToProfile ? "Profile updated." : ""));
-          router.push("/products");
+          router.push("/");
         } catch (error) {
           console.error("Error creating order:", error);
           alert("Failed to create order. Please try again.");
@@ -227,7 +494,7 @@ export default function CheckoutPage() {
         // For guests, just clear cart and show success
         clearGuestCart();
         alert("Order placed successfully! Create an account to track your order.");
-        router.push("/products");
+        router.push("/");
       }
     } catch (error) {
       console.error("Checkout error:", error);
@@ -255,7 +522,7 @@ export default function CheckoutPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Your cart is empty</h1>
           <p className="text-gray-600 mb-8">Add some products before checking out!</p>
           <button
-            onClick={() => router.push("/products")}
+            onClick={() => router.back()}
             className="px-6 py-3 bg-black text-white rounded-md hover:bg-gray-800"
           >
             Continue Shopping
@@ -334,6 +601,8 @@ export default function CheckoutPage() {
                   <input
                     type="text"
                     required
+                    pattern="[a-zA-Z\s\-]+"
+                    title="City name should only contain letters, spaces, and hyphens"
                     value={shippingForm.city}
                     onChange={(e) => {
                       setShippingForm({ ...shippingForm, city: e.target.value });
@@ -344,10 +613,26 @@ export default function CheckoutPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    State *
+                    Country *
                   </label>
-                  <input
-                    type="text"
+                  <select
+                    required
+                    value={shippingForm.country}
+                    onChange={(e) => {
+                      setShippingForm({ ...shippingForm, country: e.target.value, state: "" });
+                      if (hasExistingShipping) setShippingModified(true);
+                    }}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    <option value="USA">United States</option>
+                    <option value="Canada">Canada</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    State/Province *
+                  </label>
+                  <select
                     required
                     value={shippingForm.state}
                     onChange={(e) => {
@@ -355,7 +640,14 @@ export default function CheckoutPage() {
                       if (hasExistingShipping) setShippingModified(true);
                     }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
+                  >
+                    <option value="">Select {shippingForm.country === "USA" ? "State" : "Province"}</option>
+                    {stateOptions.map((option) => (
+                      <option key={option.code} value={option.code}>
+                        {option.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -369,23 +661,39 @@ export default function CheckoutPage() {
                       setShippingForm({ ...shippingForm, postalCode: e.target.value });
                       if (hasExistingShipping) setShippingModified(true);
                     }}
+                    placeholder={
+                      shippingForm.country === "USA" ? "12345" :
+                      shippingForm.country === "Canada" ? "A1A 1A1" :
+                      "Postal Code"
+                    }
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Country *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={shippingForm.country}
-                    onChange={(e) => {
-                      setShippingForm({ ...shippingForm, country: e.target.value });
-                      if (hasExistingShipping) setShippingModified(true);
-                    }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {shippingForm.country === "USA" && "5 digits (e.g., 90210 or 90210-1234)"}
+                    {shippingForm.country === "Canada" && "Format: A1A 1A1"}
+                  </p>
+                  {/* Address Validation Feedback */}
+                  {addressValidation.message && (
+                    <div
+                      className={`mt-2 p-2 rounded-md text-sm ${
+                        addressValidation.isValidating
+                          ? "bg-blue-50 text-blue-700"
+                          : addressValidation.isValid === true
+                          ? "bg-green-50 text-green-700"
+                          : addressValidation.isValid === false
+                          ? "bg-red-50 text-red-700"
+                          : "bg-gray-50 text-gray-700"
+                      }`}
+                    >
+                      <p className="font-medium">{addressValidation.message}</p>
+                      {addressValidation.suggestions && (
+                        <div className="mt-1 text-xs">
+                          <p>Expected state: {addressValidation.suggestions.state}</p>
+                          <p>Expected cities: {addressValidation.suggestions.cities.join(", ")}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
