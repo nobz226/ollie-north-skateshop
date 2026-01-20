@@ -26,6 +26,8 @@ export default function CheckoutPage() {
 
   const updateShippingAddress = useMutation(api.userProfile.updateShippingAddress);
   const updatePaymentMethod = useMutation(api.userProfile.updatePaymentMethod);
+  const createOrder = useMutation(api.orders.createOrder);
+  const clearUserCart = useMutation(api.cart.clearCart);
 
   // Form state
   const [shippingForm, setShippingForm] = useState({
@@ -179,15 +181,52 @@ export default function CheckoutPage() {
         }
       }
 
-      // For guests, just clear cart and show success
-      // For authenticated users, you would create an order in Convex
-      if (isGuest) {
+      // Create order for authenticated users
+      if (convexUser && !isGuest && activeCart) {
+        try {
+          // Prepare order items with product details
+          const orderItems = activeCart
+            .filter(item => item.product)
+            .map(item => ({
+              productId: item.product!._id,
+              productName: item.product!.name,
+              quantity: item.quantity,
+              price: item.product!.price,
+            }));
+
+          // Create the order
+          await createOrder({
+            userId: convexUser._id,
+            items: orderItems,
+            subtotal,
+            tax,
+            total,
+            shippingAddress: {
+              fullName: shippingForm.fullName,
+              addressLine1: shippingForm.addressLine1,
+              addressLine2: shippingForm.addressLine2,
+              city: shippingForm.city,
+              state: shippingForm.state,
+              postalCode: shippingForm.postalCode,
+              country: shippingForm.country,
+              phone: shippingForm.phone,
+            },
+          });
+
+          // Clear the user's cart after successful order
+          await clearUserCart({ userId: convexUser._id });
+
+          alert("Order placed successfully! " + (saveToProfile ? "Profile updated." : ""));
+          router.push("/products");
+        } catch (error) {
+          console.error("Error creating order:", error);
+          alert("Failed to create order. Please try again.");
+          return;
+        }
+      } else if (isGuest) {
+        // For guests, just clear cart and show success
         clearGuestCart();
         alert("Order placed successfully! Create an account to track your order.");
-        router.push("/products");
-      } else {
-        // TODO: Create order in Convex for authenticated users
-        alert("Order placed successfully! " + (saveToProfile ? "Profile updated." : ""));
         router.push("/products");
       }
     } catch (error) {

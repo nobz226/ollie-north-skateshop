@@ -65,6 +65,24 @@ export const removeFromCart = mutation({
   },
 });
 
+// Clear entire cart for a user
+export const clearCart = mutation({
+  args: {
+    userId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const cartItems = await ctx.db
+      .query("cartItems")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .collect();
+    
+    // Delete all cart items
+    await Promise.all(
+      cartItems.map((item) => ctx.db.delete(item._id))
+    );
+  },
+});
+
 // Get user's cart with product details
 export const getUserCart = query({
   args: {

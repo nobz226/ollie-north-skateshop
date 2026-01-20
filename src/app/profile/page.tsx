@@ -24,6 +24,11 @@ export default function ProfilePage() {
     convexUser ? { userId: convexUser._id } : "skip"
   );
 
+  const orders = useQuery(
+    api.orders.getUserOrders,
+    convexUser ? { userId: convexUser._id } : "skip"
+  );
+
   const updateShippingAddress = useMutation(api.userProfile.updateShippingAddress);
   const updatePaymentMethod = useMutation(api.userProfile.updatePaymentMethod);
 
@@ -175,14 +180,83 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* Order History Placeholder */}
+              {/* Order History */}
               <div className="bg-white p-8 mb-8">
                 <h3 className="text-xl font-bold mb-6">ORDER HISTORY</h3>
-                <div className="text-center py-12 text-gray-500">
-                  <Package className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-                  <p className="mb-2">No orders yet</p>
-                  <p className="text-sm">Your order history will appear here</p>
-                </div>
+                {!orders || orders.length === 0 ? (
+                  <div className="text-center py-12 text-gray-500">
+                    <Package className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                    <p className="mb-2">No orders yet</p>
+                    <p className="text-sm">Your order history will appear here</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {orders.map((order) => (
+                      <div
+                        key={order._id}
+                        className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <p className="text-sm text-gray-600">
+                              Order placed: {new Date(order.createdAt).toLocaleDateString()}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              Order ID: {order._id.slice(-8)}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-lg font-bold">${(order.total / 100).toFixed(2)}</p>
+                            <span
+                              className={`inline-block px-2 py-1 text-xs rounded ${
+                                order.status === "delivered"
+                                  ? "bg-green-100 text-green-800"
+                                  : order.status === "shipped"
+                                  ? "bg-blue-100 text-blue-800"
+                                  : order.status === "processing"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : "bg-gray-100 text-gray-800"
+                              }`}
+                            >
+                              {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="border-t pt-4">
+                          <p className="text-sm font-medium mb-2">Items:</p>
+                          <div className="space-y-2">
+                            {order.items.map((item, idx) => (
+                              <div key={idx} className="flex justify-between text-sm">
+                                <span className="text-gray-700">
+                                  {item.productName} x {item.quantity}
+                                </span>
+                                <span className="font-medium">
+                                  ${((item.price * item.quantity) / 100).toFixed(2)}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="border-t mt-4 pt-4">
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                              <p className="text-gray-600 mb-1">Subtotal:</p>
+                              <p className="text-gray-600 mb-1">Tax:</p>
+                              <p className="font-semibold">Total:</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="mb-1">${(order.subtotal / 100).toFixed(2)}</p>
+                              <p className="mb-1">${(order.tax / 100).toFixed(2)}</p>
+                              <p className="font-semibold">${(order.total / 100).toFixed(2)}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Shipping Address Section */}
