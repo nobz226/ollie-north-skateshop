@@ -1,49 +1,154 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import ProductCard from "@/components/ProductCard";
 import Header from "../Header";
 import Footer from "../Footer";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export default function ProductsPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const initialSubcategory = searchParams.get("subcategory") || "";
+  
+  // Category and Subcategory are LOCKED from URL - these determine what products to show
+  const lockedCategory = searchParams.get("category") || "";
+  const lockedSubcategory = searchParams.get("subcategory") || "";
+  
+  // These are the user-controlled filters
+  const urlProductType = searchParams.get("productType") || "";
+  const urlSize = searchParams.get("size") || "";
 
   const products = useQuery(api.products.list);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedSubcategory, setSelectedSubcategory] = useState(initialSubcategory);
-  const [selectedProductType, setSelectedProductType] = useState("");
-  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedProductType, setSelectedProductType] = useState(urlProductType);
+  const [selectedSize, setSelectedSize] = useState(urlSize);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 20000]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
 
-  // Reset to page 1 when filters change
-  useMemo(() => {
-    setCurrentPage(1);
-  }, [searchQuery, selectedCategory, selectedSubcategory, selectedProductType, selectedSize, priceRange]);
+  // DEBUG: Log URL parameters and product data
+  useEffect(() => {
+    console.log('=== DEBUG INFO ===');
+    console.log('URL - lockedCategory:', lockedCategory);
+    console.log('URL - lockedSubcategory:', lockedSubcategory);
+    console.log('Total products loaded:', products?.length);
+    
+    if (products && products.length > 0) {
+      // Show unique categories and subcategories in database
+      const uniqueCategories = [...new Set(products.map(p => p.category))];
+      const uniqueSubcategories = [...new Set(products.map(p => p.subcategory))];
+      console.log('Available categories in DB:', uniqueCategories);
+      console.log('Available subcategories in DB:', uniqueSubcategories);
+    }
+  }, [lockedCategory, lockedSubcategory, products]);
 
-  // Filter products
+  // Use useEffect instead of useMemo for side effects (per copilot-instructions.md)
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedProductType, selectedSize, priceRange]);
+
+  // Sync URL params to state when they change
+  useEffect(() => {
+    setSelectedProductType(urlProductType);
+    setSelectedSize(urlSize);
+  }, [urlProductType, urlSize]);
+
+  // Update URL when filters change (always preserve locked category/subcategory)
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (lockedCategory) params.set("category", lockedCategory);
+    if (lockedSubcategory) params.set("subcategory", lockedSubcategory);
+    if (selectedProductType) params.set("productType", selectedProductType);
+    if (selectedSize) params.set("size", selectedSize);
+    
+    const newUrl = params.toString() ? `/products?${params.toString()}` : "/products";
+    router.replace(newUrl, { scroll: false });
+  }, [lockedCategory, lockedSubcategory, selectedProductType, selectedSize, router]);
+
+  // Get available filters based on locked category/subcategory
+  const { productTypes, sizes } = useMemo(() => {
+    if (!products) return { productTypes: [], sizes: [] };
+
+    let filteredProducts = products;
+
+    // ALWAYS filter by locked category if it exists (case-insensitive)
+    if (lockedCategory) {
+      filteredProducts = filteredProducts.filter((p) => 
+        p.category.toLowerCase() === lockedCategory.toLowerCase()
+      );
+    }
+
+    // ALWAYS filter by locked subcategory if it exists (case-insensitive)
+    if (lockedSubcategory) {
+      filteredProducts = filteredProducts.filter((p) => 
+        p.subcategory.toLowerCase() === lockedSubcategory.toLowerCase()
+      );
+    }
+
+    console.log('Filtered products after category/subcategory:', filteredProducts.length);
+
+    // Get available product types for this category/subcategory
+    const availableProductTypes = Array.from(
+      new Set(filteredProducts.map((p) => p.productType))
+    ).sort();
+
+    console.log('Available product types:', availableProductTypes);
+
+    // Filter further by selected product type to get sizes
+    if (selectedProductType) {
+      filteredProducts = filteredProducts.filter((p) => p.productType === selectedProductType);
+    }
+
+    const availableSizes = Array.from(
+      new Set(filteredProducts.map((p) => p.size).filter((s): s is string => !!s))
+    ).sort((a, b) => {
+      const numA = parseFloat(a);
+      const numB = parseFloat(b);
+      if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+      return a.localeCompare(b);
+    });
+
+    return {
+      productTypes: availableProductTypes,
+      sizes: availableSizes,
+    };
+  }, [products, lockedCategory, lockedSubcategory, selectedProductType]);
+
+  // Reset dependent filters when they become invalid
+  useEffect(() => {
+    if (selectedProductType && !productTypes.includes(selectedProductType)) {
+      setSelectedProductType("");
+    }
+  }, [productTypes, selectedProductType]);
+
+  useEffect(() => {
+    if (selectedSize && !sizes.includes(selectedSize)) {
+      setSelectedSize("");
+    }
+  }, [sizes, selectedSize]);
+
+  // Filter products - ALWAYS respect locked category/subcategory (case-insensitive)
   const filteredProducts = useMemo(() => {
     if (!products) return [];
 
     return products.filter((product) => {
+      // Search filter
       const matchesSearch =
         searchQuery === "" ||
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.description.toLowerCase().includes(searchQuery.toLowerCase());
 
+      // LOCKED filters - these ALWAYS apply when present in URL (case-insensitive)
       const matchesCategory =
-        selectedCategory === "" || product.category === selectedCategory;
+        lockedCategory === "" || product.category.toLowerCase() === lockedCategory.toLowerCase();
 
       const matchesSubcategory =
-        selectedSubcategory === "" || product.subcategory.toLowerCase() === selectedSubcategory.toLowerCase();
+        lockedSubcategory === "" || product.subcategory.toLowerCase() === lockedSubcategory.toLowerCase();
 
+      // User-controlled filters
       const matchesProductType =
         selectedProductType === "" || product.productType === selectedProductType;
 
@@ -62,7 +167,7 @@ export default function ProductsPage() {
         matchesPrice
       );
     });
-  }, [products, searchQuery, selectedCategory, selectedSubcategory, selectedProductType, selectedSize, priceRange]);
+  }, [products, searchQuery, lockedCategory, lockedSubcategory, selectedProductType, selectedSize, priceRange]);
 
   // Pagination
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
@@ -70,54 +175,27 @@ export default function ProductsPage() {
   const endIndex = startIndex + itemsPerPage;
   const currentProducts = filteredProducts.slice(startIndex, endIndex);
 
-  // Get unique values for filters
-  const categories = useMemo(() => {
-    if (!products) return [];
-    return Array.from(new Set(products.map((p) => p.category))).sort();
-  }, [products]);
-
-  const subcategories = useMemo(() => {
-    if (!products) return [];
-    const filtered = selectedCategory
-      ? products.filter((p) => p.category === selectedCategory)
-      : products;
-    return Array.from(new Set(filtered.map((p) => p.subcategory))).sort();
-  }, [products, selectedCategory]);
-
-  const productTypes = useMemo(() => {
-    if (!products) return [];
-    const filtered = selectedSubcategory
-      ? products.filter((p) => p.subcategory === selectedSubcategory)
-      : products;
-    return Array.from(new Set(filtered.map((p) => p.productType))).sort();
-  }, [products, selectedSubcategory]);
-
-  const sizes = useMemo(() => {
-    if (!products) return [];
-    const filtered = selectedProductType
-      ? products.filter((p) => p.productType === selectedProductType)
-      : products;
-    return Array.from(new Set(filtered.map((p) => p.size).filter((s) => s !== undefined))).sort();
-  }, [products, selectedProductType]);
-
   const resetFilters = () => {
     setSearchQuery("");
-    setSelectedCategory("");
-    setSelectedSubcategory("");
     setSelectedProductType("");
     setSelectedSize("");
     setPriceRange([0, 20000]);
     setCurrentPage(1);
+    // DO NOT reset locked category/subcategory - they come from URL
   };
 
   const hasActiveFilters =
     searchQuery !== "" ||
-    selectedCategory !== "" ||
-    selectedSubcategory !== "" ||
     selectedProductType !== "" ||
     selectedSize !== "" ||
     priceRange[0] !== 0 ||
     priceRange[1] !== 20000;
+
+  // Dynamic page title shows most specific level
+  const pageTitle = selectedProductType || lockedSubcategory || lockedCategory || "ALL PRODUCTS";
+
+  // Determine if we're on a filtered page (category or subcategory locked)
+  const isFilteredPage = Boolean(lockedCategory || lockedSubcategory);
 
   if (!products) {
     return (
@@ -141,7 +219,7 @@ export default function ProductsPage() {
         {/* Page Header */}
         <section className="bg-black text-white py-12">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-2">ALL PRODUCTS</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-2">{pageTitle.toUpperCase()}</h1>
             <p className="text-gray-400">Find your perfect setup</p>
           </div>
         </section>
@@ -175,62 +253,16 @@ export default function ProductsPage() {
                   />
                 </div>
 
-                {/* Category Filter */}
-                <div className="mb-6">
-                  <label className="block text-sm font-bold mb-2">CATEGORY</label>
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => {
-                      setSelectedCategory(e.target.value);
-                      setSelectedSubcategory("");
-                      setSelectedProductType("");
-                      setSelectedSize("");
-                    }}
-                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-black"
-                  >
-                    <option value="">All Categories</option>
-                    {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Subcategory Filter */}
-                <div className="mb-6">
-                  <label className="block text-sm font-bold mb-2">TYPE</label>
-                  <select
-                    value={selectedSubcategory}
-                    onChange={(e) => {
-                      setSelectedSubcategory(e.target.value);
-                      setSelectedProductType("");
-                      setSelectedSize("");
-                    }}
-                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-black"
-                  >
-                    <option value="">All Types</option>
-                    {subcategories.map((subcategory) => (
-                      <option key={subcategory} value={subcategory}>
-                        {subcategory}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Product Type Filter */}
-                {productTypes.length > 0 && (
+                {/* Product Type Filter - Show when on filtered page */}
+                {isFilteredPage && (
                   <div className="mb-6">
-                    <label className="block text-sm font-bold mb-2">PRODUCT</label>
+                    <label className="block text-sm font-bold mb-2">PRODUCT TYPE</label>
                     <select
                       value={selectedProductType}
-                      onChange={(e) => {
-                        setSelectedProductType(e.target.value);
-                        setSelectedSize("");
-                      }}
+                      onChange={(e) => setSelectedProductType(e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-black"
                     >
-                      <option value="">All Products</option>
+                      <option value="">All Types</option>
                       {productTypes.map((type) => (
                         <option key={type} value={type}>
                           {type}
@@ -240,8 +272,8 @@ export default function ProductsPage() {
                   </div>
                 )}
 
-                {/* Size Filter */}
-                {sizes.length > 0 && (
+                {/* Size Filter - Show when product type is selected */}
+                {isFilteredPage && selectedProductType !== "" && (
                   <div className="mb-6">
                     <label className="block text-sm font-bold mb-2">SIZE</label>
                     <select
@@ -259,7 +291,7 @@ export default function ProductsPage() {
                   </div>
                 )}
 
-                {/* Price Range */}
+                {/* Price Range - Always show */}
                 <div className="mb-6">
                   <label className="block text-sm font-bold mb-2">
                     PRICE RANGE: ${(priceRange[0] / 100).toFixed(0)} - ${(priceRange[1] / 100).toFixed(0)}
@@ -282,7 +314,7 @@ export default function ProductsPage() {
               {/* Results Info */}
               <div className="flex items-center justify-between mb-6">
                 <p className="text-gray-600">
-                  Showing {startIndex + 1}-{Math.min(endIndex, filteredProducts.length)} of{" "}
+                  Showing {filteredProducts.length > 0 ? startIndex + 1 : 0}-{Math.min(endIndex, filteredProducts.length)} of{" "}
                   {filteredProducts.length} products
                 </p>
               </div>
@@ -291,12 +323,14 @@ export default function ProductsPage() {
               {currentProducts.length === 0 ? (
                 <div className="text-center py-20">
                   <p className="text-xl text-gray-500 mb-4">No products found</p>
-                  <button
-                    onClick={resetFilters}
-                    className="text-red-600 hover:text-red-700 font-medium"
-                  >
-                    Clear all filters
-                  </button>
+                  {hasActiveFilters && (
+                    <button
+                      onClick={resetFilters}
+                      className="text-red-600 hover:text-red-700 font-medium"
+                    >
+                      Clear all filters
+                    </button>
+                  )}
                 </div>
               ) : (
                 <>
