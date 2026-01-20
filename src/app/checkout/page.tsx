@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useConvexUser } from "@/hooks/useConvexUser";
 import { useGuestCart } from "@/hooks/useGuestCart";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import Image from "next/image";
 import Breadcrumbs from "@/components/Breadcrumbs";
@@ -19,7 +19,15 @@ export default function CheckoutPage() {
     convexUser ? { userId: convexUser._id } : "skip"
   );
 
-  // Form state - initialize with empty values since getUserProfile doesn't exist yet
+  const userProfile = useQuery(
+    api.userProfile.getUserProfile,
+    convexUser ? { userId: convexUser._id } : "skip"
+  );
+
+  const updateShippingAddress = useMutation(api.userProfile.updateShippingAddress);
+  const updatePaymentMethod = useMutation(api.userProfile.updatePaymentMethod);
+
+  // Form state
   const [shippingForm, setShippingForm] = useState({
     fullName: "",
     addressLine1: "",
@@ -39,7 +47,43 @@ export default function CheckoutPage() {
     cvv: "",
   });
 
+  // Track if user has existing profile data
+  const [hasExistingShipping, setHasExistingShipping] = useState(false);
+  const [hasExistingPayment, setHasExistingPayment] = useState(false);
+  const [shippingModified, setShippingModified] = useState(false);
+  const [paymentModified, setPaymentModified] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+
+  // Pre-fill forms with user profile data
+  useEffect(() => {
+    if (userProfile && convexUser) {
+      if (userProfile.shippingAddress) {
+        setShippingForm({
+          fullName: userProfile.shippingAddress.fullName,
+          addressLine1: userProfile.shippingAddress.addressLine1,
+          addressLine2: userProfile.shippingAddress.addressLine2 || "",
+          city: userProfile.shippingAddress.city,
+          state: userProfile.shippingAddress.state,
+          postalCode: userProfile.shippingAddress.postalCode,
+          country: userProfile.shippingAddress.country,
+          phone: userProfile.shippingAddress.phone,
+        });
+        setHasExistingShipping(true);
+      }
+      if (userProfile.paymentMethod) {
+        setPaymentForm(prev => ({
+          ...prev,
+          cardHolderName: userProfile.paymentMethod!.cardHolderName,
+          expiryMonth: userProfile.paymentMethod!.expiryMonth,
+          expiryYear: userProfile.paymentMethod!.expiryYear,
+        }));
+        setHasExistingPayment(true);
+      }
+    }
+  }, [userProfile, convexUser]);
+
   const [isProcessing, setIsProcessing] = useState(false);
+  const [saveToProfile, setSaveToProfile] = useState<boolean | null>(null);
 
   // Get product details for guest cart
   const allProducts = useQuery(api.products.list);
@@ -81,11 +125,59 @@ export default function CheckoutPage() {
       return;
     }
 
+    // For authenticated users, check if data was modified or is new
+    if (convexUser && !isGuest) {
+      const shouldAskToSave = (!hasExistingShipping || shippingModified || !hasExistingPayment || paymentModified);
+      
+      if (shouldAskToSave && saveToProfile === null) {
+        setShowSaveModal(true);
+        return;
+      }
+    }
+
+    await processOrder();
+  };
+
+  const processOrder = async () => {
     setIsProcessing(true);
 
     try {
       // Simulate payment processing
       await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Save to profile if requested and user is authenticated
+      if (convexUser && !isGuest && saveToProfile) {
+        try {
+          // Update shipping if modified or new
+          if (!hasExistingShipping || shippingModified) {
+            await updateShippingAddress({
+              userId: convexUser._id,
+              fullName: shippingForm.fullName,
+              addressLine1: shippingForm.addressLine1,
+              addressLine2: shippingForm.addressLine2,
+              city: shippingForm.city,
+              state: shippingForm.state,
+              postalCode: shippingForm.postalCode,
+              country: shippingForm.country,
+              phone: shippingForm.phone,
+            });
+          }
+
+          // Update payment if modified or new
+          if ((!hasExistingPayment || paymentModified) && paymentForm.cardNumber) {
+            await updatePaymentMethod({
+              userId: convexUser._id,
+              cardHolderName: paymentForm.cardHolderName,
+              cardLastFour: paymentForm.cardNumber.slice(-4),
+              cardType: "Visa", // In production, detect card type
+              expiryMonth: paymentForm.expiryMonth,
+              expiryYear: paymentForm.expiryYear,
+            });
+          }
+        } catch (error) {
+          console.error("Error saving to profile:", error);
+        }
+      }
 
       // For guests, just clear cart and show success
       // For authenticated users, you would create an order in Convex
@@ -95,7 +187,7 @@ export default function CheckoutPage() {
         router.push("/products");
       } else {
         // TODO: Create order in Convex for authenticated users
-        alert("Order placed successfully! (Order creation coming soon)");
+        alert("Order placed successfully! " + (saveToProfile ? "Profile updated." : ""));
         router.push("/products");
       }
     } catch (error) {
@@ -103,6 +195,8 @@ export default function CheckoutPage() {
       alert("Failed to process order. Please try again.");
     } finally {
       setIsProcessing(false);
+      setShowSaveModal(false);
+      setSaveToProfile(null);
     }
   };
 
@@ -158,7 +252,10 @@ export default function CheckoutPage() {
                     type="text"
                     required
                     value={shippingForm.fullName}
-                    onChange={(e) => setShippingForm({ ...shippingForm, fullName: e.target.value })}
+                    onChange={(e) => {
+                      setShippingForm({ ...shippingForm, fullName: e.target.value });
+                      if (hasExistingShipping) setShippingModified(true);
+                    }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
@@ -170,7 +267,10 @@ export default function CheckoutPage() {
                     type="text"
                     required
                     value={shippingForm.addressLine1}
-                    onChange={(e) => setShippingForm({ ...shippingForm, addressLine1: e.target.value })}
+                    onChange={(e) => {
+                      setShippingForm({ ...shippingForm, addressLine1: e.target.value });
+                      if (hasExistingShipping) setShippingModified(true);
+                    }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
@@ -181,7 +281,10 @@ export default function CheckoutPage() {
                   <input
                     type="text"
                     value={shippingForm.addressLine2}
-                    onChange={(e) => setShippingForm({ ...shippingForm, addressLine2: e.target.value })}
+                    onChange={(e) => {
+                      setShippingForm({ ...shippingForm, addressLine2: e.target.value });
+                      if (hasExistingShipping) setShippingModified(true);
+                    }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
@@ -193,7 +296,10 @@ export default function CheckoutPage() {
                     type="text"
                     required
                     value={shippingForm.city}
-                    onChange={(e) => setShippingForm({ ...shippingForm, city: e.target.value })}
+                    onChange={(e) => {
+                      setShippingForm({ ...shippingForm, city: e.target.value });
+                      if (hasExistingShipping) setShippingModified(true);
+                    }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
@@ -205,7 +311,10 @@ export default function CheckoutPage() {
                     type="text"
                     required
                     value={shippingForm.state}
-                    onChange={(e) => setShippingForm({ ...shippingForm, state: e.target.value })}
+                    onChange={(e) => {
+                      setShippingForm({ ...shippingForm, state: e.target.value });
+                      if (hasExistingShipping) setShippingModified(true);
+                    }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
@@ -217,7 +326,10 @@ export default function CheckoutPage() {
                     type="text"
                     required
                     value={shippingForm.postalCode}
-                    onChange={(e) => setShippingForm({ ...shippingForm, postalCode: e.target.value })}
+                    onChange={(e) => {
+                      setShippingForm({ ...shippingForm, postalCode: e.target.value });
+                      if (hasExistingShipping) setShippingModified(true);
+                    }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
@@ -229,7 +341,10 @@ export default function CheckoutPage() {
                     type="text"
                     required
                     value={shippingForm.country}
-                    onChange={(e) => setShippingForm({ ...shippingForm, country: e.target.value })}
+                    onChange={(e) => {
+                      setShippingForm({ ...shippingForm, country: e.target.value });
+                      if (hasExistingShipping) setShippingModified(true);
+                    }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
@@ -241,7 +356,10 @@ export default function CheckoutPage() {
                     type="tel"
                     required
                     value={shippingForm.phone}
-                    onChange={(e) => setShippingForm({ ...shippingForm, phone: e.target.value })}
+                    onChange={(e) => {
+                      setShippingForm({ ...shippingForm, phone: e.target.value });
+                      if (hasExistingShipping) setShippingModified(true);
+                    }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
@@ -260,7 +378,10 @@ export default function CheckoutPage() {
                     type="text"
                     required
                     value={paymentForm.cardHolderName}
-                    onChange={(e) => setPaymentForm({ ...paymentForm, cardHolderName: e.target.value })}
+                    onChange={(e) => {
+                      setPaymentForm({ ...paymentForm, cardHolderName: e.target.value });
+                      if (hasExistingPayment) setPaymentModified(true);
+                    }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
@@ -274,7 +395,10 @@ export default function CheckoutPage() {
                     placeholder="1234 5678 9012 3456"
                     maxLength={19}
                     value={paymentForm.cardNumber}
-                    onChange={(e) => setPaymentForm({ ...paymentForm, cardNumber: e.target.value })}
+                    onChange={(e) => {
+                      setPaymentForm({ ...paymentForm, cardNumber: e.target.value });
+                      if (hasExistingPayment) setPaymentModified(true);
+                    }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
@@ -288,7 +412,10 @@ export default function CheckoutPage() {
                     placeholder="MM"
                     maxLength={2}
                     value={paymentForm.expiryMonth}
-                    onChange={(e) => setPaymentForm({ ...paymentForm, expiryMonth: e.target.value })}
+                    onChange={(e) => {
+                      setPaymentForm({ ...paymentForm, expiryMonth: e.target.value });
+                      if (hasExistingPayment) setPaymentModified(true);
+                    }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
@@ -302,7 +429,10 @@ export default function CheckoutPage() {
                     placeholder="YYYY"
                     maxLength={4}
                     value={paymentForm.expiryYear}
-                    onChange={(e) => setPaymentForm({ ...paymentForm, expiryYear: e.target.value })}
+                    onChange={(e) => {
+                      setPaymentForm({ ...paymentForm, expiryYear: e.target.value });
+                      if (hasExistingPayment) setPaymentModified(true);
+                    }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
@@ -396,6 +526,44 @@ export default function CheckoutPage() {
           </div>
         </div>
       </form>
+
+      {/* Save to Profile Modal */}
+      {showSaveModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">
+              {hasExistingShipping || hasExistingPayment ? "Save Changes?" : "Save Information?"}
+            </h3>
+            <p className="text-gray-600 mb-6">
+              {hasExistingShipping || hasExistingPayment
+                ? "You've made changes to your shipping or payment information. Would you like to save these changes to your profile?"
+                : "Would you like to save this shipping and payment information to your profile for faster checkout next time?"}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setSaveToProfile(false);
+                  setShowSaveModal(false);
+                  processOrder();
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+              >
+                Just This Order
+              </button>
+              <button
+                onClick={() => {
+                  setSaveToProfile(true);
+                  setShowSaveModal(false);
+                  processOrder();
+                }}
+                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+              >
+                Save to Profile
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
