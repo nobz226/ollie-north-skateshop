@@ -47,8 +47,8 @@ export const createAdminUser = mutation({
   },
 });
 
-// Verify admin login credentials
-export const verifyAdminLogin = query({
+// Verify admin login credentials - Changed to MUTATION instead of query
+export const verifyAdminLogin = mutation({
   args: {
     username: v.string(),
     password: v.string(),
