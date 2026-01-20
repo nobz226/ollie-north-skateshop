@@ -3,11 +3,13 @@
 ## Architecture Overview
 
 This is a **Next.js 15 (App Router) + Convex + Clerk** e-commerce application for skateboarding products. The key architectural pattern is:
-- **Frontend**: Next.js client components in `src/app/` using React 19
+- **Frontend**: Next.js client components in `src/app/` using React 19 (no server components with Convex)
 - **Backend**: Convex serverless backend in `convex/` with real-time queries/mutations
-- **Auth**: Clerk handles customer authentication, synced to Convex via `SyncUser` component
-- **Admin Auth**: Separate admin authentication system using Convex stored credentials
-- **State**: Convex React hooks provide real-time reactive data (no Redux/Zustand)
+- **Auth**: Dual authentication system:
+  - Customer auth via Clerk (synced to Convex `users` table)
+  - Admin auth via custom Convex system (separate `adminUsers` table)
+- **State**: Convex React hooks provide real-time reactive data (no Redux/Zustand needed)
+- **Styling**: Tailwind CSS v4 with `cn()` utility ([src/lib/utils.ts](../src/lib/utils.ts)) for conditional classes
 
 ## Critical Workflows
 
@@ -20,15 +22,14 @@ npm run dev
 # Terminal 2: Convex backend (required for all database operations)
 npx convex dev
 ```
+**⚠️ CRITICAL**: Convex dev must be running or all database queries/mutations will fail silently.
 
-### Database Seeding
-To populate products, run the Convex mutation `seedProducts:seed` once via the Convex dashboard. This creates 150+ products across Boards/Hardware/Apparel categories.
-
-### Admin System Setup
-1. Admin user created via Convex dashboard mutation `admin:createAdminUser`
-2. Access admin panel at `/admin` (redirects to `/admin/login` if not authenticated)
-3. Admin credentials: Username: `Nobz`, Password: `LETmeinnow36$`
-4. Session stored in localStorage (24-hour expiry)
+### First-Time Setup
+1. Install dependencies: `npm install`
+2. Create `.env.local` with Clerk and Convex credentials (see Environment Variables section)
+3. Start Convex: `npx convex dev` (creates deployment if needed)
+4. Seed products: Run `seedProducts:seed` mutation via Convex dashboard
+5. Create admin user: Run `admin:createAdminUser` mutation with `{ username: "Nobz", password: "LETmeinnow36$" }`
 
 ## Key Patterns & Conventions
 
@@ -58,6 +59,10 @@ To populate products, run the Convex mutation `seedProducts:seed` once via the C
   await addToCart({ userId: convexUser._id, productId });
   ```
 - **ID Types**: Convex uses typed IDs like `Id<"users">`, `Id<"products">` - never use strings
+- **Conditional Queries**: Use `"skip"` to disable queries when dependencies aren't ready:
+  ```typescript
+  const product = useQuery(api.products.getById, productId ? { id: productId } : "skip");
+  ```
 
 ### 4. Product Categorization
 Products have a **3-level hierarchy** (see [convex/schema.ts](../convex/schema.ts)):
@@ -107,6 +112,7 @@ All interactive pages are `"use client"` components that use Convex hooks:
 import { useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 ```
+**Why no server components?** Convex React hooks require client-side reactivity. Next.js server components cannot subscribe to real-time Convex data.
 
 ### Filter Cascading
 See [src/app/products/page.tsx](../src/app/products/page.tsx#L73-L91) for cascading filter pattern:
@@ -126,6 +132,16 @@ Admin uses modal pattern for forms (see `ProductForm` component):
 - Fixed overlay with centered content
 - Close on cancel or successful submission
 - Form data validation before Convex mutation
+
+### Price Conversion Pattern
+Always convert cents ↔ dollars at the UI boundary:
+```typescript
+// Display: cents to dollars
+const displayPrice = (product.price / 100).toFixed(2); // $49.99
+
+// Submission: dollars to cents
+const priceInCents = Math.round(parseFloat(formData.price) * 100);
+```
 
 ## Known Issues to Fix
 

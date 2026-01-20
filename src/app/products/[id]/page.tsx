@@ -22,8 +22,8 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = async () => {
     if (!convexUser || userLoading) {
-      alert("Please sign in to add items to cart");
-      router.push("/sign-in");
+      // Redirect to sign-in with return URL
+      router.push("/sign-in?redirectUrl=" + encodeURIComponent(window.location.pathname));
       return;
     }
 

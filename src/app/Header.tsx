@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useConvexUser } from "@/hooks/useConvexUser";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, User } from "lucide-react";
 
 export default function Header() {
+  const { isSignedIn } = useUser();
   const { convexUser } = useConvexUser();
   
   const cart = useQuery(
@@ -74,7 +75,17 @@ export default function Header() {
                 </span>
               )}
             </Link>
-            <UserButton afterSignOutUrl="/sign-in" />
+            {isSignedIn ? (
+              <UserButton afterSignOutUrl="/" />
+            ) : (
+              <Link
+                href="/sign-in"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:text-red-600 transition-colors"
+              >
+                <User className="h-5 w-5" />
+                <span>Sign In</span>
+              </Link>
+            )}
           </div>
         </div>
 

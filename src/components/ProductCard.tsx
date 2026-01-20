@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
@@ -26,6 +27,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const router = useRouter();
   const { convexUser, isLoading: userLoading } = useConvexUser();
   const addToCart = useMutation(api.cart.addToCart);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
@@ -35,7 +37,8 @@ export default function ProductCard({ product }: ProductCardProps) {
     e.preventDefault(); // Prevent Link navigation
 
     if (!convexUser || userLoading) {
-      alert("Please sign in to add items to cart");
+      // Redirect to sign-in page
+      router.push("/sign-in?redirectUrl=" + encodeURIComponent(window.location.pathname));
       return;
     }
 
