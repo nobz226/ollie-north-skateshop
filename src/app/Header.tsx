@@ -5,7 +5,7 @@ import { UserButton, useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useConvexUser } from "@/hooks/useConvexUser";
-import { ShoppingCart, User } from "lucide-react";
+import { ShoppingCart, User, Heart } from "lucide-react";
 
 export default function Header() {
   const { isSignedIn } = useUser();
@@ -16,7 +16,14 @@ export default function Header() {
     convexUser ? { userId: convexUser._id } : "skip"
   );
 
+  // Wishlist query - will be available once Convex dev picks up the new file
+  const wishlist = useQuery(
+    api.wishlist?.getUserWishlist,
+    convexUser && api.wishlist?.getUserWishlist ? { userId: convexUser._id } : "skip"
+  );
+
   const itemCount = cart?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+  const wishlistCount = wishlist?.length || 0;
 
   return (
     <header className="border-b border-gray-200 bg-white sticky top-0 z-50">
@@ -65,12 +72,25 @@ export default function Header() {
           {/* Right side actions */}
           <div className="flex items-center space-x-4">
             {isSignedIn && (
-              <Link
-                href="/profile"
-                className="text-sm font-medium text-gray-700 hover:text-red-600 transition-colors hidden md:block"
-              >
-                Profile
-              </Link>
+              <>
+                <Link
+                  href="/wishlist"
+                  className="relative flex items-center text-gray-700 hover:text-red-600 transition-colors"
+                >
+                  <Heart className="h-6 w-6" />
+                  {wishlistCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                      {wishlistCount}
+                    </span>
+                  )}
+                </Link>
+                <Link
+                  href="/profile"
+                  className="text-sm font-medium text-gray-700 hover:text-red-600 transition-colors hidden md:block"
+                >
+                  Profile
+                </Link>
+              </>
             )}
             <Link
               href="/cart"

@@ -23,6 +23,7 @@ export const updateProduct = mutation({
     productType: v.optional(v.string()),
     size: v.optional(v.string()),
     inStock: v.optional(v.boolean()),
+    stockQuantity: v.optional(v.number()),
     featured: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
@@ -50,6 +51,7 @@ export const createProduct = mutation({
     productType: v.string(),
     size: v.optional(v.string()),
     inStock: v.boolean(),
+    stockQuantity: v.number(),
     featured: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {

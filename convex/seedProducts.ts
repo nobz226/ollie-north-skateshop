@@ -922,7 +922,10 @@ export const seed = mutation({
     ];
 
     for (const product of products) {
-      await ctx.db.insert("products", product);
+      await ctx.db.insert("products", {
+        ...product,
+        stockQuantity: Math.floor(Math.random() * 50) + 10, // Random stock between 10-60
+      });
     }
 
     return { success: true, count: products.length };

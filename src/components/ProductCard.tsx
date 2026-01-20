@@ -3,11 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
 import { useConvexUser } from "@/hooks/useConvexUser";
 import { useState } from "react";
+import { Heart } from "lucide-react";
 
 interface Product {
   _id: Id<"products">;
@@ -20,6 +21,7 @@ interface Product {
   productType: string;
   size?: string;
   inStock: boolean;
+  stockQuantity: number;
 }
 
 interface ProductCardProps {
@@ -30,6 +32,14 @@ export default function ProductCard({ product }: ProductCardProps) {
   const router = useRouter();
   const { convexUser, isLoading: userLoading } = useConvexUser();
   const addToCart = useMutation(api.cart.addToCart);
+  const addToWishlist = useMutation(api.wishlist.addToWishlist);
+  const removeFromWishlist = useMutation(api.wishlist.removeFromWishlistByProduct);
+  
+  const isInWishlist = useQuery(
+    api.wishlist.isInWishlist,
+    convexUser ? { userId: convexUser._id, productId: product._id } : "skip"
+  );
+  
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -61,6 +71,31 @@ export default function ProductCard({ product }: ProductCardProps) {
     }
   };
 
+  const handleToggleWishlist = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    if (!convexUser || userLoading) {
+      router.push("/sign-in?redirectUrl=" + encodeURIComponent(window.location.pathname));
+      return;
+    }
+
+    try {
+      if (isInWishlist) {
+        await removeFromWishlist({
+          userId: convexUser._id,
+          productId: product._id,
+        });
+      } else {
+        await addToWishlist({
+          userId: convexUser._id,
+          productId: product._id,
+        });
+      }
+    } catch (error) {
+      console.error("Error toggling wishlist:", error);
+    }
+  };
+
   return (
     <Link href={`/products/${product._id}`} className="group">
       <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
@@ -77,6 +112,15 @@ export default function ProductCard({ product }: ProductCardProps) {
               <span className="text-white font-bold text-lg">Out of Stock</span>
             </div>
           )}
+          {/* Wishlist Button */}
+          <button
+            onClick={handleToggleWishlist}
+            className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors z-10"
+          >
+            <Heart
+              className={`h-5 w-5 ${isInWishlist ? "fill-red-500 text-red-500" : "text-gray-600"}`}
+            />
+          </button>
         </div>
 
         {/* Product Details */}
@@ -87,6 +131,13 @@ export default function ProductCard({ product }: ProductCardProps) {
           <p className="text-sm text-gray-600 mb-2">
             {product.subcategory} {product.size && `• ${product.size}`}
           </p>
+          {product.inStock && (
+            <p className="text-xs text-gray-500 mb-2">
+              {product.stockQuantity > 0 
+                ? `${product.stockQuantity} in stock` 
+                : "Low stock"}
+            </p>
+          )}
           <p className="text-gray-700 text-sm line-clamp-2 mb-3">
             {product.description}
           </p>

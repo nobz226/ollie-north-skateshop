@@ -59,6 +59,7 @@ export default defineSchema({
     productType: v.string(), // "Decks", "Trucks", "Wheels", "Completes", "Bolts", etc.
     size: v.optional(v.string()), // "7.5", "8.0", "S", "M", "29", etc.
     inStock: v.boolean(),
+    stockQuantity: v.optional(v.number()), // Actual stock count - optional for migration
     featured: v.optional(v.boolean()), // for homepage
     createdAt: v.number(),
   })
@@ -71,6 +72,14 @@ export default defineSchema({
     userId: v.id("users"),
     productId: v.id("products"),
     quantity: v.number(),
+    addedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_and_product", ["userId", "productId"]),
+
+  wishlistItems: defineTable({
+    userId: v.id("users"),
+    productId: v.id("products"),
     addedAt: v.number(),
   })
     .index("by_user", ["userId"])

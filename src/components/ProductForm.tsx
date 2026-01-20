@@ -30,6 +30,7 @@ export default function ProductForm({ productId, onClose, onSuccess }: ProductFo
     productType: "",
     size: "",
     inStock: true,
+    stockQuantity: "0",
     featured: false,
   });
 
@@ -49,6 +50,7 @@ export default function ProductForm({ productId, onClose, onSuccess }: ProductFo
         productType: existingProduct.productType,
         size: existingProduct.size || "",
         inStock: existingProduct.inStock,
+        stockQuantity: existingProduct.stockQuantity?.toString() || "0",
         featured: existingProduct.featured || false,
       });
     }
@@ -81,6 +83,7 @@ export default function ProductForm({ productId, onClose, onSuccess }: ProductFo
           productType: formData.productType,
           size: formData.size || undefined,
           inStock: formData.inStock,
+          stockQuantity: parseInt(formData.stockQuantity) || 0,
           featured: formData.featured,
         });
       } else {
@@ -95,6 +98,7 @@ export default function ProductForm({ productId, onClose, onSuccess }: ProductFo
           productType: formData.productType,
           size: formData.size || undefined,
           inStock: formData.inStock,
+          stockQuantity: parseInt(formData.stockQuantity) || 0,
           featured: formData.featured,
         });
       }
@@ -273,26 +277,42 @@ export default function ProductForm({ productId, onClose, onSuccess }: ProductFo
             </div>
           </div>
 
-          {/* Checkboxes */}
-          <div className="flex gap-6">
-            <label className="flex items-center">
+          {/* Checkboxes and Stock Quantity */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={formData.inStock}
+                  onChange={(e) => setFormData({ ...formData, inStock: e.target.checked })}
+                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                />
+                <span className="ml-2 text-sm text-gray-700">In Stock</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={formData.featured}
+                  onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
+                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                />
+                <span className="ml-2 text-sm text-gray-700">Featured on Homepage</span>
+              </label>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Stock Quantity *
+              </label>
               <input
-                type="checkbox"
-                checked={formData.inStock}
-                onChange={(e) => setFormData({ ...formData, inStock: e.target.checked })}
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                type="number"
+                min="0"
+                required
+                value={formData.stockQuantity}
+                onChange={(e) => setFormData({ ...formData, stockQuantity: e.target.value })}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
               />
-              <span className="ml-2 text-sm text-gray-700">In Stock</span>
-            </label>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={formData.featured}
-                onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              <span className="ml-2 text-sm text-gray-700">Featured on Homepage</span>
-            </label>
+            </div>
           </div>
 
           {/* Error Message */}
