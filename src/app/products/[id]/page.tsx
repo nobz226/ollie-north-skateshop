@@ -5,6 +5,7 @@ import { api } from "../../../../convex/_generated/api";
 import { useParams, useRouter } from "next/navigation";
 import { Id } from "../../../../convex/_generated/dataModel";
 import { useConvexUser } from "@/hooks/useConvexUser";
+import { useGuestCart } from "@/hooks/useGuestCart";
 import { useState, useMemo } from "react";
 import Image from "next/image";
 import Header from "../../Header";
@@ -17,24 +18,27 @@ export default function ProductDetailPage() {
   const productId = params.id as Id<"products">;
   const product = useQuery(api.products.getById, { id: productId });
   const { convexUser, isLoading: userLoading } = useConvexUser();
+  const { addToCart: addToGuestCart } = useGuestCart();
   const addToCart = useMutation(api.cart.addToCart);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
   const handleAddToCart = async () => {
-    if (!convexUser || userLoading) {
-      // Redirect to sign-in with return URL
-      router.push("/sign-in?redirectUrl=" + encodeURIComponent(window.location.pathname));
-      return;
-    }
+    if (!product) return;
 
     setIsAddingToCart(true);
 
     try {
-      await addToCart({
-        userId: convexUser._id,
-        productId: product!._id,
-      });
+      if (convexUser) {
+        // Authenticated user - use Convex
+        await addToCart({
+          userId: convexUser._id,
+          productId: product._id,
+        });
+      } else {
+        // Guest user - use localStorage
+        addToGuestCart(product._id, 1);
+      }
 
       // Show success feedback
       setShowSuccess(true);

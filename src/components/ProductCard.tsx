@@ -7,6 +7,7 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
 import { useConvexUser } from "@/hooks/useConvexUser";
+import { useGuestCart } from "@/hooks/useGuestCart";
 import { useState } from "react";
 import { Heart } from "lucide-react";
 
@@ -31,9 +32,10 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const router = useRouter();
   const { convexUser, isLoading: userLoading } = useConvexUser();
-  const addToCart = useMutation(api.cart.addToCart);
+  const addToCartMutation = useMutation(api.cart.addToCart);
   const addToWishlist = useMutation(api.wishlist.addToWishlist);
   const removeFromWishlist = useMutation(api.wishlist.removeFromWishlistByProduct);
+  const { addToCart: addToGuestCart } = useGuestCart();
   
   const isInWishlist = useQuery(
     api.wishlist.isInWishlist,
@@ -46,19 +48,19 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent Link navigation
 
-    if (!convexUser || userLoading) {
-      // Redirect to sign-in page
-      router.push("/sign-in?redirectUrl=" + encodeURIComponent(window.location.pathname));
-      return;
-    }
-
     setIsAddingToCart(true);
 
     try {
-      await addToCart({
-        userId: convexUser._id,
-        productId: product._id,
-      });
+      if (convexUser) {
+        // Authenticated user - add to Convex cart
+        await addToCartMutation({
+          userId: convexUser._id,
+          productId: product._id,
+        });
+      } else {
+        // Guest user - add to localStorage cart
+        addToGuestCart(product._id);
+      }
 
       // Show success feedback
       setShowSuccess(true);

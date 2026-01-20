@@ -3,6 +3,7 @@
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { useConvexUser } from "@/hooks/useConvexUser";
+import { useGuestCart } from "@/hooks/useGuestCart";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -12,6 +13,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 export default function CartPage() {
   const { convexUser, isLoading: userLoading } = useConvexUser();
   const router = useRouter();
+  const { guestCart, isLoaded: guestCartLoaded, updateQuantity: updateGuestQuantity, removeFromCart: removeGuestItem } = useGuestCart();
   
   const cart = useQuery(
     api.cart.getUserCart,
@@ -21,38 +23,19 @@ export default function CartPage() {
   const updateQuantity = useMutation(api.cart.updateQuantity);
   const removeFromCart = useMutation(api.cart.removeFromCart);
 
-  // Show sign-in prompt if not authenticated
-  if (!userLoading && !convexUser) {
-    return (
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <Breadcrumbs items={[{ label: "Shopping Cart", href: "/cart" }]} />
-        <div className="min-h-[60vh] flex flex-col items-center justify-center">
-          <div className="text-center max-w-md">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Sign In Required</h1>
-            <p className="text-gray-600 mb-8">
-              Please sign in to view your shopping cart and checkout.
-            </p>
-            <div className="flex gap-4 justify-center">
-              <Link
-                href="/sign-in?redirectUrl=/cart"
-                className="px-6 py-3 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
-              >
-                Sign In
-              </Link>
-              <button
-                onClick={() => router.back()}
-                className="px-6 py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-              >
-                Go Back
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Get product details for guest cart items
+  const allProducts = useQuery(api.products.list);
+  const guestCartWithProducts = guestCartLoaded && allProducts 
+    ? guestCart.map(item => ({
+        ...item,
+        product: allProducts.find(p => p._id === item.productId)
+      }))
+    : [];
 
-  if (userLoading || cart === undefined) {
+  const isGuest = !convexUser && !userLoading;
+  const activeCart = isGuest ? guestCartWithProducts : cart;
+
+  if (userLoading || !guestCartLoaded) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="text-lg">Loading cart...</div>
@@ -60,48 +43,59 @@ export default function CartPage() {
     );
   }
 
-  const handleQuantityChange = async (cartItemId: Id<"cartItems">, newQuantity: number) => {
-    try {
-      await updateQuantity({
-        cartItemId,
-        quantity: newQuantity,
-      });
-    } catch (error) {
-      console.error("Error updating quantity:", error);
-      alert("Failed to update quantity");
+  const handleQuantityChange = async (cartItemId: Id<"cartItems">, productId: string, newQuantity: number) => {
+    if (isGuest) {
+      updateGuestQuantity(productId, newQuantity);
+    } else {
+      try {
+        await updateQuantity({
+          cartItemId,
+          quantity: newQuantity,
+        });
+      } catch (error) {
+        console.error("Error updating quantity:", error);
+        alert("Failed to update quantity");
+      }
     }
   };
 
-  const handleRemoveItem = async (cartItemId: Id<"cartItems">) => {
-    try {
-      await removeFromCart({
-        cartItemId,
-      });
-    } catch (error) {
-      console.error("Error removing item:", error);
-      alert("Failed to remove item");
+  const handleRemoveItem = async (cartItemId: Id<"cartItems"> | undefined, productId: string) => {
+    if (isGuest) {
+      removeGuestItem(productId);
+    } else if (cartItemId) {
+      try {
+        await removeFromCart({
+          cartItemId,
+        });
+      } catch (error) {
+        console.error("Error removing item:", error);
+        alert("Failed to remove item");
+      }
     }
   };
 
   // Calculate totals
-  const subtotal = cart.reduce((total, item) => {
+  const subtotal = (activeCart || []).reduce((total, item) => {
     return total + (item.product?.price || 0) * item.quantity;
   }, 0);
 
   const tax = Math.round(subtotal * 0.08); // 8% tax
   const total = subtotal + tax;
 
-  if (cart.length === 0) {
+  if (!activeCart || activeCart.length === 0) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Your Cart is Empty</h1>
-        <p className="text-gray-600 mb-8">Add some awesome skateboarding gear!</p>
-        <Link
-          href="/products"
-          className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-        >
-          Continue Shopping
-        </Link>
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <Breadcrumbs items={[{ label: "Shopping Cart", href: "/cart" }]} />
+        <div className="min-h-[60vh] flex flex-col items-center justify-center">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">Your Cart is Empty</h1>
+          <p className="text-gray-600 mb-8">Add some awesome skateboarding gear!</p>
+          <Link
+            href="/products"
+            className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+          >
+            Continue Shopping
+          </Link>
+        </div>
       </div>
     );
   }
@@ -111,15 +105,29 @@ export default function CartPage() {
       <Breadcrumbs items={[{ label: "Shopping Cart", href: "/cart" }]} />
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Shopping Cart</h1>
 
+      {isGuest && (
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-blue-800">
+            🛈 You&apos;re shopping as a guest.{" "}
+            <Link href="/sign-in?redirectUrl=/cart" className="underline font-semibold">
+              Sign in
+            </Link>{" "}
+            to save your cart.
+          </p>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Cart Items */}
         <div className="lg:col-span-2 space-y-4">
-          {cart.map((item) => {
+          {activeCart.map((item) => {
             if (!item.product) return null;
+
+            const cartItemId = isGuest ? undefined : (item as any)._id;
 
             return (
               <div
-                key={item._id}
+                key={isGuest ? item.productId : (item as any)._id}
                 className="bg-white rounded-lg shadow p-4 flex gap-4"
               >
                 {/* Product Image */}
@@ -151,7 +159,7 @@ export default function CartPage() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() =>
-                        handleQuantityChange(item._id, item.quantity - 1)
+                        handleQuantityChange(cartItemId as Id<"cartItems">, item.productId, item.quantity - 1)
                       }
                       className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
                       aria-label="Decrease quantity"
@@ -163,7 +171,7 @@ export default function CartPage() {
                     </span>
                     <button
                       onClick={() =>
-                        handleQuantityChange(item._id, item.quantity + 1)
+                        handleQuantityChange(cartItemId as Id<"cartItems">, item.productId, item.quantity + 1)
                       }
                       className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
                       aria-label="Increase quantity"
@@ -172,7 +180,7 @@ export default function CartPage() {
                     </button>
                   </div>
                   <button
-                    onClick={() => handleRemoveItem(item._id)}
+                    onClick={() => handleRemoveItem(cartItemId as Id<"cartItems"> | undefined, item.productId)}
                     className="text-sm text-red-600 hover:text-red-800"
                   >
                     Remove
@@ -192,7 +200,7 @@ export default function CartPage() {
 
             <div className="space-y-3 mb-4">
               <div className="flex justify-between text-gray-700">
-                <span>Subtotal ({cart.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
+                <span>Subtotal ({activeCart.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
                 <span>${(subtotal / 100).toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-gray-700">
@@ -207,7 +215,7 @@ export default function CartPage() {
 
             <button
               className="w-full bg-indigo-600 text-white py-3 rounded-md font-semibold hover:bg-indigo-700 mb-3"
-              onClick={() => alert("Checkout coming soon!")}
+              onClick={() => router.push("/checkout")}
             >
               Proceed to Checkout
             </button>

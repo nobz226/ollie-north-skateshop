@@ -5,11 +5,13 @@ import { UserButton, useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useConvexUser } from "@/hooks/useConvexUser";
+import { useGuestCart } from "@/hooks/useGuestCart";
 import { ShoppingCart, User, Heart } from "lucide-react";
 
 export default function Header() {
   const { isSignedIn } = useUser();
   const { convexUser } = useConvexUser();
+  const { guestCart, isLoaded } = useGuestCart();
   
   const cart = useQuery(
     api.cart.getUserCart,
@@ -22,7 +24,11 @@ export default function Header() {
     convexUser && api.wishlist?.getUserWishlist ? { userId: convexUser._id } : "skip"
   );
 
-  const itemCount = cart?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+  // Use guest cart count if not signed in, otherwise use convex cart
+  const itemCount = convexUser 
+    ? (cart?.reduce((sum, item) => sum + item.quantity, 0) || 0)
+    : (isLoaded ? guestCart.reduce((sum, item) => sum + item.quantity, 0) : 0);
+  
   const wishlistCount = wishlist?.length || 0;
 
   return (
