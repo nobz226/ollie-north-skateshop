@@ -2,12 +2,11 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 // Define routes that require authentication
 const isProtectedRoute = createRouteMatcher([
-  '/cart(.*)',
   '/profile(.*)',
 ]);
 
 export default clerkMiddleware((auth, req) => {
-  // Only protect cart and profile routes
+  // Only protect profile route - cart is accessible but shows sign-in prompt
   if (isProtectedRoute(req)) {
     auth.protect();
   }

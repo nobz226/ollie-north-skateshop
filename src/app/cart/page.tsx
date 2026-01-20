@@ -21,10 +21,35 @@ export default function CartPage() {
   const updateQuantity = useMutation(api.cart.updateQuantity);
   const removeFromCart = useMutation(api.cart.removeFromCart);
 
-  // Redirect to sign-in if not authenticated
+  // Show sign-in prompt if not authenticated
   if (!userLoading && !convexUser) {
-    router.push("/sign-in");
-    return null;
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <Breadcrumbs items={[{ label: "Shopping Cart", href: "/cart" }]} />
+        <div className="min-h-[60vh] flex flex-col items-center justify-center">
+          <div className="text-center max-w-md">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">Sign In Required</h1>
+            <p className="text-gray-600 mb-8">
+              Please sign in to view your shopping cart and checkout.
+            </p>
+            <div className="flex gap-4 justify-center">
+              <Link
+                href="/sign-in?redirectUrl=/cart"
+                className="px-6 py-3 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
+              >
+                Sign In
+              </Link>
+              <button
+                onClick={() => router.back()}
+                className="px-6 py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              >
+                Go Back
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (userLoading || cart === undefined) {
