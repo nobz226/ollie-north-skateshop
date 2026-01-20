@@ -114,15 +114,17 @@ export default function ProductCard({ product }: ProductCardProps) {
               <span className="text-white font-bold text-lg">Out of Stock</span>
             </div>
           )}
-          {/* Wishlist Button */}
-          <button
-            onClick={handleToggleWishlist}
-            className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors z-10"
-          >
-            <Heart
-              className={`h-5 w-5 ${isInWishlist ? "fill-red-500 text-red-500" : "text-gray-600"}`}
-            />
-          </button>
+          {/* Wishlist Button - Only show for logged-in users */}
+          {convexUser && (
+            <button
+              onClick={handleToggleWishlist}
+              className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors z-10"
+            >
+              <Heart
+                className={`h-5 w-5 ${isInWishlist ? "fill-red-500 text-red-500" : "text-gray-600"}`}
+              />
+            </button>
+          )}
         </div>
 
         {/* Product Details */}
