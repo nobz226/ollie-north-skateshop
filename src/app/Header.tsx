@@ -64,6 +64,14 @@ export default function Header() {
 
           {/* Right side actions */}
           <div className="flex items-center space-x-4">
+            {isSignedIn && (
+              <Link
+                href="/profile"
+                className="text-sm font-medium text-gray-700 hover:text-red-600 transition-colors hidden md:block"
+              >
+                Profile
+              </Link>
+            )}
             <Link
               href="/cart"
               className="relative flex items-center text-gray-700 hover:text-red-600 transition-colors"

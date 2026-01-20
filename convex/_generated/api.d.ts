@@ -20,6 +20,7 @@ import type * as adminProducts from "../adminProducts.js";
 import type * as cart from "../cart.js";
 import type * as products from "../products.js";
 import type * as seedProducts from "../seedProducts.js";
+import type * as userProfile from "../userProfile.js";
 import type * as users from "../users.js";
 
 /**
@@ -38,6 +39,7 @@ declare const fullApi: ApiFromModules<{
   cart: typeof cart;
   products: typeof products;
   seedProducts: typeof seedProducts;
+  userProfile: typeof userProfile;
   users: typeof users;
 }>;
 export declare const api: FilterApi<

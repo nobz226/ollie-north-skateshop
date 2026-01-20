@@ -4,6 +4,23 @@ import { v } from "convex/values";
 export default defineSchema({
   users: defineTable({
     clerkUserId: v.string(),
+    shippingAddress: v.optional(v.object({
+      fullName: v.string(),
+      addressLine1: v.string(),
+      addressLine2: v.optional(v.string()),
+      city: v.string(),
+      state: v.string(),
+      postalCode: v.string(),
+      country: v.string(),
+      phone: v.string(),
+    })),
+    paymentMethod: v.optional(v.object({
+      cardHolderName: v.string(),
+      cardLastFour: v.string(),
+      cardType: v.string(), // "Visa", "Mastercard", etc.
+      expiryMonth: v.string(),
+      expiryYear: v.string(),
+    })),
   }).index("by_clerk_user_id", ["clerkUserId"]),
 
   // Add admin users table

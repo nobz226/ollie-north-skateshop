@@ -1,12 +1,13 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { useConvexUser } from "@/hooks/useConvexUser";
 import Header from "../Header";
 import Footer from "../Footer";
-import { Package, User, ShoppingBag } from "lucide-react";
+import { Package, User, ShoppingBag, CreditCard, MapPin } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export default function ProfilePage() {
   const { user } = useUser();
@@ -17,7 +18,103 @@ export default function ProfilePage() {
     convexUser ? { userId: convexUser._id } : "skip"
   );
 
+  const userProfile = useQuery(
+    api.userProfile.getUserProfile,
+    convexUser ? { userId: convexUser._id } : "skip"
+  );
+
+  const updateShippingAddress = useMutation(api.userProfile.updateShippingAddress);
+  const updatePaymentMethod = useMutation(api.userProfile.updatePaymentMethod);
+
   const cartItemCount = cart?.reduce((sum, item) => sum + item.quantity, 0) || 0;
+
+  // Shipping Address Form State
+  const [shippingForm, setShippingForm] = useState({
+    fullName: "",
+    addressLine1: "",
+    addressLine2: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    country: "USA",
+    phone: "",
+  });
+
+  // Payment Method Form State
+  const [paymentForm, setPaymentForm] = useState({
+    cardHolderName: "",
+    cardLastFour: "",
+    cardType: "Visa",
+    expiryMonth: "",
+    expiryYear: "",
+  });
+
+  const [isEditingShipping, setIsEditingShipping] = useState(false);
+  const [isEditingPayment, setIsEditingPayment] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Populate forms when user profile loads
+  useEffect(() => {
+    if (userProfile?.shippingAddress) {
+      setShippingForm({
+        fullName: userProfile.shippingAddress.fullName,
+        addressLine1: userProfile.shippingAddress.addressLine1,
+        addressLine2: userProfile.shippingAddress.addressLine2 || "",
+        city: userProfile.shippingAddress.city,
+        state: userProfile.shippingAddress.state,
+        postalCode: userProfile.shippingAddress.postalCode,
+        country: userProfile.shippingAddress.country,
+        phone: userProfile.shippingAddress.phone,
+      });
+    }
+    if (userProfile?.paymentMethod) {
+      setPaymentForm({
+        cardHolderName: userProfile.paymentMethod.cardHolderName,
+        cardLastFour: userProfile.paymentMethod.cardLastFour,
+        cardType: userProfile.paymentMethod.cardType,
+        expiryMonth: userProfile.paymentMethod.expiryMonth,
+        expiryYear: userProfile.paymentMethod.expiryYear,
+      });
+    }
+  }, [userProfile]);
+
+  const handleSaveShipping = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!convexUser) return;
+
+    setIsSaving(true);
+    try {
+      await updateShippingAddress({
+        userId: convexUser._id,
+        ...shippingForm,
+      });
+      setIsEditingShipping(false);
+    } catch (error) {
+      console.error("Error saving shipping address:", error);
+      alert("Failed to save shipping address");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSavePayment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!convexUser) return;
+
+    setIsSaving(true);
+    try {
+      await updatePaymentMethod({
+        userId: convexUser._id,
+        ...paymentForm,
+      });
+      setIsEditingPayment(false);
+    } catch (error) {
+      console.error("Error saving payment method:", error);
+      alert("Failed to save payment method");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -77,13 +174,317 @@ export default function ProfilePage() {
               </div>
 
               {/* Order History Placeholder */}
-              <div className="bg-white p-8">
+              <div className="bg-white p-8 mb-8">
                 <h3 className="text-xl font-bold mb-6">ORDER HISTORY</h3>
                 <div className="text-center py-12 text-gray-500">
                   <Package className="h-16 w-16 mx-auto mb-4 text-gray-300" />
                   <p className="mb-2">No orders yet</p>
                   <p className="text-sm">Your order history will appear here</p>
                 </div>
+              </div>
+
+              {/* Shipping Address Section */}
+              <div className="bg-white p-8 mb-8">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center">
+                    <MapPin className="h-6 w-6 mr-3" />
+                    <h3 className="text-xl font-bold">SHIPPING ADDRESS</h3>
+                  </div>
+                  {!isEditingShipping && userProfile?.shippingAddress && (
+                    <button
+                      onClick={() => setIsEditingShipping(true)}
+                      className="text-sm text-red-600 hover:text-red-700"
+                    >
+                      Edit
+                    </button>
+                  )}
+                </div>
+
+                {isEditingShipping || !userProfile?.shippingAddress ? (
+                  <form onSubmit={handleSaveShipping} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Full Name *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={shippingForm.fullName}
+                        onChange={(e) => setShippingForm({ ...shippingForm, fullName: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Address Line 1 *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={shippingForm.addressLine1}
+                        onChange={(e) => setShippingForm({ ...shippingForm, addressLine1: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Address Line 2
+                      </label>
+                      <input
+                        type="text"
+                        value={shippingForm.addressLine2}
+                        onChange={(e) => setShippingForm({ ...shippingForm, addressLine2: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          City *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={shippingForm.city}
+                          onChange={(e) => setShippingForm({ ...shippingForm, city: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          State *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={shippingForm.state}
+                          onChange={(e) => setShippingForm({ ...shippingForm, state: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Postal Code *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={shippingForm.postalCode}
+                          onChange={(e) => setShippingForm({ ...shippingForm, postalCode: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Country *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={shippingForm.country}
+                          onChange={(e) => setShippingForm({ ...shippingForm, country: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Phone *
+                      </label>
+                      <input
+                        type="tel"
+                        required
+                        value={shippingForm.phone}
+                        onChange={(e) => setShippingForm({ ...shippingForm, phone: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                      />
+                    </div>
+
+                    <div className="flex gap-4 pt-4">
+                      <button
+                        type="submit"
+                        disabled={isSaving}
+                        className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 disabled:bg-gray-400"
+                      >
+                        {isSaving ? "Saving..." : "Save Address"}
+                      </button>
+                      {userProfile?.shippingAddress && (
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingShipping(false)}
+                          className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                        >
+                          Cancel
+                        </button>
+                      )}
+                    </div>
+                  </form>
+                ) : (
+                  <div className="space-y-2">
+                    <p className="font-medium">{userProfile.shippingAddress.fullName}</p>
+                    <p className="text-gray-700">{userProfile.shippingAddress.addressLine1}</p>
+                    {userProfile.shippingAddress.addressLine2 && (
+                      <p className="text-gray-700">{userProfile.shippingAddress.addressLine2}</p>
+                    )}
+                    <p className="text-gray-700">
+                      {userProfile.shippingAddress.city}, {userProfile.shippingAddress.state} {userProfile.shippingAddress.postalCode}
+                    </p>
+                    <p className="text-gray-700">{userProfile.shippingAddress.country}</p>
+                    <p className="text-gray-700">{userProfile.shippingAddress.phone}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Payment Method Section */}
+              <div className="bg-white p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center">
+                    <CreditCard className="h-6 w-6 mr-3" />
+                    <h3 className="text-xl font-bold">PAYMENT METHOD</h3>
+                  </div>
+                  {!isEditingPayment && userProfile?.paymentMethod && (
+                    <button
+                      onClick={() => setIsEditingPayment(true)}
+                      className="text-sm text-red-600 hover:text-red-700"
+                    >
+                      Edit
+                    </button>
+                  )}
+                </div>
+
+                {isEditingPayment || !userProfile?.paymentMethod ? (
+                  <form onSubmit={handleSavePayment} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Cardholder Name *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={paymentForm.cardHolderName}
+                        onChange={(e) => setPaymentForm({ ...paymentForm, cardHolderName: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Card Type *
+                      </label>
+                      <select
+                        required
+                        value={paymentForm.cardType}
+                        onChange={(e) => setPaymentForm({ ...paymentForm, cardType: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                      >
+                        <option value="Visa">Visa</option>
+                        <option value="Mastercard">Mastercard</option>
+                        <option value="American Express">American Express</option>
+                        <option value="Discover">Discover</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Last 4 Digits *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        maxLength={4}
+                        pattern="[0-9]{4}"
+                        value={paymentForm.cardLastFour}
+                        onChange={(e) => setPaymentForm({ ...paymentForm, cardLastFour: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                        placeholder="1234"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Expiry Month *
+                        </label>
+                        <select
+                          required
+                          value={paymentForm.expiryMonth}
+                          onChange={(e) => setPaymentForm({ ...paymentForm, expiryMonth: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                        >
+                          <option value="">Month</option>
+                          {Array.from({ length: 12 }, (_, i) => {
+                            const month = (i + 1).toString().padStart(2, "0");
+                            return (
+                              <option key={month} value={month}>
+                                {month}
+                              </option>
+                            );
+                          })}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Expiry Year *
+                        </label>
+                        <select
+                          required
+                          value={paymentForm.expiryYear}
+                          onChange={(e) => setPaymentForm({ ...paymentForm, expiryYear: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                        >
+                          <option value="">Year</option>
+                          {Array.from({ length: 10 }, (_, i) => {
+                            const year = (new Date().getFullYear() + i).toString();
+                            return (
+                              <option key={year} value={year}>
+                                {year}
+                              </option>
+                            );
+                          })}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-4 pt-4">
+                      <button
+                        type="submit"
+                        disabled={isSaving}
+                        className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 disabled:bg-gray-400"
+                      >
+                        {isSaving ? "Saving..." : "Save Payment Method"}
+                      </button>
+                      {userProfile?.paymentMethod && (
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingPayment(false)}
+                          className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                        >
+                          Cancel
+                        </button>
+                      )}
+                    </div>
+                  </form>
+                ) : (
+                  <div className="space-y-2">
+                    <p className="font-medium">{userProfile.paymentMethod.cardHolderName}</p>
+                    <p className="text-gray-700">
+                      {userProfile.paymentMethod.cardType} ending in {userProfile.paymentMethod.cardLastFour}
+                    </p>
+                    <p className="text-gray-700">
+                      Expires: {userProfile.paymentMethod.expiryMonth}/{userProfile.paymentMethod.expiryYear}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
