@@ -21,6 +21,7 @@ import type * as cart from "../cart.js";
 import type * as orders from "../orders.js";
 import type * as products from "../products.js";
 import type * as seedProducts from "../seedProducts.js";
+import type * as updateHardwareSizes from "../updateHardwareSizes.js";
 import type * as userProfile from "../userProfile.js";
 import type * as users from "../users.js";
 import type * as wishlist from "../wishlist.js";
@@ -42,6 +43,7 @@ declare const fullApi: ApiFromModules<{
   orders: typeof orders;
   products: typeof products;
   seedProducts: typeof seedProducts;
+  updateHardwareSizes: typeof updateHardwareSizes;
   userProfile: typeof userProfile;
   users: typeof users;
   wishlist: typeof wishlist;
