@@ -807,7 +807,7 @@ export default function ProfilePage() {
                   <Package className="h-8 w-8 mr-3" />
                   <h3 className="text-lg font-bold">TOTAL ORDERS</h3>
                 </div>
-                <p className="text-3xl font-bold mb-2">0</p>
+                <p className="text-3xl font-bold mb-2">{orders?.length || 0}</p>
                 <p className="text-sm text-gray-600">All-time purchases</p>
               </div>
 
