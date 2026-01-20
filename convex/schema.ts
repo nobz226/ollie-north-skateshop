@@ -6,6 +6,32 @@ export default defineSchema({
     clerkUserId: v.string(),
   }).index("by_clerk_user_id", ["clerkUserId"]),
 
+  // Add admin users table
+  adminUsers: defineTable({
+    username: v.string(),
+    passwordHash: v.string(), // Will store hashed password
+    createdAt: v.number(),
+  }).index("by_username", ["username"]),
+
+  // Add orders table for order history
+  orders: defineTable({
+    userId: v.id("users"),
+    items: v.array(v.object({
+      productId: v.id("products"),
+      productName: v.string(),
+      quantity: v.number(),
+      price: v.number(), // Price at time of purchase
+    })),
+    subtotal: v.number(),
+    tax: v.number(),
+    total: v.number(),
+    status: v.string(), // "pending", "processing", "shipped", "delivered", "cancelled"
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_user", ["userId"])
+    .index("by_status", ["status"])
+    .index("by_created_at", ["createdAt"]),
+
   products: defineTable({
     name: v.string(),
     description: v.string(),

@@ -1,15 +1,13 @@
 import { query } from "./_generated/server";
 import { v } from "convex/values";
 
-// Get all products
 export const list = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("products").order("desc").collect();
+    return await ctx.db.query("products").collect();
   },
 });
 
-// Get single product by ID
 export const getById = query({
   args: { id: v.id("products") },
   handler: async (ctx, args) => {
@@ -17,7 +15,6 @@ export const getById = query({
   },
 });
 
-// Get products by category
 export const getByCategory = query({
   args: { category: v.string() },
   handler: async (ctx, args) => {
@@ -28,7 +25,6 @@ export const getByCategory = query({
   },
 });
 
-// Get products by subcategory
 export const getBySubcategory = query({
   args: { subcategory: v.string() },
   handler: async (ctx, args) => {
@@ -39,7 +35,6 @@ export const getBySubcategory = query({
   },
 });
 
-// Get featured products
 export const getFeatured = query({
   args: {},
   handler: async (ctx) => {
