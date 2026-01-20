@@ -7,6 +7,7 @@ import ProductCard from "@/components/ProductCard";
 import Header from "../Header";
 import Footer from "../Footer";
 import { useSearchParams, useRouter } from "next/navigation";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 export default function ProductsPage() {
   const router = useRouter();
@@ -48,7 +49,28 @@ export default function ProductsPage() {
   // Use useEffect instead of useMemo for side effects (per copilot-instructions.md)
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, selectedProductType, selectedSize, priceRange]);
+  }, [searchQuery, lockedCategory, lockedSubcategory, selectedProductType, selectedSize, priceRange]);
+
+  // Build dynamic breadcrumbs based on current filters
+  const breadcrumbItems = useMemo(() => {
+    const items = [{ label: "Products", href: "/products" }];
+    
+    if (lockedCategory) {
+      items.push({
+        label: lockedCategory,
+        href: `/products?category=${lockedCategory}`,
+      });
+    }
+    
+    if (lockedSubcategory) {
+      items.push({
+        label: lockedSubcategory.charAt(0).toUpperCase() + lockedSubcategory.slice(1),
+        href: `/products?subcategory=${lockedSubcategory}`,
+      });
+    }
+    
+    return items;
+  }, [lockedCategory, lockedSubcategory]);
 
   // Sync URL params to state when they change
   useEffect(() => {
@@ -225,6 +247,7 @@ export default function ProductsPage() {
         </section>
 
         <div className="container mx-auto px-4 py-12">
+          <Breadcrumbs items={breadcrumbItems} />
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Filters Sidebar */}
             <aside className="lg:w-64 flex-shrink-0">

@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Header from "../Header";
 import Footer from "../Footer";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 export default function ApparelPage() {
   const subcategories = [
@@ -48,6 +49,7 @@ export default function ApparelPage() {
 
         {/* Subcategories Grid */}
         <section className="container mx-auto px-4 py-20">
+          <Breadcrumbs items={[{ label: "Apparel", href: "/apparel" }]} />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {subcategories.map((subcategory) => (
               <Link

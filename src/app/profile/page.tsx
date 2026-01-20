@@ -8,6 +8,7 @@ import Header from "../Header";
 import Footer from "../Footer";
 import { Package, User, ShoppingBag, CreditCard, MapPin } from "lucide-react";
 import { useState, useEffect } from "react";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 export default function ProfilePage() {
   const { user } = useUser();
@@ -134,6 +135,7 @@ export default function ProfilePage() {
 
       <main className="flex-grow bg-gray-50">
         <div className="container mx-auto px-4 py-12">
+          <Breadcrumbs items={[{ label: "My Profile", href: "/profile" }]} />
           <h1 className="text-4xl font-bold mb-8">MY ACCOUNT</h1>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

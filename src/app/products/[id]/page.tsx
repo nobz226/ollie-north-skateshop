@@ -5,10 +5,11 @@ import { api } from "../../../../convex/_generated/api";
 import { useParams, useRouter } from "next/navigation";
 import { Id } from "../../../../convex/_generated/dataModel";
 import { useConvexUser } from "@/hooks/useConvexUser";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
 import Header from "../../Header";
 import Footer from "../../Footer";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -46,6 +47,18 @@ export default function ProductDetailPage() {
     }
   };
 
+  // Build breadcrumbs based on product
+  const breadcrumbItems = useMemo(() => {
+    if (!product) return [{ label: "Products", href: "/products" }];
+    
+    return [
+      { label: "Products", href: "/products" },
+      { label: product.category, href: `/products?category=${product.category}` },
+      { label: product.subcategory, href: `/products?subcategory=${product.subcategory}` },
+      { label: product.name, href: `/products/${product._id}` },
+    ];
+  }, [product]);
+
   if (product === undefined) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -78,6 +91,7 @@ export default function ProductDetailPage() {
 
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-12">
+          <Breadcrumbs items={breadcrumbItems} />
           {/* Back Button */}
           <button
             onClick={() => router.back()}
