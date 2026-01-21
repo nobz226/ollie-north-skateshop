@@ -9,7 +9,7 @@ import type { Id } from "../../convex/_generated/dataModel";
 import { useConvexUser } from "@/hooks/useConvexUser";
 import { useGuestCart } from "@/hooks/useGuestCart";
 import { useState } from "react";
-import { Heart } from "lucide-react";
+import { Heart, ShoppingCart } from "lucide-react";
 
 interface Product {
   _id: Id<"products">;
@@ -154,7 +154,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             <button
               onClick={handleAddToCart}
               disabled={!product.inStock || isAddingToCart || userLoading}
-              className={`px-5 py-2.5 rounded-lg text-base font-bold transition-all duration-300 transform hover:scale-105 active:scale-95 ${
+              className={`px-5 py-2.5 rounded-lg text-base font-bold transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center gap-2 ${
                 showSuccess
                   ? "bg-green-500 text-white shadow-lg"
                   : product.inStock
@@ -162,12 +162,13 @@ export default function ProductCard({ product }: ProductCardProps) {
                   : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
             >
+              <ShoppingCart className="h-5 w-5" />
               {showSuccess
                 ? "ADDED"
                 : isAddingToCart
                 ? "ADDING..."
                 : product.inStock
-                ? "ADD TO CART"
+                ? ""
                 : "OUT OF STOCK"}
             </button>
           </div>

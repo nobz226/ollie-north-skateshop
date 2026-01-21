@@ -26,9 +26,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.01em;
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.6;
 }
 
@@ -37,6 +37,7 @@ h1 {
   font-family: var(--font-heading-1);
   font-weight: 400;
   letter-spacing: 0.05em;
+  opacity: 1;
 }
 
 h2 {
@@ -44,12 +45,36 @@ h2 {
   font-optical-sizing: auto;
   font-weight: 700;
   letter-spacing: 0.02em;
+  opacity: 1;
 }
 
 h3, h4, h5, h6 {
   font-family: var(--font-heading-2);
   font-optical-sizing: auto;
-  font-weight: 600;
+  font-weight: 800;
+  opacity: 1;
+}
+
+p {
+  font-weight: 700;
+  font-size: 1.1em;
+  opacity: 1;
+}
+
+span {
+  font-weight: 700;
+  opacity: 1;
+}
+
+a {
+  font-weight: 700;
+  opacity: 1;
+}
+
+button {
+  font-weight: 800;
+  font-size: 1.1em;
+  opacity: 1;
 }
 
 /* Improved text rendering */

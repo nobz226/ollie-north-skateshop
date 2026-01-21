@@ -11,6 +11,7 @@ import Image from "next/image";
 import Header from "../../Header";
 import Footer from "../../Footer";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { ShoppingCart } from "lucide-react";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -184,7 +185,7 @@ export default function ProductDetailPage() {
               <button
                 onClick={handleAddToCart}
                 disabled={!product.inStock || isAddingToCart || userLoading}
-                className={`w-full py-5 px-6 rounded-xl text-lg font-bold transition-all shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 ${
+                className={`w-full py-5 px-6 rounded-xl text-lg font-bold transition-all shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 flex items-center justify-center gap-3 ${
                   showSuccess
                     ? "bg-green-500 text-white"
                     : product.inStock
@@ -192,12 +193,13 @@ export default function ProductDetailPage() {
                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 }`}
               >
+                <ShoppingCart className="h-6 w-6" />
                 {showSuccess
                   ? "ADDED TO CART"
                   : isAddingToCart
                   ? "ADDING TO CART..."
                   : product.inStock
-                  ? "ADD TO CART"
+                  ? ""
                   : "OUT OF STOCK"}
               </button>
 

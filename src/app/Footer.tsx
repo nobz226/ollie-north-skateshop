@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { Instagram, Facebook, Youtube } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -69,6 +70,40 @@ export default function Footer() {
               <li>Phone: (555) 123-4567</li>
               <li>Email: shop@ollienorth.com</li>
             </ul>
+            
+            {/* Social Media Links */}
+            <div className="mt-6">
+              <h4 className="text-sm font-bold mb-3 text-cyan-400">FOLLOW US</h4>
+              <div className="flex gap-4">
+                <a 
+                  href="https://instagram.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-cyan-400 transition-all transform hover:scale-110 duration-300"
+                  aria-label="Instagram"
+                >
+                  <Instagram className="h-6 w-6" />
+                </a>
+                <a 
+                  href="https://facebook.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-cyan-400 transition-all transform hover:scale-110 duration-300"
+                  aria-label="Facebook"
+                >
+                  <Facebook className="h-6 w-6" />
+                </a>
+                <a 
+                  href="https://youtube.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-cyan-400 transition-all transform hover:scale-110 duration-300"
+                  aria-label="YouTube"
+                >
+                  <Youtube className="h-6 w-6" />
+                </a>
+              </div>
+            </div>
           </div>
         </div>
 

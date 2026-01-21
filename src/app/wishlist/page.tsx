@@ -167,12 +167,12 @@ export default function WishlistPage() {
                       disabled={!item.product.inStock}
                       className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                         item.product.inStock
-                          ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                          ? "bg-cyan-500 text-white hover:bg-cyan-600"
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"
                       }`}
                     >
                       <ShoppingCart className="h-4 w-4" />
-                      {item.product.inStock ? "Add to Cart" : "Out of Stock"}
+                      {item.product.inStock ? "" : "Out of Stock"}
                     </button>
                   </div>
                 </div>
