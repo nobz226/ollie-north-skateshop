@@ -6,35 +6,27 @@ export const createOrder = mutation({
   args: {
     userId: v.id("users"),
     items: v.array(v.object({
-      productId: v.id("products"),
       productName: v.string(),
       quantity: v.number(),
       price: v.number(), // Price at time of purchase (in cents)
     })),
-    subtotal: v.number(),
-    tax: v.number(),
     total: v.number(),
-    shippingAddress: v.object({
-      fullName: v.string(),
-      addressLine1: v.string(),
-      addressLine2: v.optional(v.string()),
-      city: v.string(),
-      state: v.string(),
-      postalCode: v.string(),
-      country: v.string(),
-      phone: v.string(),
-    }),
   },
   handler: async (ctx, args) => {
     const now = Date.now();
     
     const orderId = await ctx.db.insert("orders", {
       userId: args.userId,
-      items: args.items,
-      subtotal: args.subtotal,
-      tax: args.tax,
+      items: args.items.map(item => ({
+        productId: "" as any, // Placeholder since we don't have productId from Stripe
+        productName: item.productName,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+      subtotal: args.total,
+      tax: 0,
       total: args.total,
-      status: "pending",
+      status: "processing",
       createdAt: now,
       updatedAt: now,
     });

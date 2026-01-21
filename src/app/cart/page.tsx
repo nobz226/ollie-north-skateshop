@@ -4,15 +4,19 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { useConvexUser } from "@/hooks/useConvexUser";
 import { useGuestCart } from "@/hooks/useGuestCart";
+import { useUser } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import type { Id } from "../../../convex/_generated/dataModel";
 import Breadcrumbs from "@/components/Breadcrumbs";
 
 export default function CartPage() {
   const { convexUser, isLoading: userLoading } = useConvexUser();
+  const { user } = useUser();
   const router = useRouter();
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
   const { guestCart, isLoaded: guestCartLoaded, updateQuantity: updateGuestQuantity, removeFromCart: removeGuestItem } = useGuestCart();
   
   const cart = useQuery(
@@ -71,6 +75,40 @@ export default function CartPage() {
         console.error("Error removing item:", error);
         alert("Failed to remove item");
       }
+    }
+  };
+
+  const handleStripeCheckout = async () => {
+    if (!convexUser || !user) {
+      router.push("/sign-in");
+      return;
+    }
+
+    setIsCheckingOut(true);
+    
+    try {
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: activeCart,
+          userId: convexUser._id,
+          userEmail: user.primaryEmailAddress?.emailAddress,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.url) {
+        // Redirect to Stripe Checkout
+        window.location.href = data.url;
+      } else {
+        throw new Error("Failed to create checkout session");
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+      alert("Failed to start checkout. Please try again.");
+      setIsCheckingOut(false);
     }
   };
 
@@ -221,10 +259,11 @@ export default function CartPage() {
             </div>
 
             <button
-              className="w-full bg-cyan-500 text-white py-4 rounded-lg font-bold hover:bg-cyan-600 mb-3 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
-              onClick={() => router.push("/checkout")}
+              className="w-full bg-cyan-500 text-white py-4 rounded-lg font-bold hover:bg-cyan-600 mb-3 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={handleStripeCheckout}
+              disabled={isCheckingOut || activeCart.length === 0}
             >
-              PROCEED TO CHECKOUT
+              {isCheckingOut ? "PROCESSING..." : "PROCEED TO CHECKOUT"}
             </button>
 
             <button
