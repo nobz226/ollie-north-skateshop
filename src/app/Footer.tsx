@@ -5,33 +5,33 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="bg-black text-white mt-20">
+    <footer className="bg-gradient-to-b from-black to-gray-900 text-white mt-20">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* About */}
           <div>
-            <h3 className="text-lg font-bold mb-4">OLLIE NORTH</h3>
-            <p className="text-sm text-gray-400">
+            <h3 className="text-lg font-bold mb-4 text-cyan-400">OLLIE NORTH</h3>
+            <p className="text-sm text-gray-400 leading-relaxed">
               Your premier destination for quality skate gear. From complete boards to the smallest hardware, we got you covered.
             </p>
           </div>
 
           {/* Shop */}
           <div>
-            <h3 className="text-lg font-bold mb-4">SHOP</h3>
-            <ul className="space-y-2 text-sm">
+            <h3 className="text-lg font-bold mb-4 text-cyan-400">SHOP</h3>
+            <ul className="space-y-3 text-sm">
               <li>
-                <Link href="/boards" className="text-gray-400 hover:text-red-500 transition-colors">
+                <Link href="/boards" className="text-gray-400 hover:text-cyan-400 transition-colors inline-block hover:translate-x-1 transform duration-300">
                   Boards
                 </Link>
               </li>
               <li>
-                <Link href="/hardware" className="text-gray-400 hover:text-red-500 transition-colors">
+                <Link href="/hardware" className="text-gray-400 hover:text-cyan-400 transition-colors inline-block hover:translate-x-1 transform duration-300">
                   Hardware
                 </Link>
               </li>
               <li>
-                <Link href="/apparel" className="text-gray-400 hover:text-red-500 transition-colors">
+                <Link href="/apparel" className="text-gray-400 hover:text-cyan-400 transition-colors inline-block hover:translate-x-1 transform duration-300">
                   Apparel
                 </Link>
               </li>
@@ -40,20 +40,20 @@ export default function Footer() {
 
           {/* Info */}
           <div>
-            <h3 className="text-lg font-bold mb-4">INFO</h3>
-            <ul className="space-y-2 text-sm">
+            <h3 className="text-lg font-bold mb-4 text-cyan-400">INFO</h3>
+            <ul className="space-y-3 text-sm">
               <li>
-                <Link href="/about" className="text-gray-400 hover:text-red-500 transition-colors">
+                <Link href="/about" className="text-gray-400 hover:text-cyan-400 transition-colors inline-block hover:translate-x-1 transform duration-300">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link href="/profile" className="text-gray-400 hover:text-red-500 transition-colors">
+                <Link href="/profile" className="text-gray-400 hover:text-cyan-400 transition-colors inline-block hover:translate-x-1 transform duration-300">
                   My Account
                 </Link>
               </li>
               <li>
-                <Link href="/cart" className="text-gray-400 hover:text-red-500 transition-colors">
+                <Link href="/cart" className="text-gray-400 hover:text-cyan-400 transition-colors inline-block hover:translate-x-1 transform duration-300">
                   Shopping Cart
                 </Link>
               </li>
@@ -62,7 +62,7 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="text-lg font-bold mb-4">CONTACT</h3>
+            <h3 className="text-lg font-bold mb-4 text-cyan-400">CONTACT</h3>
             <ul className="space-y-2 text-sm text-gray-400">
               <li>123 Skate Street</li>
               <li>Venice Beach, CA 90291</li>

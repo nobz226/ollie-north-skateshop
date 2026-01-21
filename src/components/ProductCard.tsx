@@ -99,76 +99,76 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   return (
-    <Link href={`/products/${product._id}`} className="group">
-      <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+    <Link href={`/products/${product._id}`} className="group block h-full">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:border-cyan-500 transition-all duration-500 h-full flex flex-col">
         {/* Product Image */}
-        <div className="relative h-64 bg-gray-200">
+        <div className="relative h-72 bg-gray-50 overflow-hidden">
           <Image
             src={product.imageUrl}
             alt={product.name}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
           />
           {!product.inStock && (
-            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-              <span className="text-white font-bold text-lg">Out of Stock</span>
+            <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center backdrop-blur-sm">
+              <span className="text-white font-bold text-lg tracking-wide">OUT OF STOCK</span>
             </div>
           )}
           {/* Wishlist Button - Only show for logged-in users */}
           {convexUser && (
             <button
               onClick={handleToggleWishlist}
-              className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors z-10"
+              className="absolute top-4 right-4 p-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-cyan-500 hover:text-white transition-all duration-300 z-10 group/heart"
             >
               <Heart
-                className={`h-5 w-5 ${isInWishlist ? "fill-red-500 text-red-500" : "text-gray-600"}`}
+                className={`h-5 w-5 transition-all ${isInWishlist ? "fill-cyan-500 text-cyan-500 group-hover/heart:fill-white group-hover/heart:text-white" : "text-gray-700 group-hover/heart:text-white"}`}
               />
             </button>
           )}
         </div>
 
         {/* Product Details */}
-        <div className="p-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-1 group-hover:text-indigo-600 transition-colors">
+        <div className="p-5 flex-grow flex flex-col">
+          <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-cyan-600 transition-colors duration-300 line-clamp-1">
             {product.name}
           </h3>
-          <p className="text-sm text-gray-600 mb-2">
+          <p className="text-sm text-gray-600 mb-2 uppercase tracking-wide">
             {product.subcategory} {product.size && `• ${product.size}`}
           </p>
           {product.inStock && (
-            <p className="text-xs text-gray-500 mb-2">
+            <p className="text-xs text-cyan-600 font-medium mb-2">
               {product.stockQuantity > 0 
                 ? `${product.stockQuantity} in stock` 
                 : "Low stock"}
             </p>
           )}
-          <p className="text-gray-700 text-sm line-clamp-2 mb-3">
+          <p className="text-gray-600 text-base line-clamp-2 mb-4 flex-grow leading-relaxed">
             {product.description}
           </p>
 
           {/* Price and Add to Cart */}
-          <div className="flex items-center justify-between">
-            <span className="text-xl font-bold text-gray-900">
+          <div className="flex items-center justify-between mt-auto">
+            <span className="text-2xl font-bold text-gray-900">
               ${(product.price / 100).toFixed(2)}
             </span>
             <button
               onClick={handleAddToCart}
               disabled={!product.inStock || isAddingToCart || userLoading}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`px-5 py-2.5 rounded-lg text-base font-bold transition-all duration-300 transform hover:scale-105 active:scale-95 ${
                 showSuccess
-                  ? "bg-green-600 text-white"
+                  ? "bg-green-500 text-white shadow-lg"
                   : product.inStock
-                  ? "bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  ? "bg-cyan-500 text-white hover:bg-cyan-600 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
             >
               {showSuccess
-                ? "Added ✓"
+                ? "ADDED"
                 : isAddingToCart
-                ? "Adding..."
+                ? "ADDING..."
                 : product.inStock
-                ? "Add to Cart"
-                : "Out of Stock"}
+                ? "ADD TO CART"
+                : "OUT OF STOCK"}
             </button>
           </div>
         </div>

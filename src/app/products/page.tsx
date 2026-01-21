@@ -239,10 +239,10 @@ export default function ProductsPage() {
 
       <main className="flex-grow">
         {/* Page Header */}
-        <section className="bg-black text-white py-12">
+        <section className="bg-gradient-to-r from-black via-gray-900 to-black text-white py-16">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-2">{pageTitle.toUpperCase()}</h1>
-            <p className="text-gray-400">Find your perfect setup</p>
+            <h1 className="text-4xl md:text-6xl font-bold mb-2">{pageTitle.toUpperCase()}</h1>
+            <p className="text-gray-300 text-lg">Find your perfect setup</p>
           </div>
         </section>
 
@@ -251,39 +251,39 @@ export default function ProductsPage() {
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Filters Sidebar */}
             <aside className="lg:w-64 flex-shrink-0">
-              <div className="bg-gray-50 p-6 sticky top-20">
+              <div className="bg-white border border-gray-100 rounded-xl p-6 sticky top-20 shadow-lg">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-bold">FILTERS</h2>
                   {hasActiveFilters && (
                     <button
                       onClick={resetFilters}
-                      className="text-sm text-red-600 hover:text-red-700 font-medium"
+                      className="text-sm text-cyan-500 hover:text-cyan-600 font-bold transition-colors"
                     >
-                      Reset
+                      RESET
                     </button>
                   )}
                 </div>
 
                 {/* Search */}
                 <div className="mb-6">
-                  <label className="block text-sm font-bold mb-2">SEARCH</label>
+                  <label className="block text-sm font-bold mb-2 text-gray-700">SEARCH</label>
                   <input
                     type="text"
                     placeholder="Search products..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-black"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all"
                   />
                 </div>
 
                 {/* Product Type Filter - Show when on filtered page */}
                 {isFilteredPage && (
                   <div className="mb-6">
-                    <label className="block text-sm font-bold mb-2">PRODUCT TYPE</label>
+                    <label className="block text-sm font-bold mb-2 text-gray-700">PRODUCT TYPE</label>
                     <select
                       value={selectedProductType}
                       onChange={(e) => setSelectedProductType(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-black"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
                     >
                       <option value="">All Types</option>
                       {productTypes.map((type) => (
@@ -298,11 +298,11 @@ export default function ProductsPage() {
                 {/* Size Filter - Show when product type is selected */}
                 {isFilteredPage && selectedProductType !== "" && (
                   <div className="mb-6">
-                    <label className="block text-sm font-bold mb-2">SIZE</label>
+                    <label className="block text-sm font-bold mb-2 text-gray-700">SIZE</label>
                     <select
                       value={selectedSize}
                       onChange={(e) => setSelectedSize(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 focus:outline-none focus:border-black"
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all bg-white"
                     >
                       <option value="">All Sizes</option>
                       {sizes.map((size) => (
@@ -316,7 +316,7 @@ export default function ProductsPage() {
 
                 {/* Price Range - Always show */}
                 <div className="mb-6">
-                  <label className="block text-sm font-bold mb-2">
+                  <label className="block text-sm font-bold mb-2 text-gray-700">
                     PRICE RANGE: ${(priceRange[0] / 100).toFixed(0)} - ${(priceRange[1] / 100).toFixed(0)}
                   </label>
                   <input
@@ -326,7 +326,7 @@ export default function ProductsPage() {
                     step="500"
                     value={priceRange[1]}
                     onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
-                    className="w-full"
+                    className="w-full accent-cyan-500"
                   />
                 </div>
               </div>
@@ -349,7 +349,7 @@ export default function ProductsPage() {
                   {hasActiveFilters && (
                     <button
                       onClick={resetFilters}
-                      className="text-red-600 hover:text-red-700 font-medium"
+                      className="text-cyan-500 hover:text-cyan-600 font-bold transition-colors"
                     >
                       Clear all filters
                     </button>
@@ -359,7 +359,9 @@ export default function ProductsPage() {
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
                     {currentProducts.map((product) => (
-                      <ProductCard key={product._id} product={product} />
+                      <div key={product._id} className="h-full">
+                        <ProductCard product={product} />
+                      </div>
                     ))}
                   </div>
 
@@ -369,19 +371,19 @@ export default function ProductsPage() {
                       <button
                         onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                         disabled={currentPage === 1}
-                        className="px-4 py-2 border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                        className="px-6 py-3 border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-cyan-50 hover:border-cyan-500 transition-all font-bold"
                       >
-                        Previous
+                        PREVIOUS
                       </button>
 
                       {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                         <button
                           key={page}
                           onClick={() => setCurrentPage(page)}
-                          className={`px-4 py-2 border ${
+                          className={`px-5 py-3 border rounded-lg font-bold transition-all ${
                             currentPage === page
-                              ? "bg-black text-white border-black"
-                              : "border-gray-300 hover:bg-gray-50"
+                              ? "bg-cyan-500 text-white border-cyan-500 shadow-lg"
+                              : "border-gray-200 hover:bg-cyan-50 hover:border-cyan-500"
                           }`}
                         >
                           {page}
@@ -391,9 +393,9 @@ export default function ProductsPage() {
                       <button
                         onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                         disabled={currentPage === totalPages}
-                        className="px-4 py-2 border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                        className="px-6 py-3 border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-cyan-50 hover:border-cyan-500 transition-all font-bold"
                       >
-                        Next
+                        NEXT
                       </button>
                     </div>
                   )}

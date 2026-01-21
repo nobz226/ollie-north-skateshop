@@ -34,10 +34,10 @@ export default function BoardsPage() {
 
       <main className="flex-grow">
         {/* Page Header */}
-        <section className="bg-black text-white py-20">
+        <section className="bg-gradient-to-r from-black via-gray-900 to-black text-white py-20">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-5xl md:text-6xl font-bold mb-4">BOARDS</h1>
-            <p className="text-xl text-gray-400">Choose your ride</p>
+            <p className="text-xl text-gray-300">Choose your ride</p>
           </div>
         </section>
 
@@ -51,15 +51,16 @@ export default function BoardsPage() {
                 href={`/products?subcategory=${subcategory.slug}`}
                 className="group"
               >
-                <div className="relative h-80 overflow-hidden bg-gray-100 mb-4">
+                <div className="relative h-80 overflow-hidden bg-gray-100 mb-4 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500">
                   <Image
                     src={subcategory.image}
                     alt={subcategory.name}
                     fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
                 </div>
-                <h3 className="text-2xl font-bold mb-2 group-hover:text-red-600 transition-colors">
+                <h3 className="text-2xl font-bold mb-2 group-hover:text-cyan-500 transition-colors">
                   {subcategory.name}
                 </h3>
                 <p className="text-gray-600">{subcategory.description}</p>
