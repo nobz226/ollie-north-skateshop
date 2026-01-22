@@ -79,21 +79,28 @@ export default function CartPage() {
   };
 
   const handleStripeCheckout = async () => {
-    if (!convexUser || !user) {
-      router.push("/sign-in");
-      return;
-    }
-
     setIsCheckingOut(true);
     
     try {
+      // Get email - from Clerk user or prompt guest
+      let userEmail = user?.primaryEmailAddress?.emailAddress;
+      
+      if (!convexUser && !userEmail) {
+        userEmail = prompt("Please enter your email address for order confirmation:");
+        if (!userEmail || !userEmail.includes("@")) {
+          alert("Valid email is required to proceed with checkout");
+          setIsCheckingOut(false);
+          return;
+        }
+      }
+
       const response = await fetch("/api/create-checkout-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           items: activeCart,
-          userId: convexUser._id,
-          userEmail: user.primaryEmailAddress?.emailAddress,
+          userId: convexUser?._id,
+          userEmail,
         }),
       });
 

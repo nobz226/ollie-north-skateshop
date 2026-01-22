@@ -4,11 +4,13 @@ import { v } from "convex/values";
 // Create a new order
 export const createOrder = mutation({
   args: {
-    userId: v.id("users"),
+    userId: v.optional(v.id("users")),
+    guestEmail: v.optional(v.string()),
     items: v.array(v.object({
+      productId: v.string(),
       productName: v.string(),
       quantity: v.number(),
-      price: v.number(), // Price at time of purchase (in cents)
+      price: v.number(),
     })),
     total: v.number(),
   },
@@ -17,12 +19,8 @@ export const createOrder = mutation({
     
     const orderId = await ctx.db.insert("orders", {
       userId: args.userId,
-      items: args.items.map(item => ({
-        productId: "" as any, // Placeholder since we don't have productId from Stripe
-        productName: item.productName,
-        quantity: item.quantity,
-        price: item.price,
-      })),
+      guestEmail: args.guestEmail,
+      items: args.items,
       subtotal: args.total,
       tax: 0,
       total: args.total,

@@ -32,9 +32,10 @@ export default defineSchema({
 
   // Add orders table for order history
   orders: defineTable({
-    userId: v.id("users"),
+    userId: v.optional(v.id("users")), // Optional for guest orders
+    guestEmail: v.optional(v.string()), // For guest orders
     items: v.array(v.object({
-      productId: v.id("products"),
+      productId: v.string(), // Store as string to handle any ID format
       productName: v.string(),
       quantity: v.number(),
       price: v.number(), // Price at time of purchase
@@ -46,6 +47,7 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index("by_user", ["userId"])
+    .index("by_guest_email", ["guestEmail"])
     .index("by_status", ["status"])
     .index("by_created_at", ["createdAt"]),
 

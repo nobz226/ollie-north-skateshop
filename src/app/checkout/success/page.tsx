@@ -19,7 +19,7 @@ export default function CheckoutSuccessPage() {
   const clearCart = useMutation(api.cart.clearCart);
 
   useEffect(() => {
-    if (!sessionId || !convexUser) return;
+    if (!sessionId) return;
 
     const processOrder = async () => {
       try {
@@ -33,15 +33,21 @@ export default function CheckoutSuccessPage() {
         const data = await response.json();
 
         if (data.success) {
-          // Create order in Convex
+          // Create order in Convex (works for both logged-in and guest users)
           await createOrder({
-            userId: convexUser._id,
+            userId: convexUser?._id,
+            guestEmail: !convexUser ? data.userEmail : undefined,
             items: data.items,
             total: data.amount,
           });
 
-          // Clear cart
-          await clearCart({ userId: convexUser._id });
+          // Clear cart only if user is logged in
+          if (convexUser) {
+            await clearCart({ userId: convexUser._id });
+          } else {
+            // Clear guest cart from localStorage
+            localStorage.removeItem("guestCart");
+          }
 
           setIsProcessing(false);
         } else {

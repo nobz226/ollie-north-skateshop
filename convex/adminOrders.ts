@@ -10,7 +10,8 @@ export const getAllOrders = query({
     // Fetch user details for each order
     const ordersWithUsers = await Promise.all(
       orders.map(async (order) => {
-        const user = await ctx.db.get(order.userId);
+        // Handle guest orders (no userId)
+        const user = order.userId ? await ctx.db.get(order.userId) : null;
         return {
           ...order,
           user: user ? {

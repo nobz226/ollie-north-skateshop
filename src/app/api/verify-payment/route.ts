@@ -10,22 +10,20 @@ export async function POST(request: NextRequest) {
     const { sessionId } = await request.json();
 
     // Retrieve the session from Stripe
-    const session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ["line_items", "line_items.data.price.product"],
-    });
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
 
     if (session.payment_status === "paid") {
-      // Convert line items to order format
-      const items = session.line_items?.data.map((item: any) => ({
-        productName: item.description,
-        quantity: item.quantity,
-        price: item.amount_total,
-      })) || [];
+      // Get cart items from metadata
+      const cartItems = session.metadata?.cartItems 
+        ? JSON.parse(session.metadata.cartItems)
+        : [];
 
       return NextResponse.json({
         success: true,
-        items,
+        items: cartItems,
         amount: session.amount_total || 0,
+        userId: session.metadata?.userId,
+        userEmail: session.customer_email,
       });
     } else {
       return NextResponse.json({
