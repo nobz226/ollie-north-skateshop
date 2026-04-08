@@ -1,32 +1,61 @@
 # Ollie North Skateshop E-Commerce Platform
 
-A full-stack e-commerce application built with Next.js 15, React 19, Convex, and Clerk authentication. This platform provides a complete shopping experience for coffee products with advanced filtering, real-time cart management, and user authentication.
+A full-stack, modern e-commerce platform for skateboarding equipment and apparel. Built with Next.js 15, React 19, Convex, and Clerk authentication, this platform provides a complete shopping experience with advanced filtering, real-time cart management, guest checkout, a wishlist, and a fully-featured admin CMS.
 
-## Tech Stack
+---
+
+## 🧑‍💻 Demo
+
+- **Live preview:** [Add your deployment URL here]
+- **Local setup:** See [Getting Started](#getting-started) below.
+
+---
+
+## ⚡ Features
+
+- **Product Search & Filter** — Hierarchical filters (category → subcategory → product type → size → price range), URL-driven state, cascading options
+- **Shopping Cart** — Add, update, remove items; real-time header badge; 8% tax + free shipping calculation
+- **Guest Checkout** — Full cart and checkout flow without an account (localStorage-based); see [GUEST_CHECKOUT.md](./GUEST_CHECKOUT.md)
+- **Authenticated Checkout** — Convex-backed cart with real-time reactive updates across tabs/devices
+- **Wishlist** — Save favourite products (authenticated users)
+- **User Authentication** — Clerk-powered sign-up/sign-in with automatic Convex user sync
+- **User Profile** — Account info, cart summary, order history (placeholder), member benefits
+- **Admin CMS** — Separate admin panel at `/admin` with product CRUD, category management, and order history
+- **150+ Seeded Products** — Realistic skateboarding catalog with Unsplash images
+- **Responsive UI** — Tailwind CSS v4 with adaptive layouts and toast notifications
+
+---
+
+## 🛠️ Tech Stack
 
 ### Frontend
-- **Next.js 15** - React framework with App Router
-- **React 19** - UI library
-- **TypeScript** - Type safety
-- **Tailwind CSS v4** - Utility-first CSS framework
+- **Next.js 15** — React framework with App Router
+- **React 19** — UI library
+- **TypeScript** — Type safety
+- **Tailwind CSS v4** — Utility-first CSS framework
 
 ### Backend
-- **Convex** - Real-time serverless database and backend
-- **Clerk** - Authentication and user management
+- **Convex** — Real-time serverless database and backend
+- **Clerk** — Authentication and user management
 
 ### Additional Tools
-- **clsx** - Conditional className utility
-- **tailwind-merge** - Merge Tailwind classes without conflicts
+- **clsx** — Conditional className utility
+- **tailwind-merge** — Merge Tailwind classes without conflicts
 
-## Project Structure
+---
+
+## 📁 Project Structure
 
 ```
 ollie-north-skateshop/
 ├── src/
 │   ├── app/                    # Next.js App Router pages
+│   │   ├── about/             # About page
+│   │   ├── admin/             # Admin CMS (login + dashboard)
 │   │   ├── apparel/           # Apparel category page
 │   │   ├── boards/            # Boards category page
 │   │   ├── cart/              # Shopping cart page
+│   │   ├── checkout/          # Checkout page (guest + authenticated)
 │   │   ├── hardware/          # Hardware category page
 │   │   ├── products/          # Products listing and detail pages
 │   │   │   ├── [id]/         # Dynamic product detail page
@@ -34,8 +63,10 @@ ollie-north-skateshop/
 │   │   ├── profile/           # User profile page
 │   │   ├── sign-in/          # Clerk sign-in page
 │   │   ├── sign-up/          # Clerk sign-up page
+│   │   ├── wishlist/          # Wishlist page (authenticated)
 │   │   ├── Header.tsx         # Site header component
 │   │   ├── Footer.tsx         # Site footer component
+│   │   ├── Providers.tsx      # Convex + Clerk provider wrapper + SyncUser
 │   │   ├── layout.tsx         # Root layout
 │   │   └── page.tsx           # Homepage
 │   ├── components/            # Reusable React components
@@ -43,24 +74,36 @@ ollie-north-skateshop/
 │   │   ├── ProductCard.tsx    # Product display card
 │   │   └── SyncUser.tsx       # Clerk to Convex user sync
 │   ├── hooks/                 # Custom React hooks
-│   │   └── useConvexUser.ts   # Hook to get Convex user
+│   │   ├── useAdminAuth.ts    # Admin session management hook
+│   │   ├── useConvexUser.ts   # Hook to get Convex user
+│   │   └── useGuestCart.ts    # localStorage cart for guests
 │   ├── lib/                   # Utility functions
 │   │   └── utils.ts           # Helper functions (cn)
 │   └── middleware.ts          # Clerk auth middleware
-├── convex/                    # Convex backend
+├── convex/                    # Convex backend (see convex/README.md)
 │   ├── _generated/           # Auto-generated Convex types
 │   ├── addUser.ts            # User creation mutation
+│   ├── admin.ts              # Admin authentication (login, session)
+│   ├── adminOrders.ts        # Order history queries for admin
+│   ├── adminProducts.ts      # Product CRUD mutations for admin
 │   ├── cart.ts               # Cart queries and mutations
+│   ├── fileStorage.ts        # File/image storage helpers
+│   ├── orders.ts             # Customer order operations
 │   ├── products.ts           # Product queries
 │   ├── schema.ts             # Database schema
 │   ├── seedProducts.ts       # Product seeding script
-│   ├── tsconfig.json         # Convex TypeScript config
-│   └── users.ts              # User queries
+│   ├── userProfile.ts        # User profile queries/mutations
+│   ├── users.ts              # User queries
+│   └── wishlist.ts           # Wishlist queries and mutations
+├── docs/                      # Additional documentation
+│   └── ADDRESS_VALIDATION.md
 ├── public/                    # Static assets
 └── package.json              # Dependencies
 ```
 
-## Database Schema
+---
+
+## 🗄️ Database Schema
 
 ### Users Table
 Stores user information synced from Clerk authentication.
@@ -131,12 +174,12 @@ cartItems: defineTable({
 - `quantity` - Number of items
 - `addedAt` - Timestamp when added to cart
 
-## Product Categorization Hierarchy
+## 🗂️ Product Categorization Hierarchy
 
 ### Categories
-1. **Boards** - Skateboarding decks and complete setups
-2. **Hardware** - Components and accessories
-3. **Apparel** - Clothing and wearables
+1. **Boards** — Skateboarding decks and complete setups
+2. **Hardware** — Components and accessories
+3. **Apparel** — Clothing and wearables
 
 ### Subcategories by Category
 
@@ -166,12 +209,62 @@ Each subcategory contains specific product types:
 - **Wheels**: Skateboard Wheels, Longboard Wheels
 - And more...
 
-## Core Features
+---
+
+## 🔑 Authentication
+
+- Powered by [Clerk](https://clerk.com) for secure sign-up/sign-in
+- Middleware (`src/middleware.ts`) protects all routes except `/sign-in`, `/sign-up`, and `/admin/*`
+- `<SyncUser />` component (in `Providers.tsx`) automatically syncs Clerk users to the Convex `users` table on every sign-in
+- Use the `useConvexUser()` hook to access the Convex user record in components
+
+---
+
+## 🛒 Shopping Cart: Guest & Authenticated Flows
+
+Both guest and authenticated users can add products to a cart and proceed to checkout. The two flows use different storage mechanisms:
+
+| Scenario | Storage | Persistence |
+|---|---|---|
+| **Guest user** | `localStorage` via `useGuestCart` hook | Browser-only; lost if cache is cleared |
+| **Authenticated user** | Convex `cartItems` table | Cross-device, real-time reactive |
+
+- **Guest cart**: No sign-in required. Cart badge and cart page work seamlessly. Checkout collects shipping/payment info (demo only, no real payment processing).
+- **Authenticated cart**: Real-time updates via Convex subscriptions. Cart data persists across devices.
+- **Cart migration**: Guest cart does **not** automatically transfer on sign-in (planned enhancement).
+
+See [GUEST_CHECKOUT.md](./GUEST_CHECKOUT.md) for complete technical details, data flow diagram, and known limitations.
+
+---
+
+## 🛡️ Admin CMS
+
+An admin panel is available at `/admin` for shop management. It uses a **separate** authentication system from Clerk (custom Convex `adminUsers` table).
+
+**Admin Features:**
+- **Products** — Create, edit, delete products; searchable table with real-time updates
+- **Categories & Types** — Auto-generated from existing products; add new types via product form dropdowns
+- **Order History** — View all orders with user details, revenue stats, and per-user filtering
+
+**Admin Login:**
+- Navigate to `/admin` — automatically redirects to login if not authenticated
+- Default credentials set during initial setup (see [Getting Started](#-getting-started))
+- Sessions managed via localStorage with a 24-hour timeout
+
+---
+
+## ❤️ Wishlist
+
+Authenticated users can save products to a wishlist at `/wishlist`. Wishlist data is stored in Convex and queries/mutations live in `convex/wishlist.ts`.
+
+---
+
+## 🔧 Core Features
 
 ### 1. Authentication System
 - Powered by Clerk for secure authentication
 - Protected routes via middleware
-- Public routes: `/sign-in`, `/sign-up`
+- Public routes: `/sign-in`, `/sign-up`, `/admin/*`
 - All other routes require authentication
 - Automatic user sync from Clerk to Convex database
 
@@ -252,7 +345,15 @@ Located at `/profile`, displays:
 - Member benefits
 - Account settings
 
-## API Reference
+### 7. Wishlist
+Located at `/wishlist`, authenticated users can:
+- Save products for later
+- View and manage saved items
+- Add wishlist items to cart
+
+---
+
+## 🌐 API Reference
 
 ### Convex Queries
 
@@ -323,46 +424,56 @@ seedProducts.seed()
 // Run once during initial setup
 ```
 
-## Page Routes
+## 📍 Page Routes
 
 ### Public Routes
-- `/sign-in` - User sign in page
-- `/sign-up` - User registration page
+- `/sign-in` — User sign-in page
+- `/sign-up` — User registration page
+- `/admin` — Admin CMS (redirects to login if not authenticated)
 
 ### Protected Routes
-- `/` - Homepage with hero, categories, and featured products
-- `/products` - All products with advanced filtering and pagination
-- `/products/[id]` - Individual product detail page
-- `/boards` - Boards category page
-- `/hardware` - Hardware category page
-- `/apparel` - Apparel category page
-- `/cart` - Shopping cart page
-- `/profile` - User profile and account settings
+- `/` — Homepage with hero, categories, and featured products
+- `/products` — All products with advanced filtering and pagination
+- `/products/[id]` — Individual product detail page
+- `/boards` — Boards category page
+- `/hardware` — Hardware category page
+- `/apparel` — Apparel category page
+- `/cart` — Shopping cart page (guest and authenticated)
+- `/checkout` — Checkout page (guest and authenticated)
+- `/profile` — User profile and account settings
+- `/wishlist` — Saved products (authenticated only)
+- `/about` — About page
 
-## Custom Hooks
+---
+
+## 🪝 Custom Hooks
 
 ### useConvexUser
-Hook to retrieve the Convex user record for the currently authenticated Clerk user.
+Hook to retrieve the Convex user record for the currently authenticated Clerk user. Returns an object with `convexUser` (the Convex user record or `undefined`) and `isLoading` (boolean).
 
 ```typescript
-const convexUser = useConvexUser();
-// Returns: User record from Convex or undefined
+const { convexUser, isLoading } = useConvexUser();
+// convexUser._id is used for all Convex cart/profile mutations
 ```
 
-**Usage:**
+### useGuestCart
+Hook for managing a localStorage-based cart for non-authenticated (guest) users.
+
 ```typescript
-const convexUser = useConvexUser();
-if (!convexUser) return <div>Loading...</div>;
-// Use convexUser._id for cart operations
+const { guestCart, addToCart, updateQuantity, removeFromCart, clearCart, isLoaded } = useGuestCart();
 ```
 
-## Components
+### useAdminAuth
+Hook for managing the admin session (separate from Clerk). Reads/writes admin session state in localStorage with a 24-hour timeout.
+
+---
+
+## 🧩 Components
 
 ### Header
-- Site navigation
-- Category links
-- Cart icon with item count badge
-- User menu with sign out option
+- Site navigation with category links
+- Cart icon with real-time item count badge (guest + authenticated)
+- User menu with sign-out option
 - Responsive design
 
 ### Footer
@@ -375,13 +486,13 @@ if (!convexUser) return <div>Loading...</div>;
 Reusable product display component.
 
 **Props:**
-- `product` - Product object with all fields
+- `product` — Product object with all fields
 
 **Features:**
 - Product image
 - Name and description
 - Price display (formatted from cents)
-- Add to Cart button
+- Add to Cart button (supports guest and authenticated users)
 - Click to view product details
 - Toast notifications on add to cart
 
@@ -390,11 +501,12 @@ Client component that syncs Clerk authenticated users to Convex database.
 
 **Functionality:**
 - Runs on mount when user is signed in
-- Creates user record if doesn't exist
-- Updates existing user record if found
+- Creates user record if it doesn't exist
 - Handles errors silently (logs to console)
 
-## Environment Variables
+---
+
+## 🌍 Environment Variables
 
 Required environment variables (create `.env.local`):
 
@@ -410,7 +522,9 @@ NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
 NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 ```
 
-## Getting Started
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
 - Node.js 18+ 
@@ -442,34 +556,45 @@ cp .env.example .env.local
 npx convex dev
 ```
 
-5. Seed the database (in a separate terminal):
-```bash
-# In Convex dashboard or via CLI
-# Run the seedProducts.seed() mutation once
-```
+5. Seed the database:
+    - Open the [Convex dashboard](https://dashboard.convex.dev)
+    - Navigate to **Functions**
+    - Run the `seedProducts:seed` mutation once
+    - Verify 150+ products are created
 
-6. Start the development server:
+6. Create the default admin user:
+    - In the Convex dashboard, run the `admin:createAdminUser` mutation with:
+      ```json
+      { "username": "Nobz", "password": "LETmeinnow36$" }
+      ```
+    - Change the credentials for your own deployment
+
+7. Start the development server:
 ```bash
 npm run dev
 ```
 
-7. Open [http://localhost:3000](http://localhost:3000)
+8. Open [http://localhost:3000](http://localhost:3000)
 
-## Development Workflow
+---
+
+## 🔄 Development Workflow
 
 ### Running Locally
 ```bash
-# Terminal 1: Next.js dev server
+# Terminal 1: Next.js dev server (required)
 npm run dev
 
-# Terminal 2: Convex backend
+# Terminal 2: Convex backend (required — all DB operations fail without this)
 npx convex dev
 ```
+
+> ⚠️ **Both processes must be running simultaneously** for the app to work correctly.
 
 ### Database Seeding
 To populate the database with products:
 
-1. Open Convex dashboard
+1. Open [Convex dashboard](https://dashboard.convex.dev)
 2. Navigate to Functions
 3. Run `seedProducts:seed` mutation
 4. Verify 150+ products created
@@ -477,7 +602,9 @@ To populate the database with products:
 ### Adding New Products
 Modify `convex/seedProducts.ts` and add products to the respective category arrays, then re-run the seed function.
 
-## Known Issues and Limitations
+---
+
+## ⚠️ Known Issues and Limitations
 
 ### Current Implementation Issues
 
@@ -502,46 +629,39 @@ Modify `convex/seedProducts.ts` and add products to the respective category arra
 
 ### Feature Gaps
 
-1. **No Checkout System**
-   - Cart exists but no payment processing
+1. **Checkout/Payment System**
+   - Demo checkout exists but no real payment processing
    - No integration with Stripe, PayPal, or other payment providers
-   - Checkout flow not implemented
 
-2. **No Order Management**
-   - No order history tracking
+2. **Order Management**
+   - No order history tracking for customers
    - No order confirmation emails
-   - No order status updates
-   - Orders table not implemented in schema
+   - Orders table exists in schema but customer order creation is not yet wired up
 
-3. **No Product Stock Management**
-   - `inStock` field exists but not enforced
-   - No inventory tracking
-   - No low stock warnings
-   - Can add out-of-stock items to cart
+3. **Product Stock Management**
+   - `inStock` field exists but not enforced at cart/checkout time
+   - No inventory tracking or low-stock warnings
 
-4. **No Product Reviews**
-   - No rating system
-   - No user reviews or testimonials
-   - No review moderation
+4. **Product Reviews**
+   - No rating system or user reviews
 
-5. **No Wishlist Feature**
-   - Users cannot save products for later
-   - No favorites functionality
+5. **Wishlist** *(partially implemented)*
+   - Wishlist hook and route exist; full UI and edge-case handling ongoing
 
 6. **Limited Search**
    - Basic text search only
-   - No fuzzy matching
-   - No search suggestions
-   - No search history
+   - No fuzzy matching, suggestions, or search history
 
 7. **Mobile Navigation**
    - No hamburger menu for mobile
-   - Navigation menu may overflow on small screens
+   - Navigation may overflow on small screens
 
-## Recommended Improvements
+---
+
+## 🛠️ Recommended Improvements
 
 ### Short-term Fixes
-1. Replace `useMemo` with `useEffect` for page reset logic
+1. Replace `useMemo` with `useEffect` for page reset logic in `src/app/products/page.tsx`
 2. Add TypeScript types for all mutation parameters
 3. Implement error boundaries around major sections
 4. Add stock checking before adding to cart
@@ -550,20 +670,16 @@ Modify `convex/seedProducts.ts` and add products to the respective category arra
 ### Feature Enhancements
 
 **Payment Integration:**
-- Integrate Stripe or PayPal for checkout
-- Add order confirmation page
-- Implement order receipt emails
+- Integrate Stripe or PayPal for real checkout
+- Add order confirmation page and receipt emails
 
 **Order Management:**
-- Create orders table in Convex schema
-- Implement order history page
-- Add order tracking functionality
-- Build order status updates
+- Wire up customer-facing order creation via `convex/orders.ts`
+- Implement order history page and tracking
 
 **User Experience:**
 - Add product reviews and ratings system
-- Implement wishlist functionality
-- Add product quick view modal
+- Add product quick-view modal
 - Improve mobile navigation with hamburger menu
 - Add product image gallery/carousel
 
@@ -571,16 +687,13 @@ Modify `convex/seedProducts.ts` and add products to the respective category arra
 - Implement fuzzy search with relevance scoring
 - Add search autocomplete/suggestions
 - Create recently viewed products section
-- Add related products recommendations
 
 **Performance:**
 - Debounce search input to reduce queries
-- Implement virtual scrolling for large lists
-- Optimize image loading with next/image
+- Optimize image loading with `next/image`
 - Add client-side caching for filter results
 
-**Admin Features:**
-- Create admin dashboard for product management
+**Admin Enhancements:**
 - Add inventory management system
 - Implement sales analytics
 - Build customer management tools
@@ -593,35 +706,33 @@ Modify `convex/seedProducts.ts` and add products to the respective category arra
    ```
 
 2. **Image Optimization**
-   - Use Next.js Image component consistently
-   - Implement proper loading states
-   - Add blur placeholders
+   - Use Next.js `<Image>` component consistently
+   - Add blur placeholders for perceived performance
 
 3. **Virtual Scrolling**
    - For product lists exceeding 50+ items
-   - Reduces DOM nodes and improves performance
 
 4. **Caching Strategy**
    - Cache filter results on client side
-   - Implement query result caching in Convex
    - Add stale-while-revalidate patterns
 
 ### Security Considerations
 
 **Current Security:**
-- Clerk middleware protects all routes except sign-in/sign-up
+- Clerk middleware protects all customer routes
+- Admin routes use separate custom auth (not Clerk)
 - Convex validates all mutations server-side
 - User IDs properly isolated per user
 
 **Recommendations:**
 1. Add rate limiting for cart operations
 2. Validate all price calculations server-side
-3. Implement CSRF protection for mutations
-4. Add input sanitization for user-generated content
-5. Implement proper error messages without exposing system details
-6. Add request logging for security auditing
+3. Add input sanitization for user-generated content
+4. Use a proper password hashing library (e.g. `bcrypt`) for admin credentials in production
 
-## Data Flow Architecture
+---
+
+## 🔀 Data Flow Architecture
 
 ```
 User Authentication (Clerk)
@@ -645,26 +756,31 @@ Convex Mutations
 Real-time Updates
 ```
 
-## Contributing
+---
+
+## 🤝 Contributing
 
 When contributing to this project:
 
-1. Follow the existing code structure
-2. Use TypeScript for type safety
+1. Follow the existing code structure and Convex patterns
+2. Use TypeScript for type safety throughout
 3. Write descriptive commit messages
-4. Test all cart operations thoroughly
+4. Test all cart operations for both guest and authenticated flows
 5. Ensure Clerk authentication works correctly
 6. Verify Convex queries return expected data
 7. Check mobile responsiveness
 
-## License
+---
+
+## 📄 License
 
 [Add your license here]
 
-## Support
+---
 
-For issues or questions:
-- Check existing issues in the repository
-- Review Convex documentation: https://docs.convex.dev
-- Review Clerk documentation: https://clerk.com/docs
-- Review Next.js documentation: https://nextjs.org/docs
+## 📚 Further Reading & Support
+
+- [Convex documentation](https://docs.convex.dev)
+- [Clerk documentation](https://clerk.com/docs)
+- [Next.js documentation](https://nextjs.org/docs)
+- For questions, check existing issues in the repository

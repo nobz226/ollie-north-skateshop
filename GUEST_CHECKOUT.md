@@ -1,5 +1,9 @@
 # Guest Checkout Implementation
 
+Ollie North Skateshop supports a full cart and checkout experience for **guest users** — shoppers who haven't created an account. This lowers friction at the point of purchase and allows customers to try the shop without committing to sign-up. Guest cart data is stored entirely in the browser's `localStorage`, so no server-side session or authentication is required. When a guest is ready to check out, they fill in shipping and payment details directly on the checkout page. See the flows, technical details, and known limitations below.
+
+---
+
 ## Overview
 This feature allows users to browse products, add items to cart, and checkout **without creating an account**. The cart data for guest users is stored in the browser's localStorage.
 
