@@ -22,7 +22,7 @@ interface Product {
   productType: string;
   size?: string;
   inStock: boolean;
-  stockQuantity: number;
+  stockQuantity?: number;
 }
 
 interface ProductCardProps {
@@ -137,9 +137,9 @@ export default function ProductCard({ product }: ProductCardProps) {
           </p>
           {product.inStock && (
             <p className="text-xs text-cyan-600 font-medium mb-2">
-              {product.stockQuantity > 0 
-                ? `${product.stockQuantity} in stock` 
-                : "Low stock"}
+              {product.stockQuantity && product.stockQuantity > 0
+                ? `${product.stockQuantity} in stock`
+                : "In stock"}
             </p>
           )}
           <p className="text-gray-600 text-base line-clamp-2 mb-4 flex-grow leading-relaxed">
@@ -153,7 +153,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             </span>
             <button
               onClick={handleAddToCart}
-              disabled={!product.inStock || isAddingToCart || userLoading}
+              disabled={Boolean(!product.inStock || isAddingToCart || userLoading)}
               className={`px-5 py-2.5 rounded-lg text-base font-bold transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center gap-2 ${
                 showSuccess
                   ? "bg-green-500 text-white shadow-lg"

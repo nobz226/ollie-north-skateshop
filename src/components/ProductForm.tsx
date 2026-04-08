@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import type { Id } from "../../convex/_generated/dataModel";
+import Image from "next/image";
 
 interface ProductFormProps {
   productId?: Id<"products">;
@@ -290,10 +291,11 @@ export default function ProductForm({ productId, onClose, onSuccess }: ProductFo
                 <div className="mt-3">
                   <p className="text-sm font-medium text-gray-700 mb-2">Preview:</p>
                   <div className="relative w-40 h-40 border-2 border-gray-200 rounded-lg overflow-hidden">
-                    <img
+                    <Image
                       src={imagePreview}
                       alt="Preview"
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
                     />
                   </div>
                 </div>

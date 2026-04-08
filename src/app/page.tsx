@@ -8,7 +8,6 @@ import ProductCard from "@/components/ProductCard";
 import Header from "./Header";
 import Footer from "./Footer";
 import { motion } from "framer-motion";
-import { useInView } from "framer-motion";
 
 export default function Home() {
   const featuredProducts = useQuery(api.products.getFeatured);
@@ -180,8 +179,8 @@ export default function Home() {
               whileInView="animate"
               viewport={{ once: true }}
             >
-              {featuredProducts.map((product, index) => (
-                <motion.div 
+              {featuredProducts.map((product) => (
+                <motion.div
                   key={product._id}
                   variants={fadeInUp}
                 >

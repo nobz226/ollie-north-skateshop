@@ -465,19 +465,7 @@ export default function CheckoutPage() {
           await createOrder({
             userId: convexUser._id,
             items: orderItems,
-            subtotal,
-            tax,
             total,
-            shippingAddress: {
-              fullName: shippingForm.fullName,
-              addressLine1: shippingForm.addressLine1,
-              addressLine2: shippingForm.addressLine2,
-              city: shippingForm.city,
-              state: shippingForm.state,
-              postalCode: shippingForm.postalCode,
-              country: shippingForm.country,
-              phone: shippingForm.phone,
-            },
           });
 
           // Clear the user's cart after successful order

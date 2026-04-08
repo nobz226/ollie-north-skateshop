@@ -2,19 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-12-18.acacia",
+  apiVersion: "2025-12-15.clover",
 });
 
 export async function POST(request: NextRequest) {
   try {
-    const { sessionId } = await request.json();
+    const { sessionId } = await request.json() as { sessionId: string };
 
     // Retrieve the session from Stripe
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
     if (session.payment_status === "paid") {
       // Get cart items from metadata
-      const cartItems = session.metadata?.cartItems 
+      const cartItems = session.metadata?.cartItems
         ? JSON.parse(session.metadata.cartItems)
         : [];
 
@@ -31,10 +31,11 @@ export async function POST(request: NextRequest) {
         message: "Payment not completed",
       });
     }
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     console.error("Payment verification error:", error);
     return NextResponse.json(
-      { success: false, error: error.message },
+      { success: false, error: errorMessage },
       { status: 500 }
     );
   }

@@ -1,8 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 
+interface ZippopotamusPlace {
+  "place name": string;
+  "state abbreviation": string;
+  [key: string]: string;
+}
+
+interface ZippopotamusResponse {
+  places: ZippopotamusPlace[];
+  [key: string]: unknown;
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const { country, postalCode, state, city } = await request.json();
+    const { country, postalCode, state, city } = await request.json() as {
+      country?: string;
+      postalCode?: string;
+      state?: string;
+      city?: string;
+    };
 
     if (!country || !postalCode) {
       return NextResponse.json(
@@ -32,10 +48,10 @@ async function validateUSAddress(postalCode: string, state?: string, city?: stri
   try {
     // Clean up ZIP code (remove -XXXX if present)
     const cleanZip = postalCode.split("-")[0];
-    
+
     // Call Zippopotam.us API for US
     const response = await fetch(`https://api.zippopotam.us/us/${cleanZip}`);
-    
+
     if (!response.ok) {
       return NextResponse.json({
         valid: false,
@@ -43,11 +59,11 @@ async function validateUSAddress(postalCode: string, state?: string, city?: stri
       });
     }
 
-    const data = await response.json();
-    
+    const data = (await response.json()) as ZippopotamusResponse;
+
     // Extract state and city from response
     const validState = data.places[0]["state abbreviation"];
-    const validCities = data.places.map((place: any) => place["place name"].toLowerCase());
+    const validCities = data.places.map((place: ZippopotamusPlace) => place["place name"].toLowerCase());
 
     // Validate state if provided
     if (state && validState.toUpperCase() !== state.toUpperCase()) {
@@ -55,7 +71,7 @@ async function validateUSAddress(postalCode: string, state?: string, city?: stri
         valid: false,
         error: `ZIP code ${postalCode} belongs to ${validState}, not ${state}`,
         expectedState: validState,
-        expectedCities: data.places.map((p: any) => p["place name"]),
+        expectedCities: data.places.map((p: ZippopotamusPlace) => p["place name"]),
       });
     }
 
@@ -65,14 +81,14 @@ async function validateUSAddress(postalCode: string, state?: string, city?: stri
         valid: false,
         error: `ZIP code ${postalCode} does not match city ${city}`,
         expectedState: validState,
-        expectedCities: data.places.map((p: any) => p["place name"]),
+        expectedCities: data.places.map((p: ZippopotamusPlace) => p["place name"]),
       });
     }
 
     return NextResponse.json({
       valid: true,
       state: validState,
-      cities: data.places.map((p: any) => p["place name"]),
+      cities: data.places.map((p: ZippopotamusPlace) => p["place name"]),
       message: "Valid US address",
     });
   } catch (error) {
@@ -88,13 +104,13 @@ async function validateCanadianAddress(postalCode: string, state?: string, city?
   try {
     // Clean up postal code (remove spaces and hyphens)
     const cleanPostalCode = postalCode.replace(/[\s-]/g, "").toUpperCase();
-    
+
     // Extract first 3 characters for Canadian postal code
     const postalPrefix = cleanPostalCode.substring(0, 3);
-    
+
     // Call Zippopotam.us API for Canada
     const response = await fetch(`https://api.zippopotam.us/ca/${postalPrefix}`);
-    
+
     if (!response.ok) {
       return NextResponse.json({
         valid: false,
@@ -102,11 +118,11 @@ async function validateCanadianAddress(postalCode: string, state?: string, city?
       });
     }
 
-    const data = await response.json();
-    
+    const data = (await response.json()) as ZippopotamusResponse;
+
     // Extract province and city from response
     const validProvince = data.places[0]["state abbreviation"];
-    const validCities = data.places.map((place: any) => place["place name"].toLowerCase());
+    const validCities = data.places.map((place: ZippopotamusPlace) => place["place name"].toLowerCase());
 
     // Validate province if provided
     if (state && validProvince.toUpperCase() !== state.toUpperCase()) {
@@ -114,23 +130,23 @@ async function validateCanadianAddress(postalCode: string, state?: string, city?
         valid: false,
         error: `Postal code ${postalCode} belongs to ${validProvince}, not ${state}`,
         expectedState: validProvince,
-        expectedCities: data.places.map((p: any) => p["place name"]),
+        expectedCities: data.places.map((p: ZippopotamusPlace) => p["place name"]),
       });
     }
 
     // Validate city if provided (more lenient for Canadian addresses)
     if (city && !validCities.includes(city.toLowerCase())) {
       // Check if city is a partial match
-      const cityMatch = validCities.some((validCity: string) => 
+      const cityMatch = validCities.some((validCity: string) =>
         validCity.includes(city.toLowerCase()) || city.toLowerCase().includes(validCity)
       );
-      
+
       if (!cityMatch) {
         return NextResponse.json({
           valid: false,
           error: `Postal code ${postalCode} may not match city ${city}`,
           expectedState: validProvince,
-          expectedCities: data.places.map((p: any) => p["place name"]),
+          expectedCities: data.places.map((p: ZippopotamusPlace) => p["place name"]),
           warning: true, // Softer validation for Canadian cities
         });
       }
@@ -139,7 +155,7 @@ async function validateCanadianAddress(postalCode: string, state?: string, city?
     return NextResponse.json({
       valid: true,
       state: validProvince,
-      cities: data.places.map((p: any) => p["place name"]),
+      cities: data.places.map((p: ZippopotamusPlace) => p["place name"]),
       message: "Valid Canadian address",
     });
   } catch (error) {

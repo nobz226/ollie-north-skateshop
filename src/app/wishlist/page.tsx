@@ -10,6 +10,7 @@ import { X, ShoppingCart } from "lucide-react";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import Header from "../Header";
 import Footer from "../Footer";
+import type { Id } from "../../../convex/_generated/dataModel";
 
 export default function WishlistPage() {
   const { convexUser, isLoading: userLoading } = useConvexUser();
@@ -74,7 +75,7 @@ export default function WishlistPage() {
 
   const handleRemove = async (wishlistItemId: string) => {
     try {
-      await removeFromWishlist({ wishlistItemId: wishlistItemId as any });
+      await removeFromWishlist({ wishlistItemId: wishlistItemId as Id<"wishlistItems"> });
     } catch (error) {
       console.error("Error removing from wishlist:", error);
     }
@@ -86,7 +87,7 @@ export default function WishlistPage() {
     try {
       await addToCart({
         userId: convexUser._id,
-        productId: productId as any,
+        productId: productId as Id<"products">,
       });
     } catch (error) {
       console.error("Error adding to cart:", error);

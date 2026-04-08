@@ -7,6 +7,8 @@ import { useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { Check } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default function CheckoutSuccessPage() {
   const router = useRouter();
   const searchParams = useSearchParams();

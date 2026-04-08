@@ -38,7 +38,7 @@ export default function ProductDetailPage() {
         });
       } else {
         // Guest user - use localStorage
-        addToGuestCart(product._id, 1);
+        addToGuestCart(product._id);
       }
 
       // Show success feedback
@@ -184,7 +184,7 @@ export default function ProductDetailPage() {
               {/* Add to Cart Button */}
               <button
                 onClick={handleAddToCart}
-                disabled={!product.inStock || isAddingToCart || userLoading}
+                disabled={Boolean(!product || !product.inStock || isAddingToCart || userLoading)}
                 className={`w-full py-5 px-6 rounded-xl text-lg font-bold transition-all shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 flex items-center justify-center gap-3 ${
                   showSuccess
                     ? "bg-green-500 text-white"

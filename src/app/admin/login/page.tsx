@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 
@@ -10,7 +9,6 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isMounted, setIsMounted] = useState(false);
-  const router = useRouter();
 
   const verifyLogin = useMutation(api.admin.verifyAdminLogin);
 
@@ -28,7 +26,7 @@ export default function AdminLoginPage() {
           return;
         }
         localStorage.removeItem("adminSession");
-      } catch (e) {
+      } catch {
         localStorage.removeItem("adminSession");
       }
     }

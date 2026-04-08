@@ -5,6 +5,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import ProductForm from "@/components/ProductForm";
+import Image from "next/image";
 
 type TabType = "products" | "categories" | "orders";
 
@@ -141,11 +142,14 @@ function ProductsTab() {
               {filteredProducts?.map((product) => (
                 <tr key={product._id}>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <img
-                      src={product.imageUrl}
-                      alt={product.name}
-                      className="h-12 w-12 object-cover rounded"
-                    />
+                    <div className="h-12 w-12 relative rounded overflow-hidden">
+                      <Image
+                        src={product.imageUrl}
+                        alt={product.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm font-medium text-gray-900">{product.name}</div>

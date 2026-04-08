@@ -9,6 +9,8 @@ import Footer from "../Footer";
 import { useSearchParams, useRouter } from "next/navigation";
 import Breadcrumbs from "@/components/Breadcrumbs";
 
+export const dynamic = "force-dynamic";
+
 export default function ProductsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();

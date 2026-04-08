@@ -80,13 +80,14 @@ export default function CartPage() {
 
   const handleStripeCheckout = async () => {
     setIsCheckingOut(true);
-    
+
     try {
       // Get email - from Clerk user or prompt guest
-      let userEmail = user?.primaryEmailAddress?.emailAddress;
-      
+      let userEmail: string | undefined = user?.primaryEmailAddress?.emailAddress;
+
       if (!convexUser && !userEmail) {
-        userEmail = prompt("Please enter your email address for order confirmation:");
+        const promptedEmail = prompt("Please enter your email address for order confirmation:");
+        userEmail = promptedEmail ?? undefined;
         if (!userEmail || !userEmail.includes("@")) {
           alert("Valid email is required to proceed with checkout");
           setIsCheckingOut(false);
@@ -175,11 +176,14 @@ export default function CartPage() {
           {activeCart.map((item) => {
             if (!item.product) return null;
 
-            const cartItemId = isGuest ? undefined : (item as any)._id;
+            const cartItemId = isGuest ? undefined : (item as Record<string, unknown>)._id;
+            const productId = isGuest
+              ? (item as Record<string, unknown>).productId as string
+              : item.product._id;
 
             return (
               <div
-                key={isGuest ? item.productId : (item as any)._id}
+                key={item.product?._id?.toString() || `product-${Math.random()}`}
                 className="bg-white rounded-xl shadow-md border border-gray-100 p-6 flex gap-6 hover:shadow-lg transition-shadow duration-300"
               >
                 {/* Product Image */}
@@ -211,7 +215,7 @@ export default function CartPage() {
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() =>
-                        handleQuantityChange(cartItemId as Id<"cartItems">, item.productId, item.quantity - 1)
+                        handleQuantityChange(cartItemId as Id<"cartItems">, productId, item.quantity - 1)
                       }
                       className="w-9 h-9 rounded-lg border-2 border-gray-300 flex items-center justify-center hover:border-cyan-500 hover:text-cyan-500 transition-all font-bold"
                       aria-label="Decrease quantity"
@@ -223,7 +227,7 @@ export default function CartPage() {
                     </span>
                     <button
                       onClick={() =>
-                        handleQuantityChange(cartItemId as Id<"cartItems">, item.productId, item.quantity + 1)
+                        handleQuantityChange(cartItemId as Id<"cartItems">, productId, item.quantity + 1)
                       }
                       className="w-9 h-9 rounded-lg border-2 border-gray-300 flex items-center justify-center hover:border-cyan-500 hover:text-cyan-500 transition-all font-bold"
                       aria-label="Increase quantity"
@@ -232,7 +236,7 @@ export default function CartPage() {
                     </button>
                   </div>
                   <button
-                    onClick={() => handleRemoveItem(cartItemId as Id<"cartItems"> | undefined, item.productId)}
+                    onClick={() => handleRemoveItem(cartItemId as Id<"cartItems"> | undefined, productId)}
                     className="text-sm text-red-500 hover:text-red-700 font-bold transition-colors"
                   >
                     REMOVE

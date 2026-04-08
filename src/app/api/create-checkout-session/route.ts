@@ -1,16 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
+interface CartItem {
+  product: {
+    _id: string;
+    name: string;
+    description: string;
+    price: number;
+    imageUrl: string;
+  };
+  quantity: number;
+}
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-12-18.acacia",
+  apiVersion: "2025-12-15.clover",
 });
 
 export async function POST(request: NextRequest) {
   try {
-    const { items, userId, userEmail } = await request.json();
+    const { items, userId, userEmail } = await request.json() as {
+      items: CartItem[];
+      userId?: string;
+      userEmail: string;
+    };
 
     // Calculate order total and prepare line items with metadata
-    const lineItems = items.map((item: any, index: number) => ({
+    const lineItems = items.map((item: CartItem) => ({
       price_data: {
         currency: "usd",
         product_data: {
@@ -27,8 +42,8 @@ export async function POST(request: NextRequest) {
     }));
 
     // Store cart items in metadata for retrieval after payment
-    const metadata: any = {
-      cartItems: JSON.stringify(items.map((item: any) => ({
+    const metadata: Record<string, string> = {
+      cartItems: JSON.stringify(items.map((item: CartItem) => ({
         productId: item.product._id,
         productName: item.product.name,
         quantity: item.quantity,
@@ -52,10 +67,11 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ sessionId: session.id, url: session.url });
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     console.error("Stripe checkout error:", error);
     return NextResponse.json(
-      { error: error.message },
+      { error: errorMessage },
       { status: 500 }
     );
   }

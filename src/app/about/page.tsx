@@ -39,16 +39,16 @@ export default function AboutPage() {
                 grown into a trusted destination for riders across the country.
               </p>
               <p>
-                We believe skateboarding is more than just a sport—it's a
+                We believe skateboarding is more than just a sport&mdash;it&rsquo;s a
                 lifestyle, a form of self-expression, and a community that welcomes
-                everyone. Whether you're landing your first ollie or sending it down
-                a 12-stair, we're here to support your journey with the best gear
+                everyone. Whether you&rsquo;re landing your first ollie or sending it down
+                a 12-stair, we&rsquo;re here to support your journey with the best gear
                 and expertise.
               </p>
               <p>
-                Every product we stock is tested by our team of riders. We don't
+                Every product we stock is tested by our team of riders. We don&rsquo;t
                 just sell skateboards; we ride them, break them in, and push them to
-                their limits. That's how we know what works and what doesn't.
+                their limits. That&rsquo;s how we know what works and what doesn&rsquo;t.
               </p>
             </div>
           </div>
@@ -97,9 +97,9 @@ export default function AboutPage() {
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-4xl md:text-5xl font-bold mb-8">VISIT OUR SHOP</h2>
             <p className="text-gray-700 mb-8 text-lg">
-              Come hang out at our Venice Beach location. We've got a mini ramp out
+              Come hang out at our Venice Beach location. We&rsquo;ve got a mini ramp out
               back, a chill vibe inside, and a crew that actually knows what
-              they're talking about.
+              they&rsquo;re talking about.
             </p>
             <div className="bg-gradient-to-br from-gray-50 to-white p-8 rounded-2xl shadow-lg border border-gray-100 text-left">
               <h3 className="font-bold text-xl mb-4 text-cyan-600">LOCATION</h3>
