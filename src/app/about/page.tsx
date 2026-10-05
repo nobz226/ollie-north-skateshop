@@ -1,119 +1,154 @@
 "use client";
 
 import Image from "next/image";
+import { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { Truck, ThermometerSun, ShieldCheck, MapPin } from "lucide-react";
 import Header from "../Header";
 import Footer from "../Footer";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import { Marquee, Reveal, SplitReveal } from "@/components/motion";
+import { IMAGES } from "@/lib/catalog";
+
+// TODO: replace placeholder story and shipping policy with the client's own details
+const SHIPPING = [
+  {
+    icon: Truck,
+    title: "Shipped early in the week",
+    text: "Orders ship Monday to Wednesday so plants never sit in a depot over the weekend.",
+  },
+  {
+    icon: ThermometerSun,
+    title: "Weather-watched",
+    text: "During heatwaves or hard frosts we hold orders (and let you know) until it's safe to ship.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Live arrival guarantee",
+    text: "If a plant arrives damaged, send a photo within 48 hours and we'll replace or refund it.",
+  },
+  {
+    icon: MapPin,
+    title: "Local pickup",
+    text: "Nearby? Choose pickup and see the collection in person by appointment.",
+  },
+];
+
+const TIMELINE = [
+  ["Year one", "A single supermarket Venus flytrap on a kitchen windowsill. It survived (barely)."],
+  ["Year three", "Sarracenia, sundews and a first greenhouse shelf. Learned the hard way about tap water."],
+  ["Year five", "Seed-grown hybrids, hundreds of divisions, and friends asking to buy spares."],
+  ["Today", "MD Plants: the collection, finally with a proper home online."],
+];
 
 export default function AboutPage() {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const y1 = useTransform(scrollYProgress, [0, 1], ["10%", "-10%"]);
+  const y2 = useTransform(scrollYProgress, [0, 1], ["-5%", "15%"]);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
 
       <main className="flex-grow">
-        {/* Hero Section */}
-        <section className="relative h-96 bg-black text-white overflow-hidden">
-          <Image
-            src="https://images.unsplash.com/photo-1547447134-cd3f5c716030?w=1600"
-            alt="Skateboarding"
-            fill
-            className="object-cover opacity-40"
+        {/* Header */}
+        <section className="container mx-auto px-4 pt-10 pb-16">
+          <Breadcrumbs items={[{ label: "About", href: "/about" }]} />
+          <p className="label mb-6 mt-8 text-trap-500">About MD Plants</p>
+          <SplitReveal
+            as="h1"
+            inView={false}
+            text="From one windowsill flytrap to a *collection* worth sharing."
+            className="max-w-5xl text-6xl md:text-8xl leading-[0.95] text-ink"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/60"></div>
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-            <h1 className="text-5xl md:text-6xl font-bold mb-4">ABOUT US</h1>
-            <p className="text-xl max-w-2xl text-gray-200">
-              Fueling the skate scene since day one
-            </p>
+        </section>
+
+        {/* Story with parallax collage */}
+        <section ref={ref} className="container mx-auto grid items-center gap-16 px-4 py-16 lg:grid-cols-2">
+          <div className="relative h-[34rem]">
+            <motion.div style={{ y: y1 }} className="absolute left-0 top-0 h-[26rem] w-[70%] overflow-hidden rounded-t-[14rem] rounded-b-3xl">
+              <Image src={IMAGES.sarracenia} alt="Colorful Sarracenia pitcher plants" fill sizes="40vw" className="object-cover" />
+            </motion.div>
+            <motion.div style={{ y: y2 }} className="absolute bottom-0 right-0 h-64 w-[50%] overflow-hidden rounded-3xl border-[6px] border-parchment shadow-2xl">
+              <Image src={IMAGES.windowsill} alt="Venus flytraps on a windowsill" fill sizes="30vw" className="object-cover" />
+            </motion.div>
+          </div>
+
+          <div className="space-y-6 text-lg leading-relaxed text-ink/75">
+            <Reveal>
+              <p>
+                <span className="font-display float-left mr-3 mt-1 text-7xl leading-[0.8] text-trap-500">E</span>
+                very collection starts with one plant. MD Plants started the way most carnivorous
+                plant collections do: with a single Venus flytrap and a lot of curiosity. A few years (and many divisions, seedlings and
+                greenhouse shelves) later, the collection outgrew the windowsill.
+              </p>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <p>
+                Instead of scattering plants across marketplace listings, we built a proper home for
+                them. Every plant here is grown by us in pure water and nutrient-free media,
+                photographed honestly, and packed by the same hands that potted it.
+              </p>
+            </Reveal>
+            <Reveal delay={0.2}>
+              <p className="latin text-2xl text-moss-700">
+                Buying your first flytrap or hunting a specific cultivar? Let&apos;s talk plants.
+              </p>
+            </Reveal>
           </div>
         </section>
 
-        {/* Our Story */}
+        {/* Timeline */}
         <section className="container mx-auto px-4 py-20">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-4xl md:text-5xl font-bold mb-8 text-center">OUR STORY</h2>
-            <div className="space-y-6 text-gray-700 leading-relaxed text-lg">
-              <p>
-                Founded by skaters, for skaters, Ollie North Skateshop started as a
-                small garage operation in Venice Beach. What began as a passion
-                project to provide quality gear to the local skate community has
-                grown into a trusted destination for riders across the country.
-              </p>
-              <p>
-                We believe skateboarding is more than just a sport&mdash;it&rsquo;s a
-                lifestyle, a form of self-expression, and a community that welcomes
-                everyone. Whether you&rsquo;re landing your first ollie or sending it down
-                a 12-stair, we&rsquo;re here to support your journey with the best gear
-                and expertise.
-              </p>
-              <p>
-                Every product we stock is tested by our team of riders. We don&rsquo;t
-                just sell skateboards; we ride them, break them in, and push them to
-                their limits. That&rsquo;s how we know what works and what doesn&rsquo;t.
-              </p>
-            </div>
+          <div className="grid gap-px overflow-hidden rounded-3xl border border-ink/10 bg-ink/10 md:grid-cols-4">
+            {TIMELINE.map(([year, text], i) => (
+              <Reveal key={year} delay={i * 0.1} className="bg-parchment">
+                <div className="h-full p-8">
+                  <span className="label text-trap-500">0{i + 1}</span>
+                  <h3 className="mt-6 text-3xl">{year}</h3>
+                  <p className="mt-3 text-sm text-ink/65">{text}</p>
+                </div>
+              </Reveal>
+            ))}
           </div>
         </section>
 
-        {/* Values */}
-        <section className="bg-gradient-to-b from-gray-50 to-white py-20">
+        {/* Shipping */}
+        <section id="shipping" className="bg-moss-900 py-24 text-parchment scroll-mt-32">
           <div className="container mx-auto px-4">
-            <h2 className="text-4xl md:text-5xl font-bold mb-12 text-center">
-              WHAT WE STAND FOR
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-5xl mx-auto">
-              <div className="text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <div className="w-20 h-20 bg-cyan-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <div className="text-4xl">🛹</div>
-                </div>
-                <h3 className="text-xl font-bold mb-3">QUALITY GEAR</h3>
-                <p className="text-gray-600">
-                  Only the best brands and products that we trust and ride ourselves
+            <div className="mb-14 grid gap-6 md:grid-cols-2 md:items-end">
+              <SplitReveal text="Shipping *live* plants" className="text-5xl md:text-7xl" />
+              <Reveal delay={0.2}>
+                <p className="max-w-md text-parchment/70 md:ml-auto">
+                  Plants usually travel bare-root, wrapped in damp sphagnum moss. That&apos;s the
+                  safest way to ship carnivores and how growers worldwide do it.
                 </p>
-              </div>
-              <div className="text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <div className="w-20 h-20 bg-cyan-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <div className="text-4xl">🤝</div>
-                </div>
-                <h3 className="text-xl font-bold mb-3">COMMUNITY</h3>
-                <p className="text-gray-600">
-                  Supporting local skaters and giving back to the scene that raised us
-                </p>
-              </div>
-              <div className="text-center p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <div className="w-20 h-20 bg-cyan-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <div className="text-4xl">💯</div>
-                </div>
-                <h3 className="text-xl font-bold mb-3">AUTHENTICITY</h3>
-                <p className="text-gray-600">
-                  Real riders, real advice, real skate culture—no posers allowed
-                </p>
-              </div>
+              </Reveal>
+            </div>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {SHIPPING.map(({ icon: Icon, title, text }, i) => (
+                <Reveal key={title} delay={i * 0.1}>
+                  <div className="group h-full rounded-3xl border border-parchment/15 p-8 transition-colors duration-500 hover:bg-parchment hover:text-ink">
+                    <Icon className="mb-10 h-8 w-8 text-dew-300 transition-colors group-hover:text-trap-500" />
+                    <h3 className="mb-3 text-2xl">{title}</h3>
+                    <p className="text-sm opacity-70">{text}</p>
+                  </div>
+                </Reveal>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* Visit Us */}
-        <section className="container mx-auto px-4 py-20">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-4xl md:text-5xl font-bold mb-8">VISIT OUR SHOP</h2>
-            <p className="text-gray-700 mb-8 text-lg">
-              Come hang out at our Venice Beach location. We&rsquo;ve got a mini ramp out
-              back, a chill vibe inside, and a crew that actually knows what
-              they&rsquo;re talking about.
-            </p>
-            <div className="bg-gradient-to-br from-gray-50 to-white p-8 rounded-2xl shadow-lg border border-gray-100 text-left">
-              <h3 className="font-bold text-xl mb-4 text-cyan-600">LOCATION</h3>
-              <p className="mb-2">123 Skate Street</p>
-              <p className="mb-2">Venice Beach, CA 90291</p>
-              <p className="mb-4">Phone: (555) 123-4567</p>
-
-              <h3 className="font-bold text-xl mb-4 mt-6 text-cyan-600">HOURS</h3>
-              <p className="mb-1">Monday - Friday: 10AM - 8PM</p>
-              <p className="mb-1">Saturday: 9AM - 9PM</p>
-              <p>Sunday: 10AM - 6PM</p>
-            </div>
-          </div>
-        </section>
+        <div className="border-b border-ink/10 py-8">
+          <Marquee>
+            {["Pure water", "Full sun", "No fertilizer", "Cold winters", "Live food only", "Patience"].map((t) => (
+              <span key={t} className="latin px-10 text-4xl text-ink/25">
+                {t} ✺
+              </span>
+            ))}
+          </Marquee>
+        </div>
       </main>
 
       <Footer />

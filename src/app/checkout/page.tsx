@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useConvexUser } from "@/hooks/useConvexUser";
@@ -550,7 +552,7 @@ export default function CheckoutPage() {
                       setShippingForm({ ...shippingForm, fullName: e.target.value });
                       if (hasExistingShipping) setShippingModified(true);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
                   />
                 </div>
                 <div className="md:col-span-2">
@@ -565,7 +567,7 @@ export default function CheckoutPage() {
                       setShippingForm({ ...shippingForm, addressLine1: e.target.value });
                       if (hasExistingShipping) setShippingModified(true);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
                   />
                 </div>
                 <div className="md:col-span-2">
@@ -579,7 +581,7 @@ export default function CheckoutPage() {
                       setShippingForm({ ...shippingForm, addressLine2: e.target.value });
                       if (hasExistingShipping) setShippingModified(true);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
                   />
                 </div>
                 <div>
@@ -596,7 +598,7 @@ export default function CheckoutPage() {
                       setShippingForm({ ...shippingForm, city: e.target.value });
                       if (hasExistingShipping) setShippingModified(true);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
                   />
                 </div>
                 <div>
@@ -610,7 +612,7 @@ export default function CheckoutPage() {
                       setShippingForm({ ...shippingForm, country: e.target.value, state: "" });
                       if (hasExistingShipping) setShippingModified(true);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
                   >
                     <option value="USA">United States</option>
                     <option value="Canada">Canada</option>
@@ -627,7 +629,7 @@ export default function CheckoutPage() {
                       setShippingForm({ ...shippingForm, state: e.target.value });
                       if (hasExistingShipping) setShippingModified(true);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
                   >
                     <option value="">Select {shippingForm.country === "USA" ? "State" : "Province"}</option>
                     {stateOptions.map((option) => (
@@ -654,7 +656,7 @@ export default function CheckoutPage() {
                       shippingForm.country === "Canada" ? "A1A 1A1" :
                       "Postal Code"
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
                   />
                   <p className="text-xs text-gray-500 mt-1">
                     {shippingForm.country === "USA" && "5 digits (e.g., 90210 or 90210-1234)"}
@@ -695,7 +697,7 @@ export default function CheckoutPage() {
                       setShippingForm({ ...shippingForm, phone: e.target.value });
                       if (hasExistingShipping) setShippingModified(true);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
                   />
                 </div>
               </div>
@@ -717,7 +719,7 @@ export default function CheckoutPage() {
                       setPaymentForm({ ...paymentForm, cardHolderName: e.target.value });
                       if (hasExistingPayment) setPaymentModified(true);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
                   />
                 </div>
                 <div className="md:col-span-2">
@@ -734,7 +736,7 @@ export default function CheckoutPage() {
                       setPaymentForm({ ...paymentForm, cardNumber: e.target.value });
                       if (hasExistingPayment) setPaymentModified(true);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
                   />
                 </div>
                 <div>
@@ -751,7 +753,7 @@ export default function CheckoutPage() {
                       setPaymentForm({ ...paymentForm, expiryMonth: e.target.value });
                       if (hasExistingPayment) setPaymentModified(true);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
                   />
                 </div>
                 <div>
@@ -768,7 +770,7 @@ export default function CheckoutPage() {
                       setPaymentForm({ ...paymentForm, expiryYear: e.target.value });
                       if (hasExistingPayment) setPaymentModified(true);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
                   />
                 </div>
                 <div className="md:col-span-2">
@@ -782,7 +784,7 @@ export default function CheckoutPage() {
                     maxLength={4}
                     value={paymentForm.cvv}
                     onChange={(e) => setPaymentForm({ ...paymentForm, cvv: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
                   />
                 </div>
               </div>
@@ -847,7 +849,7 @@ export default function CheckoutPage() {
               <button
                 type="submit"
                 disabled={isProcessing}
-                className="w-full mt-6 bg-indigo-600 text-white py-3 rounded-md font-semibold hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="w-full mt-6 bg-moss-700 text-white py-3 rounded-md font-semibold hover:bg-moss-800 disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 {isProcessing ? "Processing..." : "Place Order"}
               </button>
@@ -891,7 +893,7 @@ export default function CheckoutPage() {
                   setShowSaveModal(false);
                   processOrder();
                 }}
-                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                className="flex-1 px-4 py-2 bg-moss-700 text-white rounded-md hover:bg-moss-800"
               >
                 Save to Profile
               </button>

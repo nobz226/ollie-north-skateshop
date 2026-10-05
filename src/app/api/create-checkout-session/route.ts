@@ -12,10 +12,6 @@ interface CartItem {
   quantity: number;
 }
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-12-15.clover",
-});
-
 export async function POST(request: NextRequest) {
   try {
     const { items, userId, userEmail } = await request.json() as {
@@ -23,6 +19,19 @@ export async function POST(request: NextRequest) {
       userId?: string;
       userEmail: string;
     };
+
+    // Initialize Stripe inside handler to avoid build-time issues
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeSecretKey) {
+      return NextResponse.json(
+        { error: "Stripe not configured" },
+        { status: 500 }
+      );
+    }
+
+    const stripe = new Stripe(stripeSecretKey, {
+      apiVersion: "2025-12-15.clover",
+    });
 
     // Calculate order total and prepare line items with metadata
     const lineItems = items.map((item: CartItem) => ({

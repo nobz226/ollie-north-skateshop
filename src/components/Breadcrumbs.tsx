@@ -12,12 +12,12 @@ interface BreadcrumbsProps {
 
 export default function Breadcrumbs({ items }: BreadcrumbsProps) {
   return (
-    <nav className="flex items-center space-x-2 text-sm text-gray-600 mb-6">
+    <nav className="label flex flex-wrap items-center gap-x-2 gap-y-1 text-ink/50 mb-6">
       <Link
         href="/"
-        className="flex items-center hover:text-red-600 transition-colors"
+        className="flex items-center hover:text-moss-700 transition-colors"
       >
-        <Home className="h-4 w-4" />
+        <Home className="h-3.5 w-3.5" />
       </Link>
       
       {items.map((item, index) => {
@@ -25,13 +25,13 @@ export default function Breadcrumbs({ items }: BreadcrumbsProps) {
         
         return (
           <div key={item.href} className="flex items-center space-x-2">
-            <ChevronRight className="h-4 w-4 text-gray-400" />
+            <ChevronRight className="h-3 w-3 text-ink/30" />
             {isLast ? (
-              <span className="font-medium text-gray-900">{item.label}</span>
+              <span className="text-ink">{item.label}</span>
             ) : (
               <Link
                 href={item.href}
-                className="hover:text-red-600 transition-colors"
+                className="hover:text-trap-500 transition-colors"
               >
                 {item.label}
               </Link>

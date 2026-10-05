@@ -106,7 +106,7 @@ export default function WishlistPage() {
               <p className="text-gray-600 mb-8">Save items you love for later!</p>
               <button
                 onClick={() => router.back()}
-                className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                className="px-6 py-3 bg-moss-700 text-white rounded-md hover:bg-moss-800"
               >
                 Continue Shopping
               </button>
@@ -154,7 +154,7 @@ export default function WishlistPage() {
                   {/* Product Info */}
                   <div className="p-4">
                     <Link href={`/products/${item.product._id}`}>
-                      <h3 className="font-semibold text-gray-900 mb-1 hover:text-indigo-600">
+                      <h3 className="font-semibold text-gray-900 mb-1 hover:text-moss-700">
                         {item.product.name}
                       </h3>
                     </Link>
@@ -168,7 +168,7 @@ export default function WishlistPage() {
                       disabled={!item.product.inStock}
                       className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                         item.product.inStock
-                          ? "bg-cyan-500 text-white hover:bg-cyan-600"
+                          ? "bg-moss-700 text-white hover:bg-moss-800"
                           : "bg-gray-300 text-gray-500 cursor-not-allowed"
                       }`}
                     >

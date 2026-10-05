@@ -21,7 +21,7 @@ export default function AdminDashboard() {
             onClick={() => setActiveTab("products")}
             className={`${
               activeTab === "products"
-                ? "border-indigo-500 text-indigo-600"
+                ? "border-moss-600 text-moss-700"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
           >
@@ -31,7 +31,7 @@ export default function AdminDashboard() {
             onClick={() => setActiveTab("categories")}
             className={`${
               activeTab === "categories"
-                ? "border-indigo-500 text-indigo-600"
+                ? "border-moss-600 text-moss-700"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
           >
@@ -41,7 +41,7 @@ export default function AdminDashboard() {
             onClick={() => setActiveTab("orders")}
             className={`${
               activeTab === "orders"
-                ? "border-indigo-500 text-indigo-600"
+                ? "border-moss-600 text-moss-700"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
           >
@@ -96,12 +96,12 @@ function ProductsTab() {
             placeholder="Search products..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
           />
         </div>
         <button
           onClick={() => setIsCreating(true)}
-          className="ml-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+          className="ml-4 px-4 py-2 bg-moss-700 text-white rounded-md hover:bg-moss-800"
         >
           Add New Product
         </button>
@@ -175,7 +175,7 @@ function ProductsTab() {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
                       onClick={() => setEditingProduct(product._id)}
-                      className="text-indigo-600 hover:text-indigo-900 mr-4"
+                      className="text-moss-700 hover:text-moss-900 mr-4"
                     >
                       Edit
                     </button>

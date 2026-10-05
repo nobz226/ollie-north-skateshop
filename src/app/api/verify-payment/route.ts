@@ -1,13 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-12-15.clover",
-});
-
 export async function POST(request: NextRequest) {
   try {
     const { sessionId } = await request.json() as { sessionId: string };
+
+    // Initialize Stripe inside handler to avoid build-time issues
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeSecretKey) {
+      return NextResponse.json(
+        { success: false, error: "Stripe not configured" },
+        { status: 500 }
+      );
+    }
+
+    const stripe = new Stripe(stripeSecretKey, {
+      apiVersion: "2025-12-15.clover",
+    });
 
     // Retrieve the session from Stripe
     const session = await stripe.checkout.sessions.retrieve(sessionId);

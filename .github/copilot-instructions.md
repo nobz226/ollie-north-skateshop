@@ -1,8 +1,8 @@
-# Ollie North Skateshop - AI Agent Instructions
+# MD Plants - AI Agent Instructions
 
 ## Architecture Overview
 
-This is a **Next.js 15 (App Router) + Convex + Clerk** e-commerce application for skateboarding products. The key architectural pattern is:
+This is a **Next.js 15 (App Router) + Convex + Clerk** e-commerce application for carnivorous plants, seeds and growing supplies. The key architectural pattern is:
 - **Frontend**: Next.js client components in `src/app/` using React 19 (no server components with Convex)
 - **Backend**: Convex serverless backend in `convex/` with real-time queries/mutations
 - **Auth**: Dual authentication system:
@@ -66,9 +66,11 @@ npx convex dev
 
 ### 4. Product Categorization
 Products have a **3-level hierarchy** (see [convex/schema.ts](../convex/schema.ts)):
-- `category`: Top-level (Boards, Hardware, Apparel)
-- `subcategory`: Secondary (Skateboards, T-Shirts, Trucks, etc.)
-- `productType`: Specific (Decks, Complete Skateboards, Wheels, etc.)
+- `category`: Top-level (Plants, Seeds, Supplies)
+- `subcategory`: Secondary (Venus Flytraps, Pitcher Plants, Growing Media, etc.)
+- `productType`: Specific (Mature Plant, Seed Packet, Growing Mix, etc.)
+
+Category/subcategory names, images and care info live in [src/lib/catalog.ts](../src/lib/catalog.ts) and must match the product data in Convex.
 
 ### 5. Pricing Convention
 **All prices stored in CENTS** in database. Always divide by 100 for display:

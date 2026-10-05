@@ -140,10 +140,10 @@ export default function CartPage() {
               </svg>
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-4">Your Cart is Empty</h1>
-            <p className="text-gray-600 mb-8">Add some awesome skateboarding gear!</p>
+            <p className="text-gray-600 mb-8">Your bog is looking a little empty. Find a hungry new plant!</p>
             <button
               onClick={() => router.back()}
-              className="px-8 py-4 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 font-bold transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="px-8 py-4 bg-moss-700 text-white rounded-lg hover:bg-moss-800 font-bold transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               CONTINUE SHOPPING
             </button>
@@ -159,10 +159,10 @@ export default function CartPage() {
       <h1 className="text-4xl font-bold text-gray-900 mb-8">Shopping Cart</h1>
 
       {isGuest && (
-        <div className="mb-6 p-4 bg-cyan-50 border border-cyan-200 rounded-lg">
-          <p className="text-cyan-900">
+        <div className="mb-6 p-4 bg-moss-50 border border-moss-200 rounded-lg">
+          <p className="text-moss-950">
             <span className="font-semibold">Guest Mode:</span>{" "}
-            <Link href="/sign-in?redirectUrl=/cart" className="underline font-semibold hover:text-cyan-600 transition-colors">
+            <Link href="/sign-in?redirectUrl=/cart" className="underline font-semibold hover:text-moss-800 transition-colors">
               Sign in
             </Link>{" "}
             to save your cart.
@@ -217,7 +217,7 @@ export default function CartPage() {
                       onClick={() =>
                         handleQuantityChange(cartItemId as Id<"cartItems">, productId, item.quantity - 1)
                       }
-                      className="w-9 h-9 rounded-lg border-2 border-gray-300 flex items-center justify-center hover:border-cyan-500 hover:text-cyan-500 transition-all font-bold"
+                      className="w-9 h-9 rounded-lg border-2 border-gray-300 flex items-center justify-center hover:border-moss-700 hover:text-moss-700 transition-all font-bold"
                       aria-label="Decrease quantity"
                     >
                       -
@@ -229,7 +229,7 @@ export default function CartPage() {
                       onClick={() =>
                         handleQuantityChange(cartItemId as Id<"cartItems">, productId, item.quantity + 1)
                       }
-                      className="w-9 h-9 rounded-lg border-2 border-gray-300 flex items-center justify-center hover:border-cyan-500 hover:text-cyan-500 transition-all font-bold"
+                      className="w-9 h-9 rounded-lg border-2 border-gray-300 flex items-center justify-center hover:border-moss-700 hover:text-moss-700 transition-all font-bold"
                       aria-label="Increase quantity"
                     >
                       +
@@ -265,12 +265,12 @@ export default function CartPage() {
               </div>
               <div className="border-t-2 border-gray-200 pt-4 flex justify-between text-xl font-bold text-gray-900">
                 <span>Total</span>
-                <span className="text-cyan-500">${(total / 100).toFixed(2)}</span>
+                <span className="text-moss-700">${(total / 100).toFixed(2)}</span>
               </div>
             </div>
 
             <button
-              className="w-full bg-cyan-500 text-white py-4 rounded-lg font-bold hover:bg-cyan-600 mb-3 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-moss-700 text-white py-4 rounded-lg font-bold hover:bg-moss-800 mb-3 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={handleStripeCheckout}
               disabled={isCheckingOut || activeCart.length === 0}
             >
@@ -279,7 +279,7 @@ export default function CartPage() {
 
             <button
               onClick={() => router.back()}
-              className="block w-full text-center text-cyan-600 hover:text-cyan-700 font-bold transition-colors"
+              className="block w-full text-center text-moss-800 hover:text-moss-900 font-bold transition-colors"
             >
               CONTINUE SHOPPING
             </button>

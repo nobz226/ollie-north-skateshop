@@ -1,8 +1,8 @@
-# Ollie North Skateshop E-Commerce Platform
+# MD Plants
 
-A full-stack e-commerce application built with Next.js 15, React 19, Convex, and Clerk authentication. This platform provides a complete shopping experience for coffee products with advanced filtering, real-time cart management, and user authentication.
+An online shop for carnivorous plants (Venus flytraps, pitcher plants, Nepenthes, sundews and butterworts) plus seeds and growing supplies. Built with **Next.js 15**, **React 19**, **Convex**, and **Clerk**. Features authentication, real-time cart, wishlist, Stripe checkout, and order management.
 
-## Tech Stack
+## 🚀 Tech Stack
 
 ### Frontend
 - **Next.js 15** - React framework with App Router
@@ -14,106 +14,116 @@ A full-stack e-commerce application built with Next.js 15, React 19, Convex, and
 - **Convex** - Real-time serverless database and backend
 - **Clerk** - Authentication and user management
 
-### Additional Tools
-- **clsx** - Conditional className utility
-- **tailwind-merge** - Merge Tailwind classes without conflicts
+### Payments & Tools
+- **Stripe** - Payment processing
+- **Framer Motion** - Animations
+- **Lucide React** - Icons
 
-## Project Structure
+---
+
+## 📁 Project Structure
 
 ```
-ollie-north-skateshop/
+md-plants/
 ├── src/
 │   ├── app/                    # Next.js App Router pages
-│   │   ├── apparel/           # Apparel category page
-│   │   ├── boards/            # Boards category page
+│   │   ├── about/             # About page
+│   │   ├── api/               # API routes (Stripe, address validation)
 │   │   ├── cart/              # Shopping cart page
-│   │   ├── hardware/          # Hardware category page
-│   │   ├── products/          # Products listing and detail pages
-│   │   │   ├── [id]/         # Dynamic product detail page
-│   │   │   └── page.tsx      # All products with filtering
-│   │   ├── profile/           # User profile page
-│   │   ├── sign-in/          # Clerk sign-in page
-│   │   ├── sign-up/          # Clerk sign-up page
-│   │   ├── Header.tsx         # Site header component
-│   │   ├── Footer.tsx         # Site footer component
-│   │   ├── layout.tsx         # Root layout
+│   │   ├── checkout/          # Checkout flow (cart → payment → success/cancel)
+│   │   ├── plants/            # Category landing pages (driven by src/lib/catalog.ts)
+│   │   ├── seeds/
+│   │   ├── supplies/
+│   │   ├── care/              # Carnivorous plant care guide
+│   │   ├── products/          # Products listing with filters + product detail
+│   │   ├── profile/           # User profile, orders, addresses
+│   │   ├── sign-in/           # Clerk sign-in
+│   │   ├── wishlist/          # User wishlist
+│   │   ├── Header.tsx         # Navigation header
+│   │   ├── Footer.tsx         # Site footer
+│   │   ├── layout.tsx         # Root layout + metadata
 │   │   └── page.tsx           # Homepage
 │   ├── components/            # Reusable React components
-│   │   ├── ConvexClientProvider.tsx  # Convex client setup
 │   │   ├── ProductCard.tsx    # Product display card
-│   │   └── SyncUser.tsx       # Clerk to Convex user sync
+│   │   ├── Breadcrumbs.tsx    # Navigation breadcrumbs
+│   │   ├── Providers.tsx      # Context providers
+│   │   └── SyncUser.tsx       # Clerk → Convex user sync
 │   ├── hooks/                 # Custom React hooks
-│   │   └── useConvexUser.ts   # Hook to get Convex user
-│   ├── lib/                   # Utility functions
-│   │   └── utils.ts           # Helper functions (cn)
+│   │   ├── useConvexUser.ts   # Get Convex user for Clerk auth
+│   │   └── useGuestCart.ts    # localStorage cart for guests
+│   ├── lib/
+│   │   ├── catalog.ts         # Shop name, categories, images, care info
+│   │   └── utils.ts           # Utility functions (cn)
 │   └── middleware.ts          # Clerk auth middleware
 ├── convex/                    # Convex backend
-│   ├── _generated/           # Auto-generated Convex types
-│   ├── addUser.ts            # User creation mutation
-│   ├── cart.ts               # Cart queries and mutations
+│   ├── _generated/           # Auto-generated types
+│   ├── admin.ts              # Admin authentication
+│   ├── adminOrders.ts        # Admin order queries
+│   ├── adminProducts.ts      # Admin product management
+│   ├── cart.ts               # Cart queries & mutations
+│   ├── fileStorage.ts        # File upload URLs
+│   ├── orders.ts             # Order creation & queries
 │   ├── products.ts           # Product queries
 │   ├── schema.ts             # Database schema
-│   ├── seedProducts.ts       # Product seeding script
+│   ├── seedProducts.ts       # Sample product seeding
 │   ├── tsconfig.json         # Convex TypeScript config
-│   └── users.ts              # User queries
+│   ├── userProfile.ts        # User profile (shipping/payment)
+│   ├── users.ts              # User queries
+│   └── wishlist.ts           # Wishlist queries & mutations
 ├── public/                    # Static assets
 └── package.json              # Dependencies
 ```
 
-## Database Schema
+---
+
+## 🗄️ Database Schema (Convex)
 
 ### Users Table
-Stores user information synced from Clerk authentication.
-
 ```typescript
 users: defineTable({
   clerkUserId: v.string(),
-})
-.index("by_clerk_id", ["clerkUserId"])
+  shippingAddress: v.optional(v.object({
+    fullName: v.string(),
+    addressLine1: v.string(),
+    addressLine2: v.optional(v.string()),
+    city: v.string(),
+    state: v.string(),
+    postalCode: v.string(),
+    country: v.string(),
+    phone: v.string(),
+  })),
+  paymentMethod: v.optional(v.object({
+    cardHolderName: v.string(),
+    cardLastFour: v.string(),
+    cardType: v.string(),
+    expiryMonth: v.string(),
+    expiryYear: v.string(),
+  })),
+}).index("by_clerk_user_id", ["clerkUserId"])
 ```
 
-**Fields:**
-- `clerkUserId` - Unique identifier from Clerk (indexed)
-
 ### Products Table
-Contains all product information with hierarchical categorization.
-
 ```typescript
 products: defineTable({
   name: v.string(),
   description: v.string(),
-  price: v.number(),
+  price: v.number(),        // in cents
   imageUrl: v.string(),
-  category: v.string(),
-  subcategory: v.string(),
-  productType: v.string(),
+  category: v.string(),     // e.g., "Category 1"
+  subcategory: v.string(),  // e.g., "Subcategory A"
+  productType: v.string(),  // e.g., "Type 1"
   size: v.optional(v.string()),
   inStock: v.boolean(),
-  featured: v.boolean(),
+  stockQuantity: v.optional(v.number()),
+  featured: v.optional(v.boolean()),
   createdAt: v.number(),
 })
-.index("by_name", ["name"])
-.index("by_category", ["category"])
-.index("by_subcategory", ["subcategory"])
-.index("by_product_type", ["productType"])
+  .index("by_category", ["category"])
+  .index("by_subcategory", ["subcategory"])
+  .index("by_product_type", ["productType"])
 ```
 
-**Fields:**
-- `name` - Product name
-- `description` - Product description
-- `price` - Price in cents (e.g., 4999 = $49.99)
-- `imageUrl` - Product image URL
-- `category` - Top-level category (Boards, Hardware, Apparel)
-- `subcategory` - Secondary category (Skateboards, T-Shirts, etc.)
-- `productType` - Specific product type (Decks, Trucks, Wheels)
-- `size` - Optional size specification (7.5", M, 29, etc.)
-- `inStock` - Availability status
-- `featured` - Featured on homepage flag
-- `createdAt` - Timestamp of creation
-
 ### Cart Items Table
-Manages shopping cart items for each user.
-
 ```typescript
 cartItems: defineTable({
   userId: v.id("users"),
@@ -121,343 +131,199 @@ cartItems: defineTable({
   quantity: v.number(),
   addedAt: v.number(),
 })
-.index("by_user", ["userId"])
-.index("by_user_and_product", ["userId", "productId"])
+  .index("by_user", ["userId"])
+  .index("by_user_and_product", ["userId", "productId"])
 ```
 
-**Fields:**
-- `userId` - Reference to user
-- `productId` - Reference to product
-- `quantity` - Number of items
-- `addedAt` - Timestamp when added to cart
+### Wishlist Items Table
+```typescript
+wishlistItems: defineTable({
+  userId: v.id("users"),
+  productId: v.id("products"),
+  addedAt: v.number(),
+})
+  .index("by_user", ["userId"])
+  .index("by_user_and_product", ["userId", "productId"])
+```
 
-## Product Categorization Hierarchy
+### Orders Table
+```typescript
+orders: defineTable({
+  userId: v.optional(v.id("users")),
+  guestEmail: v.optional(v.string()),
+  items: v.array(v.object({
+    productId: v.string(),
+    productName: v.string(),
+    quantity: v.number(),
+    price: v.number(),
+  })),
+  subtotal: v.number(),
+  tax: v.number(),
+  total: v.number(),
+  status: v.string(), // "pending", "processing", "shipped", "delivered", "cancelled"
+  createdAt: v.number(),
+  updatedAt: v.number(),
+})
+  .index("by_user", ["userId"])
+  .index("by_guest_email", ["guestEmail"])
+  .index("by_status", ["status"])
+  .index("by_created_at", ["createdAt"])
+```
 
-### Categories
-1. **Boards** - Skateboarding decks and complete setups
-2. **Hardware** - Components and accessories
-3. **Apparel** - Clothing and wearables
+---
 
-### Subcategories by Category
+## ✨ Core Features
 
-**Boards:**
-- Skateboards
-- Longboards
-- Pennyboards
-
-**Hardware:**
-- Trucks
-- Wheels
-- Bearings
-- Griptape
-- Bolts
-
-**Apparel:**
-- T-Shirts
-- Hoodies
-- Hats
-- Accessories
-
-### Product Types
-Each subcategory contains specific product types:
-- **Skateboards**: Decks, Complete Skateboards
-- **Longboards**: Longboard Decks, Complete Longboards
-- **Trucks**: Standard Trucks, Longboard Trucks
-- **Wheels**: Skateboard Wheels, Longboard Wheels
-- And more...
-
-## Core Features
-
-### 1. Authentication System
-- Powered by Clerk for secure authentication
+### 1. Authentication (Clerk)
+- Secure sign-up/sign-in with email/password, OAuth providers
 - Protected routes via middleware
-- Public routes: `/sign-in`, `/sign-up`
-- All other routes require authentication
-- Automatic user sync from Clerk to Convex database
+- Automatic user sync from Clerk → Convex database
 
 ### 2. Product Management
+- **Seeded Products**: 30+ generic template products across 3 categories
+- **Product Queries**: List all, get by ID, filter by category/subcategory/type, get featured
+- **Admin Functions**: Create, update, delete products via Convex dashboard
 
-**Seeded Products:**
-- 150+ products across all categories
-- Realistic pricing and descriptions
-- Product images from Unsplash
-- Various sizes and configurations
+### 3. Advanced Product Filtering (`/products`)
+- **Search**: Text search across names/descriptions
+- **Category Filters**: URL-locked category → subcategory cascade
+- **Product Type Filter**: Dropdown for specific types
+- **Size Filter**: Dynamic based on selected product type
+- **Price Range**: Slider ($0-$200)
+- **Pagination**: 12 products/page with full navigation
 
-**Product Queries:**
-- List all products
-- Get product by ID
-- Filter by category
-- Filter by subcategory
-- Get featured products (homepage)
+### 4. Shopping Cart
+- **Dual Mode**: Convex (authenticated) + localStorage (guests)
+- Add/update/remove items with quantity controls
+- Real-time cart badge in header
+- Subtotal, 8% tax, total calculations
 
-### 3. Advanced Product Filtering
+### 5. Wishlist
+- Heart icon on product cards (authenticated users)
+- Dedicated `/wishlist` page with remove/add-to-cart
 
-The `/products` page provides comprehensive filtering:
+### 6. Checkout Flow
+- **Shipping Form**: Full address with US/Canada validation (Zippopotam.us API)
+- **Payment Form**: Card details with validation
+- **Stripe Checkout**: Creates session, redirects to Stripe
+- **Order Creation**: On success, creates order in Convex, clears cart
 
-**Search:**
-- Text search across product names and descriptions
-- Case-insensitive matching
+### 7. User Profile (`/profile`)
+- Account info & cart summary
+- Order history with status tracking
+- Shipping address management (with validation)
+- Payment method management
+- Member perks display
 
-**Category Filters:**
-- Top-level category selection
-- Cascading subcategory options
-- Product type filtering
-- Size filtering (when applicable)
+---
 
-**Price Filtering:**
-- Range slider from $0 to $200
-- Real-time price updates
+## 🛣️ Page Routes
 
-**Filter Behavior:**
-- Filters cascade (selecting category updates subcategory options)
-- URL parameter support (e.g., `?subcategory=skateboards`)
-- Reset all filters button
-- Active filters indication
+| Route | Description |
+|-------|-------------|
+| `/` | Homepage with hero, categories, featured products |
+| `/products` | All products with filters & pagination |
+| `/products/[id]` | Product detail page |
+| `/category-1` | Category 1 subcategories |
+| `/category-2` | Category 2 subcategories |
+| `/category-3` | Category 3 subcategories |
+| `/cart` | Shopping cart |
+| `/checkout` | Multi-step checkout |
+| `/checkout/success` | Order confirmation |
+| `/checkout/cancel` | Cancelled checkout |
+| `/profile` | User account & orders |
+| `/wishlist` | Saved products |
+| `/sign-in` | Authentication |
+| `/about` | Template overview & features |
 
-### 4. Pagination
-- 12 products per page
-- Page navigation controls (Previous/Next)
-- Direct page number selection
-- Automatic reset to page 1 when filters change
-- Results counter showing current range
+---
 
-### 5. Shopping Cart
+## 🔧 Customization Guide
 
-**Features:**
-- Add products to cart with single click
-- Update quantities with +/- buttons
-- Remove individual items
-- Clear entire cart
-- Real-time cart updates
-- Cart badge in header showing item count
+### 1. Update Branding
+- **Layout metadata** (`src/app/layout.tsx`): Site title, description
+- **Header** (`src/app/Header.tsx`): Logo text, navigation links
+- **Footer** (`src/app/Footer.tsx`): Contact info, social links
+- **Homepage** (`src/app/page.tsx`): Hero text, category images/links
 
-**Cart Calculations:**
-- Subtotal calculation
-- 8% tax calculation
-- Free shipping
-- Total with tax
+### 2. Modify Categories
+- **Seed file** (`convex/seedProducts.ts`): Add your categories, subcategories, product types
+- **Category pages** (`src/app/category-1/`, etc.): Update subcategory names/images
+- **Products page**: Filters auto-adapt to your data
 
-**Cart Operations:**
-- `addToCart` - Add product or increment quantity if already in cart
-- `updateQuantity` - Change item quantity
-- `removeFromCart` - Delete item from cart
-- `clearCart` - Empty entire cart
-- `getUserCart` - Get cart items with full product details
-
-### 6. User Profile
-Located at `/profile`, displays:
-- User account information
-- Current cart summary
-- Order history section (placeholder)
-- Member benefits
-- Account settings
-
-## API Reference
-
-### Convex Queries
-
-**Products:**
-```typescript
-products.list()
-// Returns: Array of all products
-
-products.getById({ productId: Id<"products"> })
-// Returns: Single product or null
-
-products.getByCategory({ category: string })
-// Returns: Array of products in category
-
-products.getBySubcategory({ subcategory: string })
-// Returns: Array of products in subcategory
-
-products.getFeatured()
-// Returns: Array of featured products
-```
-
-**Cart:**
-```typescript
-cart.getUserCart({ userId: Id<"users"> })
-// Returns: Array of cart items with product details
-```
-
-**Users:**
-```typescript
-users.getByClerkId({ clerkUserId: string })
-// Returns: User record or null
-```
-
-### Convex Mutations
-
-**User Management:**
-```typescript
-addUser.default({ clerkUserId: string, email: string })
-// Creates or updates user in Convex
-```
-
-**Cart Management:**
-```typescript
-cart.addToCart({ 
-  userId: Id<"users">, 
-  productId: Id<"products">, 
-  quantity: number 
-})
-// Adds product to cart or increments quantity
-
-cart.updateQuantity({ 
-  itemId: Id<"cartItems">, 
-  quantity: number 
-})
-// Updates cart item quantity
-
-cart.removeFromCart({ itemId: Id<"cartItems"> })
-// Removes item from cart
-
-cart.clearCart({ userId: Id<"users"> })
-// Removes all items from user's cart
-```
-
-**Product Seeding:**
-```typescript
+### 3. Add Products
+Run the seed mutation in Convex dashboard:
+```bash
+# In Convex dashboard Functions tab, run:
 seedProducts.seed()
-// Populates database with 150+ products
-// Run once during initial setup
 ```
+Or add products manually via admin functions.
 
-## Page Routes
-
-### Public Routes
-- `/sign-in` - User sign in page
-- `/sign-up` - User registration page
-
-### Protected Routes
-- `/` - Homepage with hero, categories, and featured products
-- `/products` - All products with advanced filtering and pagination
-- `/products/[id]` - Individual product detail page
-- `/boards` - Boards category page
-- `/hardware` - Hardware category page
-- `/apparel` - Apparel category page
-- `/cart` - Shopping cart page
-- `/profile` - User profile and account settings
-
-## Custom Hooks
-
-### useConvexUser
-Hook to retrieve the Convex user record for the currently authenticated Clerk user.
-
-```typescript
-const convexUser = useConvexUser();
-// Returns: User record from Convex or undefined
-```
-
-**Usage:**
-```typescript
-const convexUser = useConvexUser();
-if (!convexUser) return <div>Loading...</div>;
-// Use convexUser._id for cart operations
-```
-
-## Components
-
-### Header
-- Site navigation
-- Category links
-- Cart icon with item count badge
-- User menu with sign out option
-- Responsive design
-
-### Footer
-- Site links (Shop, About, Contact)
-- Social media links (placeholder)
-- Contact information
-- Copyright notice
-
-### ProductCard
-Reusable product display component.
-
-**Props:**
-- `product` - Product object with all fields
-
-**Features:**
-- Product image
-- Name and description
-- Price display (formatted from cents)
-- Add to Cart button
-- Click to view product details
-- Toast notifications on add to cart
-
-### SyncUser
-Client component that syncs Clerk authenticated users to Convex database.
-
-**Functionality:**
-- Runs on mount when user is signed in
-- Creates user record if doesn't exist
-- Updates existing user record if found
-- Handles errors silently (logs to console)
-
-## Environment Variables
-
-Required environment variables (create `.env.local`):
-
+### 4. Configure Stripe
+Set environment variables:
 ```env
-# Convex
-CONVEX_DEPLOYMENT=your-deployment-url
-NEXT_PUBLIC_CONVEX_URL=your-convex-url
-
-# Clerk
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your-clerk-publishable-key
-CLERK_SECRET_KEY=your-clerk-secret-key
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+STRIPE_SECRET_KEY=sk_test_...
+NEXT_PUBLIC_URL=http://localhost:3000
 ```
 
-## Getting Started
+### 5. Styling
+- **Colors**: Edit Tailwind classes (cyan-500 is primary)
+- **Fonts**: Update Google Fonts in `layout.tsx`
+- **Components**: Modify `ProductCard.tsx`, forms, etc.
+
+---
+
+## 📦 Getting Started
 
 ### Prerequisites
-- Node.js 18+ 
-- npm or yarn
-- Convex account
-- Clerk account
+- Node.js 18+
+- npm/yarn
+- Convex account (free tier)
+- Clerk account (free tier)
+- Stripe account (for payments)
 
 ### Installation
 
-1. Clone the repository:
 ```bash
-git clone <repository-url>
-cd ollie-north-skateshop
-```
-
-2. Install dependencies:
-```bash
+# 1. Clone and install
+git clone <your-repo>
+cd e-shop-template
 npm install
-```
 
-3. Set up environment variables:
-```bash
+# 2. Set up environment variables
 cp .env.example .env.local
-# Edit .env.local with your API keys
-```
+# Add your Convex, Clerk, and Stripe keys
 
-4. Initialize Convex:
-```bash
+# 3. Initialize Convex
 npx convex dev
-```
 
-5. Seed the database (in a separate terminal):
-```bash
-# In Convex dashboard or via CLI
-# Run the seedProducts.seed() mutation once
-```
+# 4. Seed database (in Convex dashboard → Functions → seedProducts.seed)
 
-6. Start the development server:
-```bash
+# 5. Start development
 npm run dev
 ```
 
-7. Open [http://localhost:3000](http://localhost:3000)
+### Environment Variables
+```env
+# Convex
+CONVEX_DEPLOYMENT=your-deployment
+NEXT_PUBLIC_CONVEX_URL=https://your-deployment.convex.cloud
 
-## Development Workflow
+# Clerk
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 
-### Running Locally
+# Stripe
+STRIPE_SECRET_KEY=sk_test_...
+NEXT_PUBLIC_URL=http://localhost:3000
+```
+
+---
+
+## 🛠️ Development Workflow
+
 ```bash
 # Terminal 1: Next.js dev server
 npm run dev
@@ -466,205 +332,66 @@ npm run dev
 npx convex dev
 ```
 
-### Database Seeding
-To populate the database with products:
-
-1. Open Convex dashboard
-2. Navigate to Functions
-3. Run `seedProducts:seed` mutation
-4. Verify 150+ products created
-
-### Adding New Products
-Modify `convex/seedProducts.ts` and add products to the respective category arrays, then re-run the seed function.
-
-## Known Issues and Limitations
-
-### Current Implementation Issues
-
-1. **useMemo Misuse in products/page.tsx**
-   - Currently using `useMemo` for side effects (setting page state)
-   - Should use `useEffect` instead
-   - Fix needed:
-   ```typescript
-   // Change from useMemo to useEffect
-   useEffect(() => {
-     setCurrentPage(1);
-   }, [searchQuery, selectedCategory, selectedSubcategory, selectedProductType, selectedSize, priceRange]);
-   ```
-
-2. **Missing Type Definitions**
-   - Some mutation parameters lack explicit TypeScript types
-   - Should add proper type annotations for better IDE support
-
-3. **No Error Boundaries**
-   - Application lacks error boundaries for graceful error handling
-   - Should wrap main sections in error boundary components
-
-### Feature Gaps
-
-1. **No Checkout System**
-   - Cart exists but no payment processing
-   - No integration with Stripe, PayPal, or other payment providers
-   - Checkout flow not implemented
-
-2. **No Order Management**
-   - No order history tracking
-   - No order confirmation emails
-   - No order status updates
-   - Orders table not implemented in schema
-
-3. **No Product Stock Management**
-   - `inStock` field exists but not enforced
-   - No inventory tracking
-   - No low stock warnings
-   - Can add out-of-stock items to cart
-
-4. **No Product Reviews**
-   - No rating system
-   - No user reviews or testimonials
-   - No review moderation
-
-5. **No Wishlist Feature**
-   - Users cannot save products for later
-   - No favorites functionality
-
-6. **Limited Search**
-   - Basic text search only
-   - No fuzzy matching
-   - No search suggestions
-   - No search history
-
-7. **Mobile Navigation**
-   - No hamburger menu for mobile
-   - Navigation menu may overflow on small screens
-
-## Recommended Improvements
-
-### Short-term Fixes
-1. Replace `useMemo` with `useEffect` for page reset logic
-2. Add TypeScript types for all mutation parameters
-3. Implement error boundaries around major sections
-4. Add stock checking before adding to cart
-5. Implement proper loading states for all async operations
-
-### Feature Enhancements
-
-**Payment Integration:**
-- Integrate Stripe or PayPal for checkout
-- Add order confirmation page
-- Implement order receipt emails
-
-**Order Management:**
-- Create orders table in Convex schema
-- Implement order history page
-- Add order tracking functionality
-- Build order status updates
-
-**User Experience:**
-- Add product reviews and ratings system
-- Implement wishlist functionality
-- Add product quick view modal
-- Improve mobile navigation with hamburger menu
-- Add product image gallery/carousel
-
-**Search & Discovery:**
-- Implement fuzzy search with relevance scoring
-- Add search autocomplete/suggestions
-- Create recently viewed products section
-- Add related products recommendations
-
-**Performance:**
-- Debounce search input to reduce queries
-- Implement virtual scrolling for large lists
-- Optimize image loading with next/image
-- Add client-side caching for filter results
-
-**Admin Features:**
-- Create admin dashboard for product management
-- Add inventory management system
-- Implement sales analytics
-- Build customer management tools
-
-### Performance Optimizations
-
-1. **Debounce Search Input**
-   ```typescript
-   const [debouncedSearch] = useDebounce(searchQuery, 300);
-   ```
-
-2. **Image Optimization**
-   - Use Next.js Image component consistently
-   - Implement proper loading states
-   - Add blur placeholders
-
-3. **Virtual Scrolling**
-   - For product lists exceeding 50+ items
-   - Reduces DOM nodes and improves performance
-
-4. **Caching Strategy**
-   - Cache filter results on client side
-   - Implement query result caching in Convex
-   - Add stale-while-revalidate patterns
-
-### Security Considerations
-
-**Current Security:**
-- Clerk middleware protects all routes except sign-in/sign-up
-- Convex validates all mutations server-side
-- User IDs properly isolated per user
-
-**Recommendations:**
-1. Add rate limiting for cart operations
-2. Validate all price calculations server-side
-3. Implement CSRF protection for mutations
-4. Add input sanitization for user-generated content
-5. Implement proper error messages without exposing system details
-6. Add request logging for security auditing
-
-## Data Flow Architecture
-
-```
-User Authentication (Clerk)
-        ↓
-   Middleware Check
-        ↓
-   SyncUser Component
-        ↓
-   Convex Database
-        ↓
-    ┌───┴───┐
-    ↓       ↓
-Products   Cart Items
-    ↓       ↓
-React Components (Queries)
-    ↓
-User Interactions
-    ↓
-Convex Mutations
-    ↓
-Real-time Updates
+### Database Operations
+```bash
+# View data in Convex dashboard
+# Run mutations/queries in Functions tab
+# Use convex CLI for migrations
+npx convex run adminProducts.createProduct {...}
 ```
 
-## Contributing
+---
 
-When contributing to this project:
+## 🎯 Key Implementation Details
 
-1. Follow the existing code structure
-2. Use TypeScript for type safety
-3. Write descriptive commit messages
-4. Test all cart operations thoroughly
-5. Ensure Clerk authentication works correctly
-6. Verify Convex queries return expected data
-7. Check mobile responsiveness
+### Dual Cart System
+```typescript
+// Authenticated users → Convex cart (real-time, synced)
+// Guest users → localStorage (persists across sessions)
+```
 
-## License
+### Category Locking in Products Page
+```typescript
+// URL params `?category=X&subcategory=Y` lock filters
+// User can still filter by type/size/price within locked scope
+```
 
-[Add your license here]
+### Stripe Checkout Flow
+```
+Cart → Create Session API → Stripe Checkout → Success/Cancel URL
+                              ↓
+                        Webhook/Metadata → Create Order
+                              ↓
+                        Clear Cart
+```
 
-## Support
+### Address Validation
+- US ZIP codes + Canadian postal codes
+- Real-time validation via Zippopotam.us API
+- Mandatory validation before saving/order placement
 
-For issues or questions:
-- Check existing issues in the repository
-- Review Convex documentation: https://docs.convex.dev
-- Review Clerk documentation: https://clerk.com/docs
-- Review Next.js documentation: https://nextjs.org/docs
+---
+
+## 📝 License
+
+MIT License - Feel free to use this template for your projects.
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a PR
+
+---
+
+## 📞 Support
+
+- **Convex Docs**: https://docs.convex.dev
+- **Clerk Docs**: https://clerk.com/docs
+- **Next.js Docs**: https://nextjs.org/docs
+- **Stripe Docs**: https://stripe.com/docs
+
+Built with ❤️ for the developer community.

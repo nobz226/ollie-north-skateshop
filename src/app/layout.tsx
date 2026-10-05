@@ -1,11 +1,33 @@
 import type { Metadata } from "next";
+import { Fraunces, Hanken_Grotesk, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
+import { ClerkProvider } from "@clerk/nextjs";
 import Providers from "./Providers";
 
+export const dynamic = 'force-dynamic';
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  axes: ["SOFT", "WONK", "opsz"],
+  variable: "--font-fraunces",
+});
+
+const hanken = Hanken_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-hanken",
+});
+
+const plexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-plex-mono",
+});
+
 export const metadata: Metadata = {
-  title: "Ollie North Skateshop - Premium Skate Gear",
+  title: "MD Plants | Carnivorous Plants for Enthusiasts",
   description:
-    "Your one-stop shop for skateboards, longboards, pennyboards, hardware, and apparel. Quality gear for all skill levels.",
+    "Venus flytraps, pitcher plants, sundews, butterworts and Nepenthes, nursery-grown and shipped with care. Plus seeds and carnivorous-safe growing supplies.",
 };
 
 export default function RootLayout({
@@ -14,18 +36,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Alumni+Sans+Pinstripe:ital@0;1&family=Saira+Stencil+One&family=Vend+Sans:ital,wght@0,300..700;1,300..700&display=swap" rel="stylesheet" />
-      </head>
-      <body className="antialiased">
-        <Providers>
-          {children}
-        </Providers>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" className={`${fraunces.variable} ${hanken.variable} ${plexMono.variable}`}>
+        <body className="antialiased">
+          <Providers>
+            {children}
+          </Providers>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
-

@@ -47,7 +47,7 @@ export default function AdminLayout({
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <h1 className="text-xl font-bold text-gray-900">
-                Ollie North Skateshop CMS
+                MD Plants CMS
               </h1>
             </div>
             <div className="flex items-center gap-4">

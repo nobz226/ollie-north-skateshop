@@ -818,9 +818,9 @@ export default function ProfilePage() {
                 </div>
                 <ul className="text-sm space-y-2">
                   <li>✓ Free shipping on all orders</li>
-                  <li>✓ Early access to new drops</li>
+                  <li>✓ Early access to new products</li>
                   <li>✓ Exclusive member discounts</li>
-                  <li>✓ Skate tips and tutorials</li>
+                  <li>✓ Priority customer support</li>
                 </ul>
               </div>
             </div>

@@ -9,7 +9,8 @@ import type { Id } from "../../convex/_generated/dataModel";
 import { useConvexUser } from "@/hooks/useConvexUser";
 import { useGuestCart } from "@/hooks/useGuestCart";
 import { useState } from "react";
-import { Heart, ShoppingCart } from "lucide-react";
+import { Heart, Plus, Check } from "lucide-react";
+import { latinFor, specimenNumber } from "@/lib/catalog";
 
 interface Product {
   _id: Id<"products">;
@@ -98,82 +99,90 @@ export default function ProductCard({ product }: ProductCardProps) {
     }
   };
 
+  const latin = latinFor(product.subcategory);
+  const lowStock =
+    product.inStock && product.stockQuantity !== undefined && product.stockQuantity > 0 && product.stockQuantity <= 5;
+
   return (
     <Link href={`/products/${product._id}`} className="group block h-full">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:border-cyan-500 transition-all duration-500 h-full flex flex-col">
-        {/* Product Image */}
-        <div className="relative h-72 bg-gray-50 overflow-hidden">
+      <article className="h-full flex flex-col">
+        {/* Arched specimen photo */}
+        <div className="relative aspect-[4/5] overflow-hidden rounded-t-[12rem] rounded-b-3xl bg-moss-100">
           <Image
             src={product.imageUrl}
             alt={product.name}
             fill
-            className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+            sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
+            className={`object-cover transition-transform duration-[1.2s] ease-[cubic-bezier(.22,1,.36,1)] group-hover:scale-110 ${
+              product.inStock ? "" : "grayscale-[60%]"
+            }`}
           />
-          {!product.inStock && (
-            <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center backdrop-blur-sm">
-              <span className="text-white font-bold text-lg tracking-wide">OUT OF STOCK</span>
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/40 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+
+          {/* Hanging specimen tag */}
+          <div className="absolute left-1/2 top-5 -translate-x-1/2">
+            <div className="origin-top transition-transform group-hover:animate-sway">
+              <div className="mx-auto h-3 w-px bg-ink/40" />
+              <span className="label block rounded-sm bg-parchment/95 px-2.5 py-1 text-[0.65rem] text-ink shadow-sm">
+                No. {specimenNumber(product._id)}
+              </span>
             </div>
+          </div>
+
+          {!product.inStock && (
+            <span className="label absolute right-4 bottom-20 rotate-[-8deg] rounded-sm border-2 border-trap-500 bg-parchment/90 px-3 py-1.5 text-trap-600">
+              Sold out · back soon
+            </span>
           )}
+
           {/* Wishlist Button - Only show for logged-in users */}
           {convexUser && (
             <button
               onClick={handleToggleWishlist}
-              className="absolute top-4 right-4 p-2.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-cyan-500 hover:text-white transition-all duration-300 z-10 group/heart"
+              aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+              className="absolute bottom-4 right-4 z-10 rounded-full bg-parchment/90 p-2.5 backdrop-blur-sm transition-all hover:scale-110"
             >
-              <Heart
-                className={`h-5 w-5 transition-all ${isInWishlist ? "fill-cyan-500 text-cyan-500 group-hover/heart:fill-white group-hover/heart:text-white" : "text-gray-700 group-hover/heart:text-white"}`}
-              />
+              <Heart className={`h-4 w-4 ${isInWishlist ? "fill-trap-500 text-trap-500" : "text-ink"}`} />
             </button>
           )}
-        </div>
 
-        {/* Product Details */}
-        <div className="p-5 flex-grow flex flex-col">
-          <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-cyan-600 transition-colors duration-300 line-clamp-1">
-            {product.name}
-          </h3>
-          <p className="text-sm text-gray-600 mb-2 uppercase tracking-wide">
-            {product.subcategory} {product.size && `• ${product.size}`}
-          </p>
+          {/* Quick add, slides up on hover */}
           {product.inStock && (
-            <p className="text-xs text-cyan-600 font-medium mb-2">
-              {product.stockQuantity && product.stockQuantity > 0
-                ? `${product.stockQuantity} in stock`
-                : "In stock"}
-            </p>
-          )}
-          <p className="text-gray-600 text-base line-clamp-2 mb-4 flex-grow leading-relaxed">
-            {product.description}
-          </p>
-
-          {/* Price and Add to Cart */}
-          <div className="flex items-center justify-between mt-auto">
-            <span className="text-2xl font-bold text-gray-900">
-              ${(product.price / 100).toFixed(2)}
-            </span>
             <button
               onClick={handleAddToCart}
-              disabled={Boolean(!product.inStock || isAddingToCart || userLoading)}
-              className={`px-5 py-2.5 rounded-lg text-base font-bold transition-all duration-300 transform hover:scale-105 active:scale-95 flex items-center gap-2 ${
-                showSuccess
-                  ? "bg-green-500 text-white shadow-lg"
-                  : product.inStock
-                  ? "bg-cyan-500 text-white hover:bg-cyan-600 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
-              }`}
+              disabled={Boolean(isAddingToCart || userLoading)}
+              className={`absolute bottom-4 left-4 z-10 flex items-center gap-2 rounded-full px-3 py-2 text-xs sm:px-4 sm:py-2.5 sm:text-sm font-medium shadow-lg transition-all duration-500 ease-[cubic-bezier(.22,1,.36,1)] md:translate-y-[150%] md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 ${
+                showSuccess ? "bg-moss-600 text-white" : "bg-ink text-parchment hover:bg-trap-500"
+              } ${convexUser ? "right-16" : "right-4"} justify-center disabled:opacity-60`}
             >
-              <ShoppingCart className="h-5 w-5" />
-              {showSuccess
-                ? "ADDED"
-                : isAddingToCart
-                ? "ADDING..."
-                : product.inStock
-                ? ""
-                : "OUT OF STOCK"}
+              {showSuccess ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+              {showSuccess ? "Added to bag" : isAddingToCart ? "Adding…" : "Add to bag"}
             </button>
-          </div>
+          )}
         </div>
-      </div>
+
+        {/* Label */}
+        <div className="flex flex-grow flex-col pt-5 px-1">
+          <p className="label mb-2 text-moss-600 truncate">
+            {latin ? <span className="latin normal-case tracking-normal text-[0.85rem]">{latin}</span> : product.subcategory}
+            {product.size && <span className="text-ink/40"> &nbsp;/&nbsp; {product.size}</span>}
+          </p>
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+            <h3 className="text-lg sm:text-[1.4rem] leading-tight text-ink transition-colors duration-300 group-hover:text-moss-700">
+              {product.name}
+            </h3>
+            <span className="font-display text-lg sm:text-[1.4rem] leading-tight text-ink">
+              ${(product.price / 100).toFixed(2)}
+            </span>
+          </div>
+          {lowStock && (
+            <p className="label mt-3 flex items-center gap-2 text-trap-600">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-trap-500" />
+              Only {product.stockQuantity} left
+            </p>
+          )}
+        </div>
+      </article>
     </Link>
   );
 }

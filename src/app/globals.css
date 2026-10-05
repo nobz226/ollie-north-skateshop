@@ -1,18 +1,64 @@
 @import "tailwindcss";
 
-:root {
-  --primary: #0A0A0A; /* Deep Black */
-  --accent: #06B6D4; /* Electric Cyan */
-  --background: #FFFFFF;
-  --text: #0A0A0A;
-  --gray-light: #F5F5F5;
-  --gray-medium: #737373;
-  --gray-dark: #262626;
-  
-  /* Font families */
-  --font-heading-1: "Saira Stencil One", sans-serif;
-  --font-heading-2: "Vend Sans", sans-serif;
-  --font-body: "Alumni Sans Pinstripe", sans-serif;
+/*
+ * MD Plants design tokens
+ * - moss:      bog greens, from pale lichen to near-black peat
+ * - trap:      the red inside a Venus flytrap's jaws (accent, use sparingly)
+ * - dew:       sundew-droplet amber for small highlights
+ * - parchment: field-journal paper used as the page background
+ */
+@theme {
+  --color-moss-50: #f2f4ec;
+  --color-moss-100: #e2e8d6;
+  --color-moss-200: #c6d2b2;
+  --color-moss-300: #a3b688;
+  --color-moss-400: #7f9963;
+  --color-moss-500: #627d49;
+  --color-moss-600: #4b6338;
+  --color-moss-700: #3b4f2d;
+  --color-moss-800: #2f3f25;
+  --color-moss-900: #23301d;
+  --color-moss-950: #121a10;
+
+  --color-trap-50: #fdf2ef;
+  --color-trap-100: #fbe1da;
+  --color-trap-200: #f6c1b3;
+  --color-trap-300: #ee9580;
+  --color-trap-400: #e0664d;
+  --color-trap-500: #c8442c;
+  --color-trap-600: #a83420;
+  --color-trap-700: #8a2a1a;
+
+  --color-dew-300: #f0cf7a;
+  --color-dew-400: #e3b448;
+  --color-dew-500: #c9952a;
+
+  --color-parchment: #f4efe3;
+  --color-parchment-dark: #e9e1cf;
+  --color-ink: #151b14;
+
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-sans: var(--font-hanken), system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  --animate-marquee: marquee 40s linear infinite;
+  --animate-marquee-reverse: marquee 40s linear infinite reverse;
+  --animate-spin-slow: spin 22s linear infinite;
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-sway: sway 6s ease-in-out infinite;
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-14px) scale(1.04); }
+  }
+  @keyframes sway {
+    0%, 100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+  }
 }
 
 html {
@@ -20,113 +66,84 @@ html {
 }
 
 body {
-  color: var(--text);
-  background: var(--background);
-  font-family: var(--font-body);
+  color: var(--color-ink);
+  background: var(--color-parchment);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  font-size: 18px;
+  font-size: 17px;
   line-height: 1.6;
 }
 
+/* Paper grain over the whole site for a printed, field-journal feel */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.07;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
 /* Typography */
-h1 {
-  font-family: var(--font-heading-1);
-  font-weight: 400;
-  letter-spacing: 0.05em;
-  opacity: 1;
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.05;
+  font-variation-settings: "SOFT" 50, "WONK" 0;
 }
 
-h2 {
-  font-family: var(--font-heading-2);
-  font-optical-sizing: auto;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  opacity: 1;
+/* Latin plant names and accent words: Fraunces' wonky italic */
+.latin,
+h1 em, h2 em, h3 em {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-variation-settings: "SOFT" 100, "WONK" 1;
 }
 
-h3, h4, h5, h6 {
-  font-family: var(--font-heading-2);
-  font-optical-sizing: auto;
-  font-weight: 800;
-  opacity: 1;
-}
-
-p {
-  font-weight: 700;
-  font-size: 1.1em;
-  opacity: 1;
-}
-
-span {
-  font-weight: 700;
-  opacity: 1;
-}
-
-a {
-  font-weight: 700;
-  opacity: 1;
-}
-
-button {
-  font-weight: 800;
-  font-size: 1.1em;
-  opacity: 1;
-}
-
-/* Improved text rendering */
-p, span, div, a, button {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
+/* Small typewriter-style specimen labels */
+.label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--gray-light);
+  background: var(--color-parchment-dark);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--accent);
-  border-radius: 4px;
+  background: var(--color-moss-700);
+  border-radius: 5px;
+  border: 2px solid var(--color-parchment-dark);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #0891B2;
+  background: var(--color-trap-500);
 }
 
-/* Animations */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+::selection {
+  background: var(--color-trap-500);
+  color: white;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
-  to {
-    opacity: 1;
-  }
-}
-
-.animate-fadeInUp {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-.animate-fadeIn {
-  animation: fadeIn 0.6s ease-out;
 }

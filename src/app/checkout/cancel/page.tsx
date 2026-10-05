@@ -19,7 +19,7 @@ export default function CheckoutCancelPage() {
         <div className="space-y-3">
           <button
             onClick={() => router.push("/cart")}
-            className="w-full px-6 py-3 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors font-bold"
+            className="w-full px-6 py-3 bg-moss-700 text-white rounded-lg hover:bg-moss-800 transition-colors font-bold"
           >
             Return to Cart
           </button>
