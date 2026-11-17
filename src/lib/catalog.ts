@@ -2,8 +2,10 @@
 // subcategories. Category/subcategory names must match the values stored on
 // products in Convex (see convex/seedProducts.ts).
 
-export const SHOP_NAME = "MD Plants";
-export const SHOP_TAGLINE = "Carnivorous plants, grown with care";
+export const SHOP_NAME = "Carnivorables";
+export const SHOP_TAGLINE = "Rare carnivorous plants, hand-grown";
+// TODO: replace with the client's real contact email
+export const SHOP_EMAIL = "hello@carnivorables.com";
 
 const img = (id: string, width = 800) =>
   `https://images.unsplash.com/photo-${id}?w=${width}&q=80`;
@@ -28,6 +30,8 @@ export const IMAGES = {
 export interface Subcategory {
   name: string;
   latin?: string;
+  /** How the genus catches prey, e.g. "Snap trap" */
+  hunt?: string;
   description: string;
   image: string;
 }
@@ -50,30 +54,35 @@ export const CATEGORIES: Category[] = [
       {
         name: "Venus Flytraps",
         latin: "Dionaea",
+        hunt: "Snap trap",
         description: "Dionaea muscipula: the classic snap-trap, from typicals to named cultivars",
         image: IMAGES.flytraps,
       },
       {
         name: "Pitcher Plants",
         latin: "Sarracenia",
+        hunt: "Pitfall trap",
         description: "Sarracenia: hardy North American trumpet pitchers in vivid colors",
         image: IMAGES.sarracenia,
       },
       {
         name: "Tropical Pitchers",
         latin: "Nepenthes",
+        hunt: "Hanging pitfall",
         description: "Nepenthes: hanging pitchers for windowsills, terrariums and greenhouses",
         image: IMAGES.nepenthes,
       },
       {
         name: "Sundews",
         latin: "Drosera",
+        hunt: "Sticky tentacles",
         description: "Drosera: sparkling sticky tentacles that curl around their prey",
         image: IMAGES.sundews,
       },
       {
         name: "Butterworts",
         latin: "Pinguicula",
+        hunt: "Flypaper leaves",
         description: "Pinguicula: flypaper rosettes with beautiful violet-like flowers",
         image: IMAGES.butterworts,
       },
@@ -185,4 +194,20 @@ export const CARE_INFO: Record<string, CareInfo> = {
     dormancy: "Mexican species have a dry 'succulent' winter phase",
     difficulty: "Intermediate",
   },
+};
+
+/** 1 -> "I", 14 -> "XIV". Used for numbering throughout the gothic design. */
+export const toRoman = (n: number) => {
+  const map: [number, string][] = [
+    [1000, "M"], [900, "CM"], [500, "D"], [400, "CD"], [100, "C"], [90, "XC"],
+    [50, "L"], [40, "XL"], [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"],
+  ];
+  let out = "";
+  for (const [value, numeral] of map) {
+    while (n >= value) {
+      out += numeral;
+      n -= value;
+    }
+  }
+  return out;
 };

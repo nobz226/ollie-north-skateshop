@@ -34,20 +34,20 @@ export default function WishlistPage() {
             <Breadcrumbs items={[{ label: "Wishlist", href: "/wishlist" }]} />
             <div className="min-h-[60vh] flex flex-col items-center justify-center">
               <div className="text-center max-w-md">
-                <h1 className="text-3xl font-bold text-gray-900 mb-4">Sign In Required</h1>
-                <p className="text-gray-600 mb-8">
+                <h1 className="text-3xl font-bold text-gray-100 mb-4">Sign In Required</h1>
+                <p className="text-gray-400 mb-8">
                   Please sign in to view your wishlist.
                 </p>
                 <div className="flex gap-4 justify-center">
                   <Link
                     href="/sign-in?redirectUrl=/wishlist"
-                    className="px-6 py-3 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
+                    className="px-6 py-3 bg-black text-bone rounded-md hover:bg-gray-200 transition-colors"
                   >
                     Sign In
                   </Link>
                   <button
                     onClick={() => router.back()}
-                    className="px-6 py-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                    className="px-6 py-3 border border-gray-700 rounded-md hover:bg-gray-950 transition-colors"
                   >
                     Go Back
                   </button>
@@ -102,11 +102,11 @@ export default function WishlistPage() {
           <div className="max-w-7xl mx-auto px-4 py-8">
             <Breadcrumbs items={[{ label: "Wishlist", href: "/wishlist" }]} />
             <div className="min-h-[60vh] flex flex-col items-center justify-center">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">Your Wishlist is Empty</h1>
-              <p className="text-gray-600 mb-8">Save items you love for later!</p>
+              <h1 className="text-3xl font-bold text-gray-100 mb-4">Your Wishlist is Empty</h1>
+              <p className="text-gray-400 mb-8">Save items you love for later!</p>
               <button
                 onClick={() => router.back()}
-                className="px-6 py-3 bg-moss-700 text-white rounded-md hover:bg-moss-800"
+                className="px-6 py-3 bg-fen-300 text-bone rounded-md hover:bg-fen-200"
               >
                 Continue Shopping
               </button>
@@ -121,19 +121,19 @@ export default function WishlistPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-grow bg-gray-50">
+      <main className="flex-grow bg-gray-950">
         <div className="max-w-7xl mx-auto px-4 py-8">
           <Breadcrumbs items={[{ label: "Wishlist", href: "/wishlist" }]} />
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">My Wishlist</h1>
+          <h1 className="text-3xl font-bold text-gray-100 mb-8">My Wishlist</h1>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {wishlist.map((item) => {
               if (!item.product) return null;
 
               return (
-                <div key={item._id} className="bg-white rounded-lg shadow-md overflow-hidden">
+                <div key={item._id} className="bg-vault rounded-lg shadow-md overflow-hidden">
                   {/* Product Image */}
-                  <Link href={`/products/${item.product._id}`} className="block relative h-48 bg-gray-200">
+                  <Link href={`/products/${item.product._id}`} className="block relative h-48 bg-gray-800">
                     <Image
                       src={item.product.imageUrl}
                       alt={item.product.name}
@@ -145,21 +145,21 @@ export default function WishlistPage() {
                         e.preventDefault();
                         handleRemove(item._id);
                       }}
-                      className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md hover:bg-gray-100"
+                      className="absolute top-2 right-2 p-2 bg-vault rounded-full shadow-md hover:bg-gray-900"
                     >
-                      <X className="h-4 w-4 text-gray-600" />
+                      <X className="h-4 w-4 text-gray-400" />
                     </button>
                   </Link>
 
                   {/* Product Info */}
                   <div className="p-4">
                     <Link href={`/products/${item.product._id}`}>
-                      <h3 className="font-semibold text-gray-900 mb-1 hover:text-moss-700">
+                      <h3 className="font-semibold text-gray-100 mb-1 hover:text-fen-300">
                         {item.product.name}
                       </h3>
                     </Link>
-                    <p className="text-sm text-gray-600 mb-2">{item.product.subcategory}</p>
-                    <p className="text-lg font-bold text-gray-900 mb-3">
+                    <p className="text-sm text-gray-400 mb-2">{item.product.subcategory}</p>
+                    <p className="text-lg font-bold text-gray-100 mb-3">
                       ${(item.product.price / 100).toFixed(2)}
                     </p>
 
@@ -168,8 +168,8 @@ export default function WishlistPage() {
                       disabled={!item.product.inStock}
                       className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                         item.product.inStock
-                          ? "bg-moss-700 text-white hover:bg-moss-800"
-                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          ? "bg-fen-300 text-bone hover:bg-fen-200"
+                          : "bg-gray-700 text-gray-500 cursor-not-allowed"
                       }`}
                     >
                       <ShoppingCart className="h-4 w-4" />

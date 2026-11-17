@@ -176,7 +176,7 @@ export default function ProductForm({ productId, onClose, onSuccess }: ProductFo
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto">
-      <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 my-8">
+      <div className="bg-vault rounded-lg p-6 max-w-2xl w-full mx-4 my-8">
         <h3 className="text-lg font-medium mb-4">
           {productId ? "Edit Product" : "Create New Product"}
         </h3>
@@ -184,7 +184,7 @@ export default function ProductForm({ productId, onClose, onSuccess }: ProductFo
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-300">
               Product Name *
             </label>
             <input
@@ -192,27 +192,27 @@ export default function ProductForm({ productId, onClose, onSuccess }: ProductFo
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-moss-600 focus:border-moss-600"
+              className="mt-1 block w-full px-3 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-fen-400 focus:border-fen-400"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-300">
               Description
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-moss-600 focus:border-moss-600"
+              className="mt-1 block w-full px-3 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-fen-400 focus:border-fen-400"
             />
           </div>
 
           {/* Price and Image URL */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-300">
                 Price (USD) *
               </label>
               <input
@@ -221,11 +221,11 @@ export default function ProductForm({ productId, onClose, onSuccess }: ProductFo
                 required
                 value={formData.price}
                 onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-moss-600 focus:border-moss-600"
+                className="mt-1 block w-full px-3 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-fen-400 focus:border-fen-400"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-300">
                 Size (optional)
               </label>
               <input
@@ -233,21 +233,21 @@ export default function ProductForm({ productId, onClose, onSuccess }: ProductFo
                 value={formData.size}
                 onChange={(e) => setFormData({ ...formData, size: e.target.value })}
                 placeholder="e.g., 8.0, M, L"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-moss-600 focus:border-moss-600"
+                className="mt-1 block w-full px-3 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-fen-400 focus:border-fen-400"
               />
             </div>
           </div>
 
           {/* Image Upload */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Product Image
             </label>
             
             <div className="space-y-3">
               {/* File Upload */}
               <div>
-                <label className="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-moss-700">
+                <label className="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-700 rounded-md shadow-sm text-sm font-medium text-gray-300 bg-vault hover:bg-gray-950 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-fen-300">
                   <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
@@ -260,15 +260,15 @@ export default function ProductForm({ productId, onClose, onSuccess }: ProductFo
                   />
                 </label>
                 {isUploading && (
-                  <p className="text-sm text-moss-800 mt-1">Uploading image...</p>
+                  <p className="text-sm text-fen-200 mt-1">Uploading image...</p>
                 )}
               </div>
 
               {/* OR divider */}
               <div className="flex items-center">
-                <div className="flex-grow border-t border-gray-300"></div>
+                <div className="flex-grow border-t border-gray-700"></div>
                 <span className="px-3 text-sm text-gray-500">OR</span>
-                <div className="flex-grow border-t border-gray-300"></div>
+                <div className="flex-grow border-t border-gray-700"></div>
               </div>
 
               {/* URL Input */}
@@ -282,15 +282,15 @@ export default function ProductForm({ productId, onClose, onSuccess }: ProductFo
                     setSelectedFile(null);
                   }}
                   placeholder="https://... (paste image URL)"
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-moss-700 focus:border-moss-700"
+                  className="block w-full px-3 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-fen-300 focus:border-fen-300"
                 />
               </div>
 
               {/* Image Preview */}
               {imagePreview && (
                 <div className="mt-3">
-                  <p className="text-sm font-medium text-gray-700 mb-2">Preview:</p>
-                  <div className="relative w-40 h-40 border-2 border-gray-200 rounded-lg overflow-hidden">
+                  <p className="text-sm font-medium text-gray-300 mb-2">Preview:</p>
+                  <div className="relative w-40 h-40 border-2 border-gray-800 rounded-lg overflow-hidden">
                     <Image
                       src={imagePreview}
                       alt="Preview"
@@ -306,14 +306,14 @@ export default function ProductForm({ productId, onClose, onSuccess }: ProductFo
           {/* Category Dropdowns */}
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-300">
                 Category *
               </label>
               <select
                 required
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-moss-600 focus:border-moss-600"
+                className="mt-1 block w-full px-3 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-fen-400 focus:border-fen-400"
               >
                 <option value="">Select...</option>
                 {categories?.categories.map((cat) => (
@@ -328,20 +328,20 @@ export default function ProductForm({ productId, onClose, onSuccess }: ProductFo
                   type="text"
                   placeholder="New category name"
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="mt-2 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="mt-2 block w-full px-3 py-2 border border-gray-700 rounded-md"
                 />
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-300">
                 Subcategory *
               </label>
               <select
                 required
                 value={formData.subcategory}
                 onChange={(e) => setFormData({ ...formData, subcategory: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-moss-600 focus:border-moss-600"
+                className="mt-1 block w-full px-3 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-fen-400 focus:border-fen-400"
               >
                 <option value="">Select...</option>
                 {categories?.subcategories.map((subcat) => (
@@ -356,20 +356,20 @@ export default function ProductForm({ productId, onClose, onSuccess }: ProductFo
                   type="text"
                   placeholder="New subcategory name"
                   onChange={(e) => setFormData({ ...formData, subcategory: e.target.value })}
-                  className="mt-2 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="mt-2 block w-full px-3 py-2 border border-gray-700 rounded-md"
                 />
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-300">
                 Product Type *
               </label>
               <select
                 required
                 value={formData.productType}
                 onChange={(e) => setFormData({ ...formData, productType: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-moss-600 focus:border-moss-600"
+                className="mt-1 block w-full px-3 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-fen-400 focus:border-fen-400"
               >
                 <option value="">Select...</option>
                 {categories?.productTypes.map((type) => (
@@ -384,7 +384,7 @@ export default function ProductForm({ productId, onClose, onSuccess }: ProductFo
                   type="text"
                   placeholder="New product type"
                   onChange={(e) => setFormData({ ...formData, productType: e.target.value })}
-                  className="mt-2 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="mt-2 block w-full px-3 py-2 border border-gray-700 rounded-md"
                 />
               )}
             </div>
@@ -398,23 +398,23 @@ export default function ProductForm({ productId, onClose, onSuccess }: ProductFo
                   type="checkbox"
                   checked={formData.inStock}
                   onChange={(e) => setFormData({ ...formData, inStock: e.target.checked })}
-                  className="h-4 w-4 text-moss-700 focus:ring-moss-600 border-gray-300 rounded"
+                  className="h-4 w-4 text-fen-300 focus:ring-fen-400 border-gray-700 rounded"
                 />
-                <span className="ml-2 text-sm text-gray-700">In Stock</span>
+                <span className="ml-2 text-sm text-gray-300">In Stock</span>
               </label>
               <label className="flex items-center">
                 <input
                   type="checkbox"
                   checked={formData.featured}
                   onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                  className="h-4 w-4 text-moss-700 focus:ring-moss-600 border-gray-300 rounded"
+                  className="h-4 w-4 text-fen-300 focus:ring-fen-400 border-gray-700 rounded"
                 />
-                <span className="ml-2 text-sm text-gray-700">Featured on Homepage</span>
+                <span className="ml-2 text-sm text-gray-300">Featured on Homepage</span>
               </label>
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-300">
                 Stock Quantity *
               </label>
               <input
@@ -423,15 +423,15 @@ export default function ProductForm({ productId, onClose, onSuccess }: ProductFo
                 required
                 value={formData.stockQuantity}
                 onChange={(e) => setFormData({ ...formData, stockQuantity: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-moss-600 focus:border-moss-600"
+                className="mt-1 block w-full px-3 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-fen-400 focus:border-fen-400"
               />
             </div>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <p className="text-sm text-red-800">{error}</p>
+            <div className="rounded-md bg-red-950 p-4">
+              <p className="text-sm text-red-200">{error}</p>
             </div>
           )}
 
@@ -441,14 +441,14 @@ export default function ProductForm({ productId, onClose, onSuccess }: ProductFo
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+              className="px-4 py-2 border border-gray-700 rounded-md text-gray-300 hover:bg-gray-950 disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 bg-moss-700 text-white rounded-md hover:bg-moss-800 disabled:opacity-50"
+              className="px-4 py-2 bg-fen-300 text-bone rounded-md hover:bg-fen-200 disabled:opacity-50"
             >
               {isSubmitting ? "Saving..." : productId ? "Update Product" : "Create Product"}
             </button>

@@ -1,64 +1,106 @@
 @import "tailwindcss";
 
 /*
- * MD Plants design tokens
- * - moss:      bog greens, from pale lichen to near-black peat
- * - trap:      the red inside a Venus flytrap's jaws (accent, use sparingly)
- * - dew:       sundew-droplet amber for small highlights
- * - parchment: field-journal paper used as the page background
+ * Carnivorables design tokens: "gothic botanical apothecary"
+ * Taken from the hand-inked blackletter logo.
+ * - crypt / vault: candle-black page and raised surfaces
+ * - bone:          aged-paper foreground (all body text)
+ * - blood:         rubrication red, used the way scribes used red ink: initials, accents, calls to action
+ * - fen:           desaturated bog green for secondary / success states
+ * - ember:         candle-flame amber for tiny highlights
+ * - gray:          warm stone greys (overrides Tailwind's cool greys)
  */
 @theme {
-  --color-moss-50: #f2f4ec;
-  --color-moss-100: #e2e8d6;
-  --color-moss-200: #c6d2b2;
-  --color-moss-300: #a3b688;
-  --color-moss-400: #7f9963;
-  --color-moss-500: #627d49;
-  --color-moss-600: #4b6338;
-  --color-moss-700: #3b4f2d;
-  --color-moss-800: #2f3f25;
-  --color-moss-900: #23301d;
-  --color-moss-950: #121a10;
+  --color-crypt: #0d0b0a;
+  --color-vault: #161210;
+  --color-bone: #ece3cf;
 
-  --color-trap-50: #fdf2ef;
-  --color-trap-100: #fbe1da;
-  --color-trap-200: #f6c1b3;
-  --color-trap-300: #ee9580;
-  --color-trap-400: #e0664d;
-  --color-trap-500: #c8442c;
-  --color-trap-600: #a83420;
-  --color-trap-700: #8a2a1a;
+  --color-blood-50: #fcf0ee;
+  --color-blood-100: #f8dcd7;
+  --color-blood-200: #f0b5ab;
+  --color-blood-300: #e5867a;
+  --color-blood-400: #d65a4c;
+  --color-blood-500: #b8352a;
+  --color-blood-600: #962a22;
+  --color-blood-700: #78221c;
+  --color-blood-800: #5a1a16;
+  --color-blood-900: #3d1210;
+  --color-blood-950: #220a09;
 
-  --color-dew-300: #f0cf7a;
-  --color-dew-400: #e3b448;
-  --color-dew-500: #c9952a;
+  --color-fen-50: #eef0e8;
+  --color-fen-100: #d9dece;
+  --color-fen-200: #b6c0a3;
+  --color-fen-300: #919f7b;
+  --color-fen-400: #6f7f5a;
+  --color-fen-500: #566544;
+  --color-fen-600: #434f36;
+  --color-fen-700: #343d2b;
+  --color-fen-800: #272e21;
+  --color-fen-900: #1b2018;
+  --color-fen-950: #10130e;
 
-  --color-parchment: #f4efe3;
-  --color-parchment-dark: #e9e1cf;
-  --color-ink: #151b14;
+  --color-ember-100: #fbecc8;
+  --color-ember-300: #f2c46d;
+  --color-ember-400: #e0a23e;
+  --color-ember-500: #c07f22;
+  --color-ember-700: #7a4d12;
 
-  --font-display: var(--font-fraunces), Georgia, serif;
-  --font-sans: var(--font-hanken), system-ui, sans-serif;
-  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+  --color-gray-50: #f6f3ee;
+  --color-gray-100: #ebe6dd;
+  --color-gray-200: #d7d0c3;
+  --color-gray-300: #bcb3a3;
+  --color-gray-400: #9c9282;
+  --color-gray-500: #7d7365;
+  --color-gray-600: #62594e;
+  --color-gray-700: #4a433b;
+  --color-gray-800: #332e29;
+  --color-gray-900: #221e1b;
+  --color-gray-950: #161311;
 
-  --animate-marquee: marquee 40s linear infinite;
-  --animate-marquee-reverse: marquee 40s linear infinite reverse;
-  --animate-spin-slow: spin 22s linear infinite;
-  --animate-float: float 7s ease-in-out infinite;
-  --animate-sway: sway 6s ease-in-out infinite;
+  /* Sharp corners everywhere: engraved plates, not pills (rounded-full dots stay round) */
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
+  --radius-4xl: 0px;
+
+  --font-gothic: var(--font-unifraktur), serif;
+  --font-display: var(--font-cinzel), Georgia, serif;
+  --font-rune: var(--font-cinzel-deco), var(--font-cinzel), serif;
+  --font-sans: var(--font-spectral), Georgia, serif;
+  --font-label: var(--font-cinzel), Georgia, serif;
+  --font-mono: ui-monospace, SFMono-Regular, monospace;
+
+  --animate-marquee: marquee 50s linear infinite;
+  --animate-marquee-reverse: marquee 50s linear infinite reverse;
+  --animate-rise: rise 14s linear infinite;
+  --animate-flicker: flicker 5s ease-in-out infinite;
 
   @keyframes marquee {
     from { transform: translateX(0); }
     to { transform: translateX(-50%); }
   }
-  @keyframes float {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-14px) scale(1.04); }
+  /* Spores / embers drifting upward */
+  @keyframes rise {
+    0% { transform: translate3d(0, 0, 0); opacity: 0; }
+    10% { opacity: 1; }
+    50% { transform: translate3d(14px, -45vh, 0); }
+    90% { opacity: 0.8; }
+    100% { transform: translate3d(-10px, -90vh, 0); opacity: 0; }
   }
-  @keyframes sway {
-    0%, 100% { transform: rotate(-3deg); }
-    50% { transform: rotate(3deg); }
+  @keyframes flicker {
+    0%, 100% { opacity: 0.85; }
+    40% { opacity: 1; }
+    45% { opacity: 0.7; }
+    60% { opacity: 0.95; }
   }
+}
+
+:root {
+  color-scheme: dark;
 }
 
 html {
@@ -66,75 +108,197 @@ html {
 }
 
 body {
-  color: var(--color-ink);
-  background: var(--color-parchment);
+  color: var(--color-bone);
+  background: var(--color-crypt);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
   font-size: 17px;
-  line-height: 1.6;
+  font-weight: 300;
+  line-height: 1.7;
 }
 
-/* Paper grain over the whole site for a printed, field-journal feel */
+/* Film grain + candle vignette over the whole site */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 100;
-  opacity: 0.07;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.09;
+  mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.5) 100%);
 }
 
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
-  font-weight: 500;
-  letter-spacing: -0.015em;
-  line-height: 1.05;
-  font-variation-settings: "SOFT" 50, "WONK" 0;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.08;
 }
 
-/* Latin plant names and accent words: Fraunces' wonky italic */
-.latin,
-h1 em, h2 em, h3 em {
-  font-family: var(--font-display);
+/* Section headings (h1/h2) in heavy blackletter like the logo.
+   Smaller h3+ titles (cards, product names) stay in Cinzel for readability. */
+h1, h2 {
+  font-family: var(--font-gothic);
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.1;
+}
+
+/* Latin plant names: Spectral italic */
+.latin {
+  font-family: var(--font-sans);
   font-style: italic;
-  font-variation-settings: "SOFT" 100, "WONK" 1;
+  font-weight: 300;
+  letter-spacing: 0;
+}
+/* Accent words inside headings stay carved capitals, rubricated red */
+h1 em, h2 em, h3 em {
+  font-style: normal;
+  color: var(--color-blood-400);
+}
+h1 .latin, h2 .latin, h3 .latin {
+  color: inherit;
 }
 
-/* Small typewriter-style specimen labels */
+/* Blackletter, echoing the logo. Use for short words only: numerals, initials, titles. */
+.gothic {
+  font-family: var(--font-gothic);
+  font-weight: 700;
+  letter-spacing: 0;
+  font-style: normal;
+}
+
+/* Ornamented Roman numerals */
+.rune {
+  font-family: var(--font-rune);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  font-style: normal;
+}
+
+/* Small carved caps for labels */
 .label {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.14em;
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
+}
+
+/* Pointed Gothic (lancet) window: an image mask that stretches to any box */
+.lancet {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M0 100V34C0 14 22 4 50 0c28 4 50 14 50 34v66z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M0 100V34C0 14 22 4 50 0c28 4 50 14 50 34v66z'/%3E%3C/svg%3E");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+/* Photos sit muted and candle-lit, then come alive when their card is hovered */
+.specimen-img {
+  filter: grayscale(0.5) sepia(0.25) brightness(0.82) contrast(1.08);
+  transition: filter 0.9s cubic-bezier(0.22, 1, 0.36, 1), transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.group:hover .specimen-img,
+.specimen-img.is-alive {
+  filter: none;
+}
+
+/* Double hairline frame, like an engraved plate border */
+.frame {
+  position: relative;
+  border: 1px solid color-mix(in srgb, var(--color-bone) 16%, transparent);
+}
+.frame::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid color-mix(in srgb, var(--color-bone) 7%, transparent);
+  pointer-events: none;
+}
+
+/* Buttons: sharp, engraved, never pills */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 1.9rem;
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: 0.74rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  transition: background-color 0.35s, color 0.35s, border-color 0.35s, box-shadow 0.35s;
+}
+.btn-blood {
+  background: var(--color-blood-600);
+  color: var(--color-bone);
+  box-shadow: inset 0 0 0 1px rgba(236, 227, 207, 0.18), 0 0 0 1px var(--color-blood-600);
+}
+.btn-blood:hover {
+  background: var(--color-blood-500);
+  box-shadow: inset 0 0 0 1px rgba(236, 227, 207, 0.35), 0 0 30px -4px rgba(184, 53, 42, 0.6);
+}
+.btn-ghost {
+  border: 1px solid color-mix(in srgb, var(--color-bone) 30%, transparent);
+  color: var(--color-bone);
+}
+.btn-ghost:hover {
+  border-color: var(--color-bone);
+  background: var(--color-bone);
+  color: var(--color-crypt);
+}
+
+/* Link with a red rule that grows from the centre */
+.link-rule {
+  position: relative;
+}
+.link-rule::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  right: 50%;
+  bottom: -4px;
+  height: 1px;
+  background: var(--color-blood-400);
+  transition: left 0.35s, right 0.35s;
+}
+.link-rule:hover::after,
+.link-rule[aria-current="page"]::after {
+  left: 0;
+  right: 0;
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
 }
-
 ::-webkit-scrollbar-track {
-  background: var(--color-parchment-dark);
+  background: var(--color-crypt);
 }
-
 ::-webkit-scrollbar-thumb {
-  background: var(--color-moss-700);
-  border-radius: 5px;
-  border: 2px solid var(--color-parchment-dark);
+  background: var(--color-gray-800);
+  border: 2px solid var(--color-crypt);
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-trap-500);
+  background: var(--color-blood-600);
 }
 
 ::selection {
-  background: var(--color-trap-500);
-  color: white;
+  background: var(--color-blood-600);
+  color: var(--color-bone);
 }
 
 @media (prefers-reduced-motion: reduce) {

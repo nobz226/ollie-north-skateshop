@@ -15,14 +15,14 @@ export default function AdminDashboard() {
   return (
     <div>
       {/* Tab Navigation */}
-      <div className="border-b border-gray-200 mb-6">
+      <div className="border-b border-gray-800 mb-6">
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveTab("products")}
             className={`${
               activeTab === "products"
-                ? "border-moss-600 text-moss-700"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                ? "border-fen-400 text-fen-300"
+                : "border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-700"
             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
           >
             Products Management
@@ -31,8 +31,8 @@ export default function AdminDashboard() {
             onClick={() => setActiveTab("categories")}
             className={`${
               activeTab === "categories"
-                ? "border-moss-600 text-moss-700"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                ? "border-fen-400 text-fen-300"
+                : "border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-700"
             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
           >
             Categories & Types
@@ -41,8 +41,8 @@ export default function AdminDashboard() {
             onClick={() => setActiveTab("orders")}
             className={`${
               activeTab === "orders"
-                ? "border-moss-600 text-moss-700"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                ? "border-fen-400 text-fen-300"
+                : "border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-700"
             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
           >
             Order History
@@ -96,27 +96,27 @@ function ProductsTab() {
             placeholder="Search products..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
+            className="w-full px-4 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-fen-400"
           />
         </div>
         <button
           onClick={() => setIsCreating(true)}
-          className="ml-4 px-4 py-2 bg-moss-700 text-white rounded-md hover:bg-moss-800"
+          className="ml-4 px-4 py-2 bg-fen-300 text-bone rounded-md hover:bg-fen-200"
         >
           Add New Product
         </button>
       </div>
 
       {/* Product Count */}
-      <div className="text-sm text-gray-600">
+      <div className="text-sm text-gray-400">
         Showing {filteredProducts?.length || 0} of {products.length} products
       </div>
 
       {/* Products Table */}
-      <div className="bg-white shadow overflow-hidden rounded-lg">
+      <div className="bg-vault shadow overflow-hidden rounded-lg">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-gray-800">
+            <thead className="bg-gray-950">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Image
@@ -138,7 +138,7 @@ function ProductsTab() {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-vault divide-y divide-gray-800">
               {filteredProducts?.map((product) => (
                 <tr key={product._id}>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -152,21 +152,21 @@ function ProductsTab() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm font-medium text-gray-900">{product.name}</div>
+                    <div className="text-sm font-medium text-gray-100">{product.name}</div>
                     <div className="text-sm text-gray-500">{product.subcategory}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {product.category}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
                     ${(product.price / 100).toFixed(2)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-none ${
                         product.inStock
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
+                          ? "bg-green-900 text-green-200"
+                          : "bg-red-900 text-red-200"
                       }`}
                     >
                       {product.inStock ? "In Stock" : "Out of Stock"}
@@ -175,13 +175,13 @@ function ProductsTab() {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <button
                       onClick={() => setEditingProduct(product._id)}
-                      className="text-moss-700 hover:text-moss-900 mr-4"
+                      className="text-fen-300 hover:text-fen-100 mr-4"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDelete(product._id)}
-                      className="text-red-600 hover:text-red-900"
+                      className="text-red-400 hover:text-red-100"
                     >
                       Delete
                     </button>
@@ -236,11 +236,11 @@ function CategoriesTab() {
 
 function CategoryList({ title, items }: { title: string; items: string[] }) {
   return (
-    <div className="bg-white p-6 rounded-lg shadow">
-      <h3 className="text-lg font-medium text-gray-900 mb-4">{title}</h3>
+    <div className="bg-vault p-6 rounded-lg shadow">
+      <h3 className="text-lg font-medium text-gray-100 mb-4">{title}</h3>
       <ul className="space-y-2 max-h-96 overflow-y-auto">
         {items.map((item) => (
-          <li key={item} className="text-sm text-gray-700 py-1 border-b border-gray-100">
+          <li key={item} className="text-sm text-gray-300 py-1 border-b border-gray-900">
             {item}
           </li>
         ))}
@@ -271,24 +271,24 @@ function OrdersTab() {
     <div className="space-y-6">
       {/* Order Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-6 rounded-lg shadow">
+        <div className="bg-vault p-6 rounded-lg shadow">
           <div className="text-sm text-gray-500">Total Orders</div>
           <div className="text-2xl font-bold">{stats.totalOrders}</div>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow">
+        <div className="bg-vault p-6 rounded-lg shadow">
           <div className="text-sm text-gray-500">Total Revenue</div>
           <div className="text-2xl font-bold">${(stats.totalRevenue / 100).toFixed(2)}</div>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow">
+        <div className="bg-vault p-6 rounded-lg shadow">
           <div className="text-sm text-gray-500">Avg Order Value</div>
           <div className="text-2xl font-bold">${(stats.averageOrderValue / 100).toFixed(2)}</div>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow">
+        <div className="bg-vault p-6 rounded-lg shadow">
           <div className="text-sm text-gray-500">Filter by User</div>
           <select
             value={selectedUserId}
             onChange={(e) => setSelectedUserId(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+            className="mt-1 block w-full px-3 py-2 border border-gray-700 rounded-md text-sm"
           >
             <option value="">All Users</option>
             {users?.map((user) => (
@@ -301,11 +301,11 @@ function OrdersTab() {
       </div>
 
       {/* Orders List */}
-      <div className="bg-white shadow overflow-hidden rounded-lg">
+      <div className="bg-vault shadow overflow-hidden rounded-lg">
         {filteredOrders && filteredOrders.length > 0 ? (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-800">
+              <thead className="bg-gray-950">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                     Order Date
@@ -324,10 +324,10 @@ function OrdersTab() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-vault divide-y divide-gray-800">
                 {filteredOrders.map((order) => (
                   <tr key={order._id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -336,11 +336,11 @@ function OrdersTab() {
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {order.items.length} item(s)
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-100">
                       ${(order.total / 100).toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-none bg-green-900 text-green-200">
                         {order.status}
                       </span>
                     </td>

@@ -1,113 +1,91 @@
 "use client";
 
 import Link from "next/link";
-import { Instagram, Facebook, Youtube, ArrowUp } from "lucide-react";
-import { CATEGORIES, SHOP_NAME } from "@/lib/catalog";
-import { TrapMark } from "@/components/motion";
+import { ArrowUp } from "lucide-react";
+import { CATEGORIES, SHOP_EMAIL, SHOP_NAME } from "@/lib/catalog";
+import { Flourish, Wordmark } from "@/components/motion";
 
-const linkClass =
-  "text-parchment/60 hover:text-parchment transition-colors";
+const linkClass = "text-bone/55 transition-colors hover:text-bone";
 
+// TODO: replace with the client's real social profiles
 const SOCIALS = [
-  { href: "https://instagram.com", label: "Instagram", icon: Instagram },
-  { href: "https://facebook.com", label: "Facebook", icon: Facebook },
-  { href: "https://youtube.com", label: "YouTube", icon: Youtube },
+  { href: "https://instagram.com", label: "Instagram" },
+  { href: "https://facebook.com", label: "Facebook" },
+  { href: "https://youtube.com", label: "YouTube" },
 ];
 
 export default function Footer() {
   return (
-    <footer className="relative overflow-hidden bg-ink text-parchment">
-      <div className="container mx-auto px-4 pt-20">
-        <div className="grid grid-cols-2 gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
-          {/* About */}
-          <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="group inline-flex items-center gap-3">
-              <TrapMark className="h-10 w-10 text-parchment" />
-              <span className="font-display text-3xl">
-                MD <em className="latin text-moss-300">Plants</em>
-              </span>
-            </Link>
-            <p className="mt-5 max-w-xs text-sm text-parchment/60 leading-relaxed">
-              Hobbyist-grown carnivorous plants for collectors and the newly curious.
-              Every plant is raised in our own collection and packed by hand.
-            </p>
-            <div className="mt-6 flex gap-3">
-              {SOCIALS.map(({ href, label, icon: Icon }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-parchment/20 text-parchment/70 transition-all hover:border-trap-400 hover:bg-trap-500 hover:text-white"
-                >
-                  <Icon className="h-4 w-4" />
-                </a>
-              ))}
-            </div>
-          </div>
+    <footer className="relative overflow-hidden border-t border-bone/10 bg-crypt">
+      {/* Red glow rising from below, like a hearth */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[60%] bg-[radial-gradient(ellipse_at_bottom,rgba(150,42,34,0.22),transparent_65%)]" />
 
-          {/* Shop */}
+      <div className="container relative mx-auto px-4 pt-20">
+        <div className="flex flex-col items-center text-center">
+          <Flourish />
+          <p className="latin mt-6 max-w-xl text-2xl text-bone/70 md:text-3xl">
+            Rare carnivorous plants, raised in rainwater and shipped to hunt in your home.
+          </p>
+        </div>
+
+        <div className="mt-16 grid grid-cols-2 gap-10 border-y border-bone/10 py-12 md:grid-cols-4">
           <div>
-            <h3 className="label mb-5 text-trap-300">Shop</h3>
-            <ul className="space-y-3 text-sm">
-              <li>
-                <Link href="/products" className={linkClass}>
-                  All products
-                </Link>
-              </li>
+            <h3 className="label mb-5 text-blood-400">Shop</h3>
+            <ul className="space-y-2.5">
+              <li><Link href="/products" className={linkClass}>All specimens</Link></li>
               {CATEGORIES.map((category) => (
                 <li key={category.slug}>
-                  <Link href={`/${category.slug}`} className={linkClass}>
-                    {category.name}
-                  </Link>
+                  <Link href={`/${category.slug}`} className={linkClass}>{category.name}</Link>
                 </li>
               ))}
             </ul>
           </div>
-
-          {/* Info */}
           <div>
-            <h3 className="label mb-5 text-trap-300">Info</h3>
-            <ul className="space-y-3 text-sm">
+            <h3 className="label mb-5 text-blood-400">Learn</h3>
+            <ul className="space-y-2.5">
               <li><Link href="/care" className={linkClass}>Care guide</Link></li>
-              <li><Link href="/about" className={linkClass}>About</Link></li>
+              <li><Link href="/about" className={linkClass}>Our story</Link></li>
               <li><Link href="/about#shipping" className={linkClass}>Shipping</Link></li>
-              <li><Link href="/profile" className={linkClass}>My account</Link></li>
             </ul>
           </div>
-
-          {/* Contact */}
           <div>
-            <h3 className="label mb-5 text-trap-300">Contact</h3>
-            {/* TODO: replace with the client's real contact details */}
-            <ul className="space-y-3 text-sm text-parchment/60">
-              <li>hello@mdplants.com</li>
+            <h3 className="label mb-5 text-blood-400">Account</h3>
+            <ul className="space-y-2.5">
+              <li><Link href="/profile" className={linkClass}>Profile</Link></li>
+              <li><Link href="/wishlist" className={linkClass}>Wishlist</Link></li>
+              <li><Link href="/cart" className={linkClass}>Bag</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="label mb-5 text-blood-400">Correspondence</h3>
+            <ul className="space-y-2.5 text-bone/55">
+              <li><a href={`mailto:${SHOP_EMAIL}`} className={linkClass}>{SHOP_EMAIL}</a></li>
               <li>Local pickup by appointment</li>
-              <li>Ships Mon–Wed</li>
+              {SOCIALS.map(({ href, label }) => (
+                <li key={label}>
+                  <a href={href} target="_blank" rel="noopener noreferrer" className={linkClass}>
+                    {label} ↗
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
 
-        <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-parchment/10 py-6 text-xs text-parchment/40 sm:flex-row">
-          <p className="label">&copy; {new Date().getFullYear()} {SHOP_NAME} · Grown with care</p>
+        <div className="flex flex-col items-center justify-between gap-4 py-6 text-bone/40 sm:flex-row">
+          <p className="label text-[0.66rem]">&copy; {new Date().getFullYear()} {SHOP_NAME} · Grown in the dark, shipped into the light</p>
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="label flex items-center gap-2 hover:text-parchment transition-colors"
+            className="label flex items-center gap-2 text-[0.66rem] transition-colors hover:text-bone"
           >
-            Back to top <ArrowUp className="h-3.5 w-3.5" />
+            Ascend <ArrowUp className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>
 
-      {/* Giant outlined wordmark */}
-      <div aria-hidden className="pointer-events-none select-none overflow-hidden text-center leading-[0.8] -mb-[0.1em] pt-6">
-        <span
-          className="font-display block whitespace-nowrap text-[19vw] text-transparent"
-          style={{ WebkitTextStroke: "1.5px var(--color-moss-600)" }}
-        >
-          MD <em className="latin">Plants</em>
-        </span>
+      {/* Giant wordmark, cropped by the bottom edge */}
+      <div aria-hidden className="relative mx-auto -mb-[3vw] w-[110%] max-w-none -translate-x-[4.5%] px-4 opacity-[0.12]">
+        <Wordmark />
       </div>
     </footer>
   );

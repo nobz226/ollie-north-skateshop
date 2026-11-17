@@ -227,7 +227,7 @@ export default function ProductsPageContent() {
         <Header />
         <main className="flex-grow flex items-center justify-center">
           <div className="text-center">
-            <div className="latin text-3xl text-ink/60 animate-pulse">Gathering specimens…</div>
+            <div className="latin text-3xl text-bone/60 animate-pulse">Gathering specimens…</div>
           </div>
         </main>
         <Footer />
@@ -243,15 +243,15 @@ export default function ProductsPageContent() {
         {/* Page Header */}
         <section className="container mx-auto px-4 pt-10 pb-4">
           <Breadcrumbs items={breadcrumbItems} />
-          <div className="mt-8 flex flex-col gap-4 border-b border-ink/15 pb-10 md:flex-row md:items-end md:justify-between">
+          <div className="mt-8 flex flex-col gap-4 border-b border-bone/15 pb-10 md:flex-row md:items-end md:justify-between">
             <SplitReveal
               key={pageTitle}
               as="h1"
               inView={false}
               text={latinFor(pageTitle) ? `*${latinFor(pageTitle)}*` : pageTitle === "ALL PRODUCTS" ? "The whole *bog*" : pageTitle}
-              className="text-6xl md:text-8xl leading-[0.95] text-ink capitalize"
+              className="text-6xl md:text-8xl leading-[0.95] text-bone capitalize"
             />
-            <p className="label text-ink/50 md:text-right">
+            <p className="label text-bone/50 md:text-right">
               {latinFor(pageTitle) ? `${pageTitle} · ` : ""}
               {filteredProducts.length} specimens available
             </p>
@@ -262,13 +262,13 @@ export default function ProductsPageContent() {
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Filters Sidebar */}
             <aside className="lg:w-64 flex-shrink-0">
-              <div className="sticky top-32 rounded-3xl border border-ink/10 bg-white/60 p-6 backdrop-blur">
+              <div className="sticky top-32 rounded-3xl border border-bone/10 bg-vault/60 p-6 backdrop-blur">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-2xl">Refine</h2>
                   {hasActiveFilters && (
                     <button
                       onClick={resetFilters}
-                      className="label text-trap-500 hover:text-trap-600 transition-colors"
+                      className="label text-blood-500 hover:text-blood-400 transition-colors"
                     >
                       Reset
                     </button>
@@ -277,24 +277,24 @@ export default function ProductsPageContent() {
 
                 {/* Search */}
                 <div className="mb-6">
-                  <label className="label block mb-2 text-ink/60">SEARCH</label>
+                  <label className="label block mb-2 text-bone/60">SEARCH</label>
                   <input
                     type="text"
                     placeholder="Search products..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-ink/15 rounded-full bg-parchment/60 focus:outline-none focus:ring-2 focus:ring-moss-600 focus:border-transparent transition-all"
+                    className="w-full px-4 py-2.5 border border-bone/15 rounded-none bg-crypt/60 focus:outline-none focus:ring-2 focus:ring-fen-400 focus:border-transparent transition-all"
                   />
                 </div>
 
                 {/* Product Type Filter - Show when on filtered page */}
                 {isFilteredPage && (
                   <div className="mb-6">
-                    <label className="label block mb-2 text-ink/60">PRODUCT TYPE</label>
+                    <label className="label block mb-2 text-bone/60">PRODUCT TYPE</label>
                     <select
                       value={selectedProductType}
                       onChange={(e) => setSelectedProductType(e.target.value)}
-                      className="w-full px-4 py-2.5 border border-ink/15 rounded-full bg-parchment/60 focus:outline-none focus:ring-2 focus:ring-moss-600 focus:border-transparent transition-all bg-white"
+                      className="w-full px-4 py-2.5 border border-bone/15 rounded-none bg-crypt/60 focus:outline-none focus:ring-2 focus:ring-fen-400 focus:border-transparent transition-all bg-vault"
                     >
                       <option value="">All Types</option>
                       {productTypes.map((type) => (
@@ -309,11 +309,11 @@ export default function ProductsPageContent() {
                 {/* Size Filter - Show when product type is selected */}
                 {isFilteredPage && selectedProductType !== "" && (
                   <div className="mb-6">
-                    <label className="label block mb-2 text-ink/60">SIZE</label>
+                    <label className="label block mb-2 text-bone/60">SIZE</label>
                     <select
                       value={selectedSize}
                       onChange={(e) => setSelectedSize(e.target.value)}
-                      className="w-full px-4 py-2.5 border border-ink/15 rounded-full bg-parchment/60 focus:outline-none focus:ring-2 focus:ring-moss-600 focus:border-transparent transition-all bg-white"
+                      className="w-full px-4 py-2.5 border border-bone/15 rounded-none bg-crypt/60 focus:outline-none focus:ring-2 focus:ring-fen-400 focus:border-transparent transition-all bg-vault"
                     >
                       <option value="">All Sizes</option>
                       {sizes.map((size) => (
@@ -327,7 +327,7 @@ export default function ProductsPageContent() {
 
                 {/* Price Range - Always show */}
                 <div className="mb-6">
-                  <label className="label block mb-2 text-ink/60">PRICE RANGE: ${(priceRange[0] / 100).toFixed(0)} - ${(priceRange[1] / 100).toFixed(0)}
+                  <label className="label block mb-2 text-bone/60">PRICE RANGE: ${(priceRange[0] / 100).toFixed(0)} - ${(priceRange[1] / 100).toFixed(0)}
                   </label>
                   <input
                     type="range"
@@ -336,7 +336,7 @@ export default function ProductsPageContent() {
                     step="500"
                     value={priceRange[1]}
                     onChange={(e) => setPriceRange([0, parseInt(e.target.value)])}
-                    className="w-full accent-trap-500"
+                    className="w-full accent-blood-500"
                   />
                 </div>
               </div>
@@ -346,7 +346,7 @@ export default function ProductsPageContent() {
             <div className="flex-grow">
               {/* Results Info */}
               <div className="flex items-center justify-between mb-6">
-                <p className="label text-ink/50">
+                <p className="label text-bone/50">
                   Showing {filteredProducts.length > 0 ? startIndex + 1 : 0}-{Math.min(endIndex, filteredProducts.length)} of{" "}
                   {filteredProducts.length} products
                 </p>
@@ -359,7 +359,7 @@ export default function ProductsPageContent() {
                   {hasActiveFilters && (
                     <button
                       onClick={resetFilters}
-                      className="text-moss-700 hover:text-moss-800 font-bold transition-colors"
+                      className="text-fen-300 hover:text-fen-200 font-bold transition-colors"
                     >
                       Clear all filters
                     </button>
@@ -381,7 +381,7 @@ export default function ProductsPageContent() {
                       <button
                         onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                         disabled={currentPage === 1}
-                        className="label px-6 py-3 border border-ink/15 rounded-full disabled:opacity-40 disabled:cursor-not-allowed hover:bg-ink hover:text-parchment transition-all"
+                        className="label px-6 py-3 border border-bone/15 rounded-none disabled:opacity-40 disabled:cursor-not-allowed hover:bg-bone hover:text-crypt transition-all"
                       >
                         PREVIOUS
                       </button>
@@ -392,8 +392,8 @@ export default function ProductsPageContent() {
                           onClick={() => setCurrentPage(page)}
                           className={`h-11 w-11 border rounded-full font-mono text-sm transition-all ${
                             currentPage === page
-                              ? "bg-ink text-parchment border-ink"
-                              : "border-ink/15 hover:border-ink"
+                              ? "bg-bone text-crypt border-bone"
+                              : "border-bone/15 hover:border-bone"
                           }`}
                         >
                           {page}
@@ -403,7 +403,7 @@ export default function ProductsPageContent() {
                       <button
                         onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                         disabled={currentPage === totalPages}
-                        className="label px-6 py-3 border border-ink/15 rounded-full disabled:opacity-40 disabled:cursor-not-allowed hover:bg-ink hover:text-parchment transition-all"
+                        className="label px-6 py-3 border border-bone/15 rounded-none disabled:opacity-40 disabled:cursor-not-allowed hover:bg-bone hover:text-crypt transition-all"
                       >
                         NEXT
                       </button>

@@ -509,11 +509,11 @@ export default function CheckoutPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <Breadcrumbs items={[{ label: "Checkout", href: "/checkout" }]} />
         <div className="min-h-[60vh] flex flex-col items-center justify-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Your cart is empty</h1>
-          <p className="text-gray-600 mb-8">Add some products before checking out!</p>
+          <h1 className="text-3xl font-bold text-gray-100 mb-4">Your cart is empty</h1>
+          <p className="text-gray-400 mb-8">Add some products before checking out!</p>
           <button
             onClick={() => router.back()}
-            className="px-6 py-3 bg-black text-white rounded-md hover:bg-gray-800"
+            className="px-6 py-3 bg-black text-bone rounded-md hover:bg-gray-200"
           >
             Continue Shopping
           </button>
@@ -530,18 +530,18 @@ export default function CheckoutPage() {
           { label: "Checkout", href: "/checkout" }
         ]} 
       />
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
+      <h1 className="text-3xl font-bold text-gray-100 mb-8">Checkout</h1>
 
       <form onSubmit={handleSubmitOrder}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Forms Section */}
           <div className="lg:col-span-2 space-y-8">
             {/* Shipping Information */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Shipping Information</h2>
+            <div className="bg-vault rounded-lg shadow p-6">
+              <h2 className="text-xl font-bold text-gray-100 mb-4">Shipping Information</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Full Name *
                   </label>
                   <input
@@ -552,11 +552,11 @@ export default function CheckoutPage() {
                       setShippingForm({ ...shippingForm, fullName: e.target.value });
                       if (hasExistingShipping) setShippingModified(true);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
+                    className="w-full px-4 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-fen-400"
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Address Line 1 *
                   </label>
                   <input
@@ -567,11 +567,11 @@ export default function CheckoutPage() {
                       setShippingForm({ ...shippingForm, addressLine1: e.target.value });
                       if (hasExistingShipping) setShippingModified(true);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
+                    className="w-full px-4 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-fen-400"
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Address Line 2
                   </label>
                   <input
@@ -581,11 +581,11 @@ export default function CheckoutPage() {
                       setShippingForm({ ...shippingForm, addressLine2: e.target.value });
                       if (hasExistingShipping) setShippingModified(true);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
+                    className="w-full px-4 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-fen-400"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     City *
                   </label>
                   <input
@@ -598,11 +598,11 @@ export default function CheckoutPage() {
                       setShippingForm({ ...shippingForm, city: e.target.value });
                       if (hasExistingShipping) setShippingModified(true);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
+                    className="w-full px-4 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-fen-400"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Country *
                   </label>
                   <select
@@ -612,14 +612,14 @@ export default function CheckoutPage() {
                       setShippingForm({ ...shippingForm, country: e.target.value, state: "" });
                       if (hasExistingShipping) setShippingModified(true);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
+                    className="w-full px-4 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-fen-400"
                   >
                     <option value="USA">United States</option>
                     <option value="Canada">Canada</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     State/Province *
                   </label>
                   <select
@@ -629,7 +629,7 @@ export default function CheckoutPage() {
                       setShippingForm({ ...shippingForm, state: e.target.value });
                       if (hasExistingShipping) setShippingModified(true);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
+                    className="w-full px-4 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-fen-400"
                   >
                     <option value="">Select {shippingForm.country === "USA" ? "State" : "Province"}</option>
                     {stateOptions.map((option) => (
@@ -640,7 +640,7 @@ export default function CheckoutPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Postal Code *
                   </label>
                   <input
@@ -656,7 +656,7 @@ export default function CheckoutPage() {
                       shippingForm.country === "Canada" ? "A1A 1A1" :
                       "Postal Code"
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
+                    className="w-full px-4 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-fen-400"
                   />
                   <p className="text-xs text-gray-500 mt-1">
                     {shippingForm.country === "USA" && "5 digits (e.g., 90210 or 90210-1234)"}
@@ -669,10 +669,10 @@ export default function CheckoutPage() {
                         addressValidation.isValidating
                           ? "bg-blue-50 text-blue-700"
                           : addressValidation.isValid === true
-                          ? "bg-green-50 text-green-700"
+                          ? "bg-green-950 text-green-300"
                           : addressValidation.isValid === false
-                          ? "bg-red-50 text-red-700"
-                          : "bg-gray-50 text-gray-700"
+                          ? "bg-red-950 text-red-300"
+                          : "bg-gray-950 text-gray-300"
                       }`}
                     >
                       <p className="font-medium">{addressValidation.message}</p>
@@ -686,7 +686,7 @@ export default function CheckoutPage() {
                   )}
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Phone Number *
                   </label>
                   <input
@@ -697,18 +697,18 @@ export default function CheckoutPage() {
                       setShippingForm({ ...shippingForm, phone: e.target.value });
                       if (hasExistingShipping) setShippingModified(true);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
+                    className="w-full px-4 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-fen-400"
                   />
                 </div>
               </div>
             </div>
 
             {/* Payment Information */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Payment Information</h2>
+            <div className="bg-vault rounded-lg shadow p-6">
+              <h2 className="text-xl font-bold text-gray-100 mb-4">Payment Information</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Cardholder Name *
                   </label>
                   <input
@@ -719,11 +719,11 @@ export default function CheckoutPage() {
                       setPaymentForm({ ...paymentForm, cardHolderName: e.target.value });
                       if (hasExistingPayment) setPaymentModified(true);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
+                    className="w-full px-4 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-fen-400"
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Card Number *
                   </label>
                   <input
@@ -736,11 +736,11 @@ export default function CheckoutPage() {
                       setPaymentForm({ ...paymentForm, cardNumber: e.target.value });
                       if (hasExistingPayment) setPaymentModified(true);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
+                    className="w-full px-4 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-fen-400"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Expiry Month *
                   </label>
                   <input
@@ -753,11 +753,11 @@ export default function CheckoutPage() {
                       setPaymentForm({ ...paymentForm, expiryMonth: e.target.value });
                       if (hasExistingPayment) setPaymentModified(true);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
+                    className="w-full px-4 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-fen-400"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     Expiry Year *
                   </label>
                   <input
@@ -770,11 +770,11 @@ export default function CheckoutPage() {
                       setPaymentForm({ ...paymentForm, expiryYear: e.target.value });
                       if (hasExistingPayment) setPaymentModified(true);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
+                    className="w-full px-4 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-fen-400"
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
                     CVV *
                   </label>
                   <input
@@ -784,7 +784,7 @@ export default function CheckoutPage() {
                     maxLength={4}
                     value={paymentForm.cvv}
                     onChange={(e) => setPaymentForm({ ...paymentForm, cvv: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-moss-600"
+                    className="w-full px-4 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-fen-400"
                   />
                 </div>
               </div>
@@ -796,8 +796,8 @@ export default function CheckoutPage() {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow p-6 sticky top-4">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Order Summary</h2>
+            <div className="bg-vault rounded-lg shadow p-6 sticky top-4">
+              <h2 className="text-xl font-bold text-gray-100 mb-4">Order Summary</h2>
               
               {/* Cart Items */}
               <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
@@ -816,13 +816,13 @@ export default function CheckoutPage() {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
+                        <p className="text-sm font-medium text-gray-100 truncate">
                           {item.product.name}
                         </p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-gray-400">
                           Qty: {item.quantity}
                         </p>
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-sm font-medium text-gray-100">
                           ${((item.product.price * item.quantity) / 100).toFixed(2)}
                         </p>
                       </div>
@@ -832,15 +832,15 @@ export default function CheckoutPage() {
               </div>
 
               <div className="border-t pt-4 space-y-3">
-                <div className="flex justify-between text-gray-700">
+                <div className="flex justify-between text-gray-300">
                   <span>Subtotal</span>
                   <span>${(subtotal / 100).toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-gray-700">
+                <div className="flex justify-between text-gray-300">
                   <span>Tax (8%)</span>
                   <span>${(tax / 100).toFixed(2)}</span>
                 </div>
-                <div className="border-t pt-3 flex justify-between text-lg font-bold text-gray-900">
+                <div className="border-t pt-3 flex justify-between text-lg font-bold text-gray-100">
                   <span>Total</span>
                   <span>${(total / 100).toFixed(2)}</span>
                 </div>
@@ -849,7 +849,7 @@ export default function CheckoutPage() {
               <button
                 type="submit"
                 disabled={isProcessing}
-                className="w-full mt-6 bg-moss-700 text-white py-3 rounded-md font-semibold hover:bg-moss-800 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="w-full mt-6 bg-fen-300 text-bone py-3 rounded-md font-semibold hover:bg-fen-200 disabled:bg-gray-600 disabled:cursor-not-allowed"
               >
                 {isProcessing ? "Processing..." : "Place Order"}
               </button>
@@ -867,11 +867,11 @@ export default function CheckoutPage() {
       {/* Save to Profile Modal */}
       {showSaveModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">
+          <div className="bg-vault rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-xl font-bold text-gray-100 mb-4">
               {hasExistingShipping || hasExistingPayment ? "Save Changes?" : "Save Information?"}
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-400 mb-6">
               {hasExistingShipping || hasExistingPayment
                 ? "You've made changes to your shipping or payment information. Would you like to save these changes to your profile?"
                 : "Would you like to save this shipping and payment information to your profile for faster checkout next time?"}
@@ -883,7 +883,7 @@ export default function CheckoutPage() {
                   setShowSaveModal(false);
                   processOrder();
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+                className="flex-1 px-4 py-2 border border-gray-700 text-gray-300 rounded-md hover:bg-gray-950"
               >
                 Just This Order
               </button>
@@ -893,7 +893,7 @@ export default function CheckoutPage() {
                   setShowSaveModal(false);
                   processOrder();
                 }}
-                className="flex-1 px-4 py-2 bg-moss-700 text-white rounded-md hover:bg-moss-800"
+                className="flex-1 px-4 py-2 bg-fen-300 text-bone rounded-md hover:bg-fen-200"
               >
                 Save to Profile
               </button>

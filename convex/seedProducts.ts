@@ -1,6 +1,6 @@
 import { mutation } from "./_generated/server";
 
-// Demo catalog for MD Plants. Category/subcategory names must match
+// Demo catalog for Carnivorables. Category/subcategory names must match
 // src/lib/catalog.ts so the category pages and care info line up.
 
 const img = (id: string) => `https://images.unsplash.com/photo-${id}?w=800&q=80`;

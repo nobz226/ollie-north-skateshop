@@ -134,16 +134,16 @@ export default function CartPage() {
         <Breadcrumbs items={[{ label: "Shopping Cart", href: "/cart" }]} />
         <div className="min-h-[60vh] flex flex-col items-center justify-center">
           <div className="text-center max-w-md">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-24 h-24 bg-gray-900 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-12 h-12 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
               </svg>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Your Cart is Empty</h1>
-            <p className="text-gray-600 mb-8">Your bog is looking a little empty. Find a hungry new plant!</p>
+            <h1 className="text-3xl font-bold text-gray-100 mb-4">Your Cart is Empty</h1>
+            <p className="text-gray-400 mb-8">Your bog is looking a little empty. Find a hungry new plant!</p>
             <button
               onClick={() => router.back()}
-              className="px-8 py-4 bg-moss-700 text-white rounded-lg hover:bg-moss-800 font-bold transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="px-8 py-4 bg-fen-300 text-bone rounded-lg hover:bg-fen-200 font-bold transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               CONTINUE SHOPPING
             </button>
@@ -156,13 +156,13 @@ export default function CartPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <Breadcrumbs items={[{ label: "Shopping Cart", href: "/cart" }]} />
-      <h1 className="text-4xl font-bold text-gray-900 mb-8">Shopping Cart</h1>
+      <h1 className="text-4xl font-bold text-gray-100 mb-8">Shopping Cart</h1>
 
       {isGuest && (
-        <div className="mb-6 p-4 bg-moss-50 border border-moss-200 rounded-lg">
-          <p className="text-moss-950">
+        <div className="mb-6 p-4 bg-fen-950 border border-fen-800 rounded-lg">
+          <p className="text-fen-50">
             <span className="font-semibold">Guest Mode:</span>{" "}
-            <Link href="/sign-in?redirectUrl=/cart" className="underline font-semibold hover:text-moss-800 transition-colors">
+            <Link href="/sign-in?redirectUrl=/cart" className="underline font-semibold hover:text-fen-200 transition-colors">
               Sign in
             </Link>{" "}
             to save your cart.
@@ -184,7 +184,7 @@ export default function CartPage() {
             return (
               <div
                 key={item.product?._id?.toString() || `product-${Math.random()}`}
-                className="bg-white rounded-xl shadow-md border border-gray-100 p-6 flex gap-6 hover:shadow-lg transition-shadow duration-300"
+                className="bg-vault rounded-xl shadow-md border border-gray-900 p-6 flex gap-6 hover:shadow-lg transition-shadow duration-300"
               >
                 {/* Product Image */}
                 <div className="relative h-28 w-28 flex-shrink-0 rounded-lg overflow-hidden">
@@ -198,14 +198,14 @@ export default function CartPage() {
 
                 {/* Product Details */}
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-bold text-gray-900 mb-1">
+                  <h3 className="text-lg font-bold text-gray-100 mb-1">
                     {item.product.name}
                   </h3>
-                  <p className="text-sm text-gray-600 mb-2 uppercase tracking-wide">
+                  <p className="text-sm text-gray-400 mb-2 uppercase tracking-wide">
                     {item.product.subcategory}
                     {item.product.size && ` • ${item.product.size}`}
                   </p>
-                  <p className="text-xl font-bold text-gray-900">
+                  <p className="text-xl font-bold text-gray-100">
                     ${(item.product.price / 100).toFixed(2)}
                   </p>
                 </div>
@@ -217,7 +217,7 @@ export default function CartPage() {
                       onClick={() =>
                         handleQuantityChange(cartItemId as Id<"cartItems">, productId, item.quantity - 1)
                       }
-                      className="w-9 h-9 rounded-lg border-2 border-gray-300 flex items-center justify-center hover:border-moss-700 hover:text-moss-700 transition-all font-bold"
+                      className="w-9 h-9 rounded-lg border-2 border-gray-700 flex items-center justify-center hover:border-fen-300 hover:text-fen-300 transition-all font-bold"
                       aria-label="Decrease quantity"
                     >
                       -
@@ -229,7 +229,7 @@ export default function CartPage() {
                       onClick={() =>
                         handleQuantityChange(cartItemId as Id<"cartItems">, productId, item.quantity + 1)
                       }
-                      className="w-9 h-9 rounded-lg border-2 border-gray-300 flex items-center justify-center hover:border-moss-700 hover:text-moss-700 transition-all font-bold"
+                      className="w-9 h-9 rounded-lg border-2 border-gray-700 flex items-center justify-center hover:border-fen-300 hover:text-fen-300 transition-all font-bold"
                       aria-label="Increase quantity"
                     >
                       +
@@ -237,7 +237,7 @@ export default function CartPage() {
                   </div>
                   <button
                     onClick={() => handleRemoveItem(cartItemId as Id<"cartItems"> | undefined, productId)}
-                    className="text-sm text-red-500 hover:text-red-700 font-bold transition-colors"
+                    className="text-sm text-red-500 hover:text-red-300 font-bold transition-colors"
                   >
                     REMOVE
                   </button>
@@ -249,28 +249,28 @@ export default function CartPage() {
 
         {/* Order Summary */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 sticky top-4">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          <div className="bg-vault rounded-xl shadow-lg border border-gray-900 p-6 sticky top-4">
+            <h2 className="text-2xl font-bold text-gray-100 mb-6">
               Order Summary
             </h2>
 
             <div className="space-y-4 mb-6">
-              <div className="flex justify-between text-gray-700">
+              <div className="flex justify-between text-gray-300">
                 <span className="font-medium">Subtotal ({activeCart.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
                 <span className="font-bold">${(subtotal / 100).toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-gray-700">
+              <div className="flex justify-between text-gray-300">
                 <span className="font-medium">Tax (8%)</span>
                 <span className="font-bold">${(tax / 100).toFixed(2)}</span>
               </div>
-              <div className="border-t-2 border-gray-200 pt-4 flex justify-between text-xl font-bold text-gray-900">
+              <div className="border-t-2 border-gray-800 pt-4 flex justify-between text-xl font-bold text-gray-100">
                 <span>Total</span>
-                <span className="text-moss-700">${(total / 100).toFixed(2)}</span>
+                <span className="text-fen-300">${(total / 100).toFixed(2)}</span>
               </div>
             </div>
 
             <button
-              className="w-full bg-moss-700 text-white py-4 rounded-lg font-bold hover:bg-moss-800 mb-3 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-fen-300 text-bone py-4 rounded-lg font-bold hover:bg-fen-200 mb-3 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
               onClick={handleStripeCheckout}
               disabled={isCheckingOut || activeCart.length === 0}
             >
@@ -279,7 +279,7 @@ export default function CartPage() {
 
             <button
               onClick={() => router.back()}
-              className="block w-full text-center text-moss-800 hover:text-moss-900 font-bold transition-colors"
+              className="block w-full text-center text-fen-200 hover:text-fen-100 font-bold transition-colors"
             >
               CONTINUE SHOPPING
             </button>
