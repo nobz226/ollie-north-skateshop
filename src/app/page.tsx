@@ -2,16 +2,9 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { useQuery } from "convex/react";
-import {
-  AnimatePresence,
-  motion,
-  useMotionValue,
-  useScroll,
-  useSpring,
-  useTransform,
-} from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, ArrowUpRight, Droplets, PackageCheck, Sprout, MessageCircle } from "lucide-react";
 import { api } from "../../convex/_generated/api";
 import ProductCard from "@/components/ProductCard";
@@ -284,15 +277,8 @@ function GenusTicker() {
   );
 }
 
-/** Editorial index of plant types with an image that follows the cursor. */
+/** Editorial index of plant types. */
 function CollectionIndex() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState<number | null>(null);
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const x = useSpring(mx, { stiffness: 160, damping: 22 });
-  const y = useSpring(my, { stiffness: 160, damping: 22 });
-
   return (
     <section className="container mx-auto px-4 py-24">
       <div className="mb-12 grid gap-6 md:grid-cols-2 md:items-end">
@@ -310,21 +296,11 @@ function CollectionIndex() {
         </Reveal>
       </div>
 
-      <div
-        ref={ref}
-        className="relative"
-        onMouseMove={(e) => {
-          const rect = ref.current!.getBoundingClientRect();
-          mx.set(e.clientX - rect.left);
-          my.set(e.clientY - rect.top);
-        }}
-        onMouseLeave={() => setActive(null)}
-      >
+      <div>
         {GENERA.map((g, i) => (
           <Reveal key={g.name} delay={i * 0.06} y={20}>
             <Link
               href={subcategoryHref(g.name)}
-              onMouseEnter={() => setActive(i)}
               className="group relative grid grid-cols-[auto_1fr_auto] items-center gap-6 border-t border-ink/15 py-7 last:border-b md:grid-cols-[80px_1.2fr_1fr_140px_auto]"
             >
               <span className="label text-ink/40">0{i + 1}</span>
@@ -347,27 +323,6 @@ function CollectionIndex() {
             </Link>
           </Reveal>
         ))}
-
-        {/* Cursor-following preview (desktop) */}
-        <motion.div
-          className="pointer-events-none absolute left-0 top-0 z-20 hidden md:block"
-          style={{ x, y }}
-        >
-          <AnimatePresence mode="popLayout">
-            {active !== null && (
-              <motion.div
-                key={active}
-                className="relative -ml-32 -mt-44 h-80 w-64 overflow-hidden rounded-t-[8rem] rounded-b-2xl shadow-2xl"
-                initial={{ opacity: 0, scale: 0.7, rotate: -8 }}
-                animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                exit={{ opacity: 0, scale: 0.8, rotate: 8 }}
-                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <Image src={GENERA[active].image} alt="" fill sizes="256px" className="object-cover" />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
       </div>
     </section>
   );
